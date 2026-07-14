@@ -433,6 +433,22 @@ function uInput(prefix,value,id,onblur,suffix,disabled){
 }
 
 // ── VALIDATION ────────────────────────────────────────────────────────────────
+function validateInputs(){
+  var errs=[];
+  if(+S.price<=0) errs.push("Asset price must be greater than zero");
+  if(+S.life<=0) errs.push("Asset life must be greater than zero");
+  if(S.salvage!==''&&+S.salvage<0) errs.push("Salvage value cannot be negative");
+  if(S.salvage!==''&&+S.salvage>=+S.price) errs.push("Salvage cannot equal or exceed the asset price");
+  if(+S.term<=0) errs.push("Lease term must be greater than zero");
+  if(+S.term>+S.life) errs.push("Lease term cannot exceed asset life");
+  if(S.deposit&&+S.depositAmt<0) errs.push("Deposit amount cannot be negative");
+  if(+S.leasePmt<=0) errs.push("Lease payment must be greater than zero");
+  if(S.method==="Double-declining"&&!(+S.ddbRate>0)) errs.push("Depreciation rate must be greater than zero for double-declining method");
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.borrowRate<=0) errs.push("Borrowing rate must be greater than zero");
+  if(+S.roi<=0) errs.push("Required return on investment must be greater than zero");
+  return errs;
+}
 function goToResults(){
   var missing=[];
     if(!S.price)missing.push("Purchase Price");

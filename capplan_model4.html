@@ -801,7 +801,21 @@ function renderPage2(){
 
 function updYB(altIdx,yr,val){while(S.alts[altIdx].yearlyBenefits.length<=yr)S.alts[altIdx].yearlyBenefits.push(0);S.alts[altIdx].yearlyBenefits[yr]=val}
 
+function validateInputs(){
+  var errs=[];
+  if(+S.currentSalvage<0) errs.push("Current asset trade-in value cannot be negative");
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.coc<=0) errs.push("Required return must be greater than zero");
+  S.options&&S.options.forEach(function(o,i){
+    if(o.cost!==undefined&&+o.cost<=0) errs.push("Option "+(i+1)+" cost must be greater than zero");
+    if(o.life!==undefined&&+o.life<=0) errs.push("Option "+(i+1)+" life must be greater than zero");
+    if(o.salvageNew!==undefined&&+o.salvageNew<0) errs.push("Option "+(i+1)+" salvage cannot be negative");
+    if(o.salvageNew!==undefined&&o.cost&&+o.salvageNew>=+o.cost) errs.push("Option "+(i+1)+" salvage cannot equal or exceed its cost");
+  });
+  return errs;
+}
 function runCalc(){
+  var valErrs=validateInputs();if(valErrs.length>0){S.missing=valErrs;render();return;}
   try{
     var results=[];
     for(var i=0;i<S.numAlts;i++)results.push(calcAsset(S.alts[i],S.taxRate,S.coc));

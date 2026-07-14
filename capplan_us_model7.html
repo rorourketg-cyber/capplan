@@ -488,6 +488,20 @@ function selectAssetType(name){S.assetTypeSel=name;S.propertyClass=suggestProper
 function applyHours(){
   var h=Math.round(S.hrs_wdays*S.hrs_hpday*S.hrs_util/100);S.hours=h;S.hrs_open=false;render();
 }
+function validateInputs(){
+  var errs=[];
+  if(+S.cost<=0) errs.push("Asset cost must be greater than zero");
+  if(!S.propertyClass) errs.push("MACRS property class must be selected");
+  if(+S.life<=0) errs.push("Asset life must be greater than zero");
+  if(S.salvage!==''&&+S.salvage<0) errs.push("Salvage value cannot be negative");
+  if(S.salvage!==''&&+S.salvage>=+S.cost) errs.push("Salvage cannot equal or exceed the asset cost");
+  if(+S.hours<=0) errs.push("Annual hours must be greater than zero");
+  if(+S.om1<0) errs.push("Year 1 O&M cannot be negative");
+  if(S.section179!==''&&+S.section179>+S.cost) errs.push("Section 179 cannot exceed the asset cost");
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.coc<=0) errs.push("Required return must be greater than zero");
+  return errs;
+}
 function goToResults(){
   var missing=[];
   if(!S.cost)missing.push("Asset Cost");if(!S.propertyClass)missing.push("MACRS Property Class");
@@ -496,7 +510,9 @@ function goToResults(){
   if(!S.hours)missing.push("Annual Billable Hours");
   if(!S.taxRate)missing.push("Tax Rate");if(!S.coc)missing.push("Required Rate of Return");
   if(missing.length>0){S.missingFields=missing;render();return;}
-  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+  S.missingFields=null;
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
+  try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
 }
 function resetInputs(){
   S.cost="";S.propertyClass="";S.assetTypeSel="";S.bonusElected=false;S.section179="";

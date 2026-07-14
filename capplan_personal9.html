@@ -220,6 +220,20 @@ function makeBNList(notes,id){var list=document.getElementById(id);if(!list)retu
 function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last?" last":"")+'"><div class="field-label">'+l+'</div>'+h+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';}
 function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--green)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
 
+function validateInputs(){
+  var errs=[];
+  if(+S.price<=0) errs.push("Purchase price must be greater than zero");
+  if(+S.life<=0) errs.push("Asset life must be greater than zero");
+  if(S.salvage!==''&&+S.salvage<0) errs.push("Resale value cannot be negative");
+  if(S.salvage!==''&&+S.salvage>=+S.price) errs.push("Resale value cannot equal or exceed the purchase price");
+  if(+S.term<=0) errs.push("Lease term must be greater than zero");
+  if(+S.term>+S.life) errs.push("Lease term cannot exceed asset life");
+  if(S.deposit&&+S.depositAmt<0) errs.push("Deposit amount cannot be negative");
+  if(+S.leasePmt<=0) errs.push("Lease payment must be greater than zero");
+  if(+S.borrowRate<=0) errs.push("Borrowing rate must be greater than zero");
+  if(+S.borrowRate>=100) errs.push("Borrowing rate cannot equal or exceed 100%");
+  return errs;
+}
 function goToResults(){
   var missing=[];
   if(!S.price)missing.push("Purchase price");if(!S.life)missing.push("How long you'll keep it");
@@ -228,7 +242,9 @@ function goToResults(){
   if(S.deposit&&(!S.depositAmt&&S.depositAmt!==0))missing.push("Deposit amount");
   if(!S.leasePmt)missing.push("Lease payment");if(!S.borrowRate)missing.push("Your borrowing rate");
   if(missing.length>0){S.missingFields=missing;render();return;}
-  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+  S.missingFields=null;
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
+  try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
 }
 function resetInputs(){S.price="";S.life="";S.salvage="";S.term="";S.deposit=true;S.depositAmt="";S.depositReturned=true;S.freq=1;S.leasePmt="";S.borrowRate="";S.missingFields=null;S.choosing_lease=false;S.res=null;render();}
 function loadExample(){S.price=35000;S.life=4;S.salvage=12000;S.term=4;S.deposit=true;S.depositAmt=3000;S.depositReturned=true;S.freq=12;S.leasePmt=650;S.borrowRate=6;S.missingFields=null;render();}

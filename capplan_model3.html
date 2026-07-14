@@ -700,6 +700,18 @@ function renderPage2(){
 }
 
 function updateYB(idx,val){while(S.yearlyBenefits.length<=idx)S.yearlyBenefits.push(0);S.yearlyBenefits[idx]=val}
+function validateInputs(){
+  var errs=[];
+  if(+S.cost<=0) errs.push("New asset cost must be greater than zero");
+  if(+S.life<=0) errs.push("Asset life must be greater than zero");
+  if(S.salvageNew!==undefined&&+S.salvageNew<0) errs.push("New asset salvage cannot be negative");
+  if(S.salvageNew!==undefined&&S.cost&&+S.salvageNew>=+S.cost) errs.push("New asset salvage cannot equal or exceed its cost");
+  if(+S.currentSalvage<0) errs.push("Current asset trade-in value cannot be negative");
+  if(S.method==="Double-declining"&&!(+S.ddbRate>0)) errs.push("Depreciation rate must be greater than zero");
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.coc<=0) errs.push("Required return must be greater than zero");
+  return errs;
+}
 function runCalc(){try{S.res=calcAll();S.page=3;render()}catch(e){console.error(e);alert("Calculation error: "+e.message)}}
 
 // ── PAGE 3 ────────────────────────────────────────────────────────────────────

@@ -188,13 +188,25 @@ function makeBNList(notes,id){var list=document.getElementById(id);if(!list)retu
 function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last?" last":"")+'"><div class="field-label">'+l+'</div>'+h+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';}
 function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--green)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
 
+function validateInputs(){
+  var errs=[];
+  if(+S.price<=0) errs.push("Purchase price must be greater than zero");
+  if(S.life===''||+S.life<=0) errs.push("Ownership period must be greater than zero");
+  if(S.salvage!==''&&+S.salvage<0) errs.push("Resale value cannot be negative");
+  if(S.salvage!==''&&S.price!==''&&+S.salvage>=+S.price) errs.push("Resale value cannot equal or exceed the purchase price");
+  if(S.benefits!==''&&+S.benefits<0) errs.push("Annual value cannot be negative");
+  if(+S.coc<=0) errs.push("Target return must be greater than zero");
+  return errs;
+}
 function goToResults(){
   var missing=[];
   if(!S.price)missing.push("Purchase price");if(!S.life)missing.push("How long you will keep it");
   if(!S.salvage&&S.salvage!==0)missing.push("Expected resale value");
   if(!S.benefits&&S.benefits!==0)missing.push("Annual value you expect");if(!S.coc)missing.push("Target return");
   if(missing.length>0){S.missingFields=missing;render();return;}
-  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+  S.missingFields=null;
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
+  try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
 }
 function resetInputs(){S.price="";S.life="";S.salvage="";S.benefits="";S.coc="";S.assetType="";S.missingFields=null;S.bw_open=false;S.bw_spend="";S.bw_pct="";S.res=null;S.page=1;render();}
 function loadExample(){S.price=28000;S.life=6;S.salvage=8000;S.benefits=5500;S.coc=6;S.assetType="vehicle";S.missingFields=null;render();}

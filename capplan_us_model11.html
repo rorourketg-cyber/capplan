@@ -497,6 +497,21 @@ var NOTES2=[
 
 function makeBNList(notes,id){var list=document.getElementById(id);if(!list)return;list.innerHTML="";notes.forEach(function(n,i){var item=document.createElement("div");item.className="bn-item";var head=document.createElement("div");head.className="bn-head";head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+id+i+'">›</div>';var body=document.createElement("div");body.className="bn-body";body.textContent=n.a;head.onclick=function(){var open=body.classList.contains("open");body.classList.toggle("open");document.getElementById("arr"+id+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";head.style.background=open?"":"var(--surface)";};item.appendChild(head);item.appendChild(body);list.appendChild(item);});}
 
+function validateInputs(){
+  var errs=[];
+  if(+S.price<=0) errs.push("Asset price must be greater than zero");
+  if(!S.propertyClass) errs.push("MACRS property class must be selected");
+  if(+S.life<=0) errs.push("Asset life must be greater than zero");
+  if(S.salvage!==''&&+S.salvage<0) errs.push("Salvage value cannot be negative");
+  if(S.salvage!==''&&+S.salvage>=+S.price) errs.push("Salvage cannot equal or exceed the asset price");
+  if(+S.term<=0) errs.push("Lease term must be greater than zero");
+  if(+S.term>+S.life) errs.push("Lease term cannot exceed asset life");
+  if(S.deposit&&+S.depositAmt<0) errs.push("Deposit amount cannot be negative");
+  if(+S.leasePmt<=0) errs.push("Lease payment must be greater than zero");
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.borrowRate<=0) errs.push("Borrowing rate must be greater than zero");
+  return errs;
+}
 function goToResults(){
   var missing=[];
   if(!S.price)missing.push("Asset Price");if(!S.propertyClass)missing.push("MACRS Property Class");
@@ -504,7 +519,9 @@ function goToResults(){
   if(!S.term)missing.push("Lease Term");if(!S.leasePmt)missing.push("Lease Payment");
   if(!S.taxRate)missing.push("Tax Rate");if(!S.borrowRate)missing.push("Borrowing Rate");
   if(missing.length>0){S.missingFields=missing;render();return;}
-  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+  S.missingFields=null;
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
+  try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
 }
 function resetInputs(){
   S.price="";S.propertyClass="";S.assetTypeSel="";S.bonusElected=false;S.section179="";

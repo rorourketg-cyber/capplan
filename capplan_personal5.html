@@ -220,12 +220,28 @@ function applyAssetClass(id){
   render();
 }
 
+function validateInputs(){
+  var errs=[];
+  if(+S.price<=0) errs.push("Purchase price must be greater than zero");
+  if(+S.life<=0) errs.push("Maximum useful life must be greater than zero");
+  if(S.currentAge!==''&&+S.currentAge<0) errs.push("Current age cannot be negative");
+  if(S.currentAge!==''&&+S.currentAge>=+S.life) errs.push("Current age must be less than maximum useful life");
+  if(+S.salvageRate<0) errs.push("Salvage rate cannot be negative");
+  if(+S.salvageRate>100) errs.push("Salvage rate cannot exceed 100%");
+  if(+S.om1<=0) errs.push("Year 1 maintenance cost must be greater than zero");
+  if(S.omInc!==''&&+S.omInc<0) errs.push("Annual maintenance increase cannot be negative");
+  if(+S.coc<=0) errs.push("Target return must be greater than zero");
+  if(+S.coc>=100) errs.push("Target return cannot equal or exceed 100%");
+  return errs;
+}
 function goToResults(){
   var missing=[];
   if(!S.price)missing.push("Purchase price");if(!S.life)missing.push("Maximum useful life");
   if(!S.om1)missing.push("Year 1 maintenance cost");if(!S.coc)missing.push("Target return");
   if(missing.length>0){S.missingFields=missing;render();return;}
-  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+  S.missingFields=null;
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
+  try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
 }
 function resetInputs(){S.price="";S.life="";S.currentAge="";S.salvageRate="";S.om1="";S.omType="pct";S.omInc="";S.coc="";S.assetClass="";S.assetCategory="";S.missingFields=null;render();}
 function loadExample(){S.assetClass="eco-car";S.price=28000;S.life=8;S.currentAge=3;S.salvageRate=55;S.om1=1250;S.omType="pct";S.omInc=20;S.coc=6;S.missingFields=null;render();}

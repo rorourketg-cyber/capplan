@@ -388,6 +388,17 @@ function uInput(prefix,value,id,onblur,suffix){
 }
 
 // ── VALIDATION ────────────────────────────────────────────────────────────────
+function validateInputs(){
+  var errs=[];
+  if(+S.cost<=0) errs.push("Asset cost must be greater than zero");
+  if(+S.life<=0) errs.push("Maximum useful life must be greater than zero");
+  if(+S.svRate<0) errs.push("Salvage rate cannot be negative");
+  if(+S.svRate>100) errs.push("Salvage rate cannot exceed 100%");
+  if(+S.om1<=0) errs.push("Year 1 O&M cost must be greater than zero");
+  if(S.omInc!==''&&+S.omInc<0) errs.push("Annual O&M increase cannot be negative");
+  if(+S.coc<=0) errs.push("Required return must be greater than zero");
+  return errs;
+}
 function goToResults(){
   var missing=[];
   if(S.cost===""||S.cost==null)missing.push("Initial Investment");

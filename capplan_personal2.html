@@ -158,6 +158,19 @@ function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="
 function addOption(){if(S.options.length>=5)return;var letter=String.fromCharCode(65+S.options.length);S.options.push(emptyOption("Option "+letter));S.activeTab=S.options.length-1;render();}
 function removeOption(i){if(S.options.length<=2)return;S.options.splice(i,1);if(S.activeTab>=S.options.length)S.activeTab=S.options.length-1;render();}
 
+function validateInputs(){
+  var errs=[];
+  if(+S.coc<=0) errs.push("Target return must be greater than zero");
+  if(+S.coc>=100) errs.push("Target return cannot equal or exceed 100%");
+  // Check each option
+  S.options.forEach(function(o,i){
+    if(o.price!==''&&+o.price<=0) errs.push("Option "+(i+1)+" price must be greater than zero");
+    if(o.life!==''&&+o.life<=0) errs.push("Option "+(i+1)+" life must be greater than zero");
+    if(o.salvage!==''&&+o.salvage<0) errs.push("Option "+(i+1)+" resale value cannot be negative");
+    if(o.salvage!==''&&o.price!==''&&+o.salvage>=+o.price) errs.push("Option "+(i+1)+" resale cannot equal or exceed its price");
+  });
+  return errs;
+}
 function goToResults(){
   var missing=[];
   if(!S.coc)missing.push("Target return");
@@ -167,7 +180,9 @@ function goToResults(){
     if(!o.benefits&&o.benefits!==0)missing.push(o.label+": annual value");
   });
   if(missing.length>0){S.missingFields=missing;render();return;}
-  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+  S.missingFields=null;
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
+  try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
 }
 function resetInputs(){S.coc="";S.options=[emptyOption("Option A"),emptyOption("Option B")];S.activeTab=0;S.missingFields=null;render();}
 function loadExample(){

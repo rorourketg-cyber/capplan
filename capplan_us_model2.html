@@ -479,6 +479,12 @@ function removeAlt(i){if(S.alts.length<=2)return;S.alts.splice(i,1);if(S.activeT
 function selectAssetType(i,name){S.alts[i].assetTypeSel=name;S.alts[i].propertyClass=suggestPropertyClass(name);render();}
 function selectPropertyClass(i,cls){S.alts[i].propertyClass=cls;render();}
 
+function validateInputs(){
+  var errs=[];
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.coc<=0) errs.push("Required return must be greater than zero");
+  return errs;
+}
 function goToResults(){
   var missing=[];if(!S.taxRate)missing.push("Tax Rate");if(!S.coc)missing.push("Required Rate of Return");
   S.alts.forEach(function(a){
@@ -487,7 +493,9 @@ function goToResults(){
     if(a.annuity&&!a.annuityAmount)missing.push(a.label+": Annual Benefit");
   });
   if(missing.length>0){S.missingFields=missing;render();return;}
-  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+  S.missingFields=null;
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
+  try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
 }
 function resetInputs(){S.taxRate="";S.coc="";S.alts=[emptyAlt("Alternative A"),emptyAlt("Alternative B")];S.activeTab=0;S.missingFields=null;S.res=null;S.page=1;render();}
 function loadExample(){

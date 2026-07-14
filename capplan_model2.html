@@ -764,7 +764,22 @@ function renderPage2(){
   document.getElementById("main-content").innerHTML=html;
 }
 
+function validateInputs(){
+  var errs=[];
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.coc<=0) errs.push("Required return must be greater than zero");
+  if(+S.coc>=100) errs.push("Required return cannot equal or exceed 100%");
+  for(var i=0;i<S.numAlts;i++){
+    var o=S.alts[i];
+    if(+o.cost<=0) errs.push("Option "+(i+1)+" cost must be greater than zero");
+    if(+o.life<=0) errs.push("Option "+(i+1)+" life must be greater than zero");
+    if(o.salvage!==undefined&&+o.salvage<0) errs.push("Option "+(i+1)+" salvage cannot be negative");
+    if(o.salvage!==undefined&&+o.salvage>=+o.cost) errs.push("Option "+(i+1)+" salvage cannot equal or exceed its cost");
+  }
+  return errs;
+}
 function runCalc(){
+  var valErrs=validateInputs();if(valErrs.length>0){S.missing=valErrs;render();return;}
   try{
     var results=[];
     for(var i=0;i<S.numAlts;i++) results.push(calcAsset(S.alts[i],S.taxRate,S.coc));

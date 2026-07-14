@@ -546,6 +546,18 @@ function goToPage2(){
   if(missing.length>0){S.missingFields=missing;render();return;}
   S.missingFields=null;S.page=2;render();
 }
+function validateInputs(){
+  var errs=[];
+  if(+S.cost<=0) errs.push("Asset cost must be greater than zero");
+  if(!S.propertyClass) errs.push("MACRS property class must be selected");
+  if(+S.life<=0) errs.push("Asset life must be greater than zero");
+  if(S.salvage!==''&&+S.salvage<0) errs.push("Salvage value cannot be negative");
+  if(S.salvage!==''&&+S.salvage>=+S.cost) errs.push("Salvage cannot equal or exceed the asset cost");
+  if(S.section179!==''&&+S.section179>+S.cost) errs.push("Section 179 cannot exceed the asset cost");
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.coc<=0) errs.push("Required return must be greater than zero");
+  return errs;
+}
 function goToResults(){
   var missing=[];
   if(S.annuity){if(!S.annuityAmount)missing.push("Annual Benefit Amount");}

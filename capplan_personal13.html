@@ -151,12 +151,24 @@ function makeBNList(notes,id){var list=document.getElementById(id);if(!list)retu
 function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last?" last":"")+'"><div class="field-label">'+l+'</div>'+h+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';}
 function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--green)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
 
+function validateInputs(){
+  var errs=[];
+  if(S.benefits!==''&&+S.benefits<=0) errs.push("Annual value must be greater than zero");
+  if(+S.life<=0) errs.push("Ownership period must be greater than zero");
+  if(+S.svPct<0) errs.push("Salvage percentage cannot be negative");
+  if(+S.svPct>=100) errs.push("Salvage percentage cannot equal or exceed 100%");
+  if(+S.coc<=0) errs.push("Target return must be greater than zero");
+  if(+S.coc>=100) errs.push("Target return cannot equal or exceed 100%");
+  return errs;
+}
 function goToResults(){
   var missing=[];
   if(!S.benefits&&S.benefits!==0)missing.push("Annual value you expect");if(!S.life)missing.push("How long you'll keep it");
   if(!S.svPct&&S.svPct!==0)missing.push("Expected resale %");if(!S.coc)missing.push("Target return");
   if(missing.length>0){S.missingFields=missing;render();return;}
-  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+  S.missingFields=null;
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
+  try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
 }
 function resetInputs(){S.benefits="";S.life="";S.svPct="";S.coc="";S.missingFields=null;S.bw_open=false;S.bw_val="";S.bw_pct="";render();}
 function loadExample(){S.benefits=4500;S.life=5;S.svPct=30;S.coc=6;S.missingFields=null;render();}

@@ -200,13 +200,27 @@ function cR(l,k,v,s){return'<div style="margin-bottom:11px"><div style="font-siz
 function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last?" last":"")+'"><div class="field-label">'+l+'</div>'+h+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';}
 function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--blue)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
 
+function validateInputs(){
+  var errs=[];
+  if(+S.cost<=0) errs.push("Original cost must be greater than zero");
+  if(+S.life<=0) errs.push("Asset life must be greater than zero");
+  if(+S.age<=0) errs.push("Current age must be greater than zero");
+  if(+S.age>+S.life) errs.push("Current age cannot exceed asset life");
+  if(S.benefits!==''&&+S.benefits<0) errs.push("Annual benefit received cannot be negative");
+  if(S.method==="Double-declining"&&!(+S.ddbRate>0)) errs.push("Depreciation rate must be greater than zero for double-declining method");
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.coc<=0) errs.push("Required return must be greater than zero");
+  return errs;
+}
 function goToResults(){
   var missing=[];  if(!S.cost)missing.push("Original Cost");if(!S.life)missing.push("Useful Life");if(!S.age)missing.push("Age of Asset");
   if(!S.benefits&&S.benefits!==0)missing.push("Annual Benefits");
   if(S.method==="Double-declining"&&!S.ddbRate)missing.push("Depreciation Rate");
   if(!S.taxRate)missing.push("Tax Rate");if(!S.coc)missing.push("Required Return");
   if(missing.length>0){S.missingFields=missing;render();return;}
-  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+  S.missingFields=null;
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
+  try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
 }
 function resetInputs(){S.cost="";S.life="";S.age="";S.benefits="";S.method="Double-declining";S.hyr=true;S.ddbRate="";S.taxRate="";S.coc="";S.missingFields=null;S.bw_open=false;S.bw_current="";S.bw_improvement="";render();}
 function loadExample(){

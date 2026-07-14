@@ -416,6 +416,20 @@ function uInput(prefix,value,id,onblur,suffix,disabled){
 }
 
 // ── VALIDATION ────────────────────────────────────────────────────────────────
+function validateInputs(){
+  var errs=[];
+  if(+S.price<=0) errs.push("Asset price must be greater than zero");
+  if(+S.life<=0) errs.push("Asset life must be greater than zero");
+  if(S.salvage!==''&&+S.salvage<0) errs.push("Salvage value cannot be negative");
+  if(S.salvage!==''&&+S.salvage>=+S.price) errs.push("Salvage cannot equal or exceed the asset price");
+  if(+S.term<=0) errs.push("Lease term must be greater than zero");
+  if(+S.term>+S.life) errs.push("Lease term cannot exceed asset life");
+  if(S.endPrice!==''&&+S.endPrice<0) errs.push("End-of-lease purchase price cannot be negative");
+  if(S.method==="Double-declining"&&!(+S.ddbRate>0)) errs.push("Depreciation rate must be greater than zero for double-declining method");
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.coc<=0) errs.push("Required return must be greater than zero");
+  return errs;
+}
 function goToResults(){
   var missing=[];
   if(!S.price)missing.push("Selling Price");

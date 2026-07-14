@@ -164,6 +164,19 @@ function estimateMarketValue(){var orig=+S.mv_orig||0,age=+S.mv_age||0,life=+S.m
 function addOption(){if(S.options.length>=5)return;var letter=String.fromCharCode(65+S.options.length);S.options.push(emptyOption("Option "+letter));S.activeTab=S.options.length-1;render();}
 function removeOption(i){if(S.options.length<=2)return;S.options.splice(i,1);if(S.activeTab>=S.options.length)S.activeTab=S.options.length-1;render();}
 
+function validateInputs(){
+  var errs=[];
+  if(+S.currentValue<0) errs.push("Current asset value cannot be negative");
+  if(+S.coc<=0) errs.push("Target return must be greater than zero");
+  if(+S.coc>=100) errs.push("Target return cannot equal or exceed 100%");
+  S.options.forEach(function(o,i){
+    if(o.price!==''&&+o.price<=0) errs.push("Option "+(i+1)+" price must be greater than zero");
+    if(o.life!==''&&+o.life<=0) errs.push("Option "+(i+1)+" life must be greater than zero");
+    if(o.salvage!==''&&+o.salvage<0) errs.push("Option "+(i+1)+" resale value cannot be negative");
+    if(o.salvage!==''&&o.price!==''&&+o.salvage>=+o.price) errs.push("Option "+(i+1)+" resale cannot equal or exceed its price");
+  });
+  return errs;
+}
 function goToResults(){
   var missing=[];
   if(!S.currentValue&&S.currentValue!==0)missing.push("What your current asset is worth");
@@ -174,7 +187,9 @@ function goToResults(){
     if(!o.extraBen&&o.extraBen!==0)missing.push(o.label+": extra annual value");
   });
   if(missing.length>0){S.missingFields=missing;render();return;}
-  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+  S.missingFields=null;
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
+  try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
 }
 function resetInputs(){S.currentValue="";S.coc="";S.options=[emptyOption("Option A"),emptyOption("Option B")];S.activeTab=0;S.missingFields=null;S.mv_open=false;S.mv_orig="";S.mv_age="";S.mv_life="";render();}
 function loadExample(){

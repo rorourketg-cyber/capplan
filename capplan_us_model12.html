@@ -470,6 +470,19 @@ var NOTES2=[
 
 function makeBNList(notes,id){var list=document.getElementById(id);if(!list)return;list.innerHTML="";notes.forEach(function(n,i){var item=document.createElement("div");item.className="bn-item";var head=document.createElement("div");head.className="bn-head";head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+id+i+'">&#8250;</div>';var body=document.createElement("div");body.className="bn-body";body.textContent=n.a;head.onclick=function(){var open=body.classList.contains("open");body.classList.toggle("open");document.getElementById("arr"+id+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";head.style.background=open?"":"var(--surface)";};item.appendChild(head);item.appendChild(body);list.appendChild(item);});}
 
+function validateInputs(){
+  var errs=[];
+  if(+S.cost<=0) errs.push("Original cost must be greater than zero");
+  if(!S.propertyClass) errs.push("MACRS property class must be selected");
+  if(+S.life<=0) errs.push("Asset life must be greater than zero");
+  if(+S.age<=0) errs.push("Current age must be greater than zero");
+  if(+S.age>+S.life) errs.push("Current age cannot exceed asset life");
+  if(S.benefits!==''&&+S.benefits<0) errs.push("Annual benefit cannot be negative");
+  if(S.section179!==''&&+S.section179>+S.cost) errs.push("Section 179 cannot exceed the original cost");
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.coc<=0) errs.push("Target return must be greater than zero");
+  return errs;
+}
 function goToResults(){
   var missing=[];
   if(!S.cost)missing.push("Original Cost");if(!S.propertyClass)missing.push("MACRS Property Class");
@@ -477,7 +490,9 @@ function goToResults(){
   if(!S.benefits&&S.benefits!==0)missing.push("Annual After-Tax Benefit");
   if(!S.taxRate)missing.push("Tax Rate");if(!S.coc)missing.push("Target Return");
   if(missing.length>0){S.missingFields=missing;render();return;}
-  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+  S.missingFields=null;
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
+  try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
 }
 function resetInputs(){
   S.cost="";S.propertyClass="";S.assetTypeSel="";S.bonusElected=false;S.section179="";

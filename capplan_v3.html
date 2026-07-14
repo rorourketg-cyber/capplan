@@ -915,7 +915,19 @@ function updateYB(idx, val) {
   S.yearlyBenefits[idx] = val;
 }
 
+function validateInputs(){
+  var errs=[];
+  if(+S.cost<=0) errs.push("Asset cost must be greater than zero");
+  if(+S.life<=0) errs.push("Asset life must be greater than zero");
+  if(S.salvage!==undefined&&+S.salvage<0) errs.push("Salvage value cannot be negative");
+  if(S.salvage!==undefined&&S.cost&&+S.salvage>=+S.cost) errs.push("Salvage cannot equal or exceed the cost");
+  if(S.method==="Double-declining"&&!(+S.ddbRate>0)) errs.push("Depreciation rate must be greater than zero for double-declining method");
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.coc<=0) errs.push("Required return must be greater than zero");
+  return errs;
+}
 function runCalc() {
+  var valErrs=validateInputs();if(valErrs.length>0){S.missing=valErrs;render();return;}
   try { S.res = calcAll(); S.page = 3; render(); }
   catch(e) { console.error(e); alert("Calculation error: "+e.message); }
 }
