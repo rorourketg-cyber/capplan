@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan — Capital Planning for Business and Personal Finance</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0F1D2E;--blue:#1B3F6E;--blue-mid:#2A5298;--blue-soft:rgba(27,63,110,0.08);
+  --green:#2E7D52;--green-warm:#3D8B5A;--green-soft:rgba(46,125,82,0.09);
+  --gold:#C9A84C;--surface:#F7F8FA;--border:#E2E6EC;
+  --t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;--white:#ffffff;
+  --warn:#C84B31;
+}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--white);color:var(--t1);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:Georgia,serif;line-height:1.2}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+
+/* ── NAV ──────────────────────────────────────────────────────────────────── */
+#nav{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--navy);border-bottom:1px solid rgba(255,255,255,0.08)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo-mark{width:32px;height:32px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-logo-text{font-family:Georgia,serif;font-size:20px;color:var(--white)}.nav-logo-text span{color:#A8C5E8}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{font-size:14px;font-weight:500;color:rgba(255,255,255,0.75);transition:color .15s}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{background:var(--green);color:var(--white);border:none;border-radius:6px;padding:8px 18px;font-size:14px;font-weight:600}
+.nav-cta:hover{background:var(--green-warm)}
+
+/* ── HERO ─────────────────────────────────────────────────────────────────── */
+#hero{background:var(--navy);padding:120px 32px 0;min-height:100vh;display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden}
+.hero-eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+.hero-headline{font-family:Georgia,serif;font-size:clamp(42px,5.5vw,76px);color:var(--white);text-align:center;max-width:900px;line-height:1.1;margin-bottom:24px}
+.hero-headline em{font-style:normal;color:#A8C5E8}
+.hero-sub{font-size:18px;color:rgba(255,255,255,0.65);text-align:center;max-width:640px;line-height:1.7;margin-bottom:56px}
+
+/* Fork */
+.hero-fork{display:grid;grid-template-columns:1fr 1fr;gap:0;width:100%;max-width:960px;border-radius:16px 16px 0 0;overflow:hidden;box-shadow:0 -24px 80px rgba(0,0,0,0.4)}
+.fork-panel{padding:40px 44px;display:flex;flex-direction:column;gap:20px;position:relative}
+.fork-panel.business{background:var(--blue)}
+.fork-panel.personal{background:var(--green)}
+.fork-divider{position:absolute;top:0;bottom:0;right:0;width:1px;background:rgba(255,255,255,0.15)}
+.fork-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.6)}
+.fork-title{font-family:Georgia,serif;font-size:28px;color:var(--white);line-height:1.2}
+.fork-desc{font-size:14px;color:rgba(255,255,255,0.75);line-height:1.6}
+.fork-models{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.fork-chip{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:4px 12px;font-size:12px;color:rgba(255,255,255,0.85)}
+.fork-btn{display:inline-flex;align-items:center;gap:8px;background:var(--white);border:none;border-radius:8px;padding:12px 22px;font-size:14px;font-weight:700;margin-top:8px;transition:transform .15s,box-shadow .15s;align-self:flex-start}
+.fork-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+.fork-panel.business .fork-btn{color:var(--blue)}
+.fork-panel.personal .fork-btn{color:var(--green)}
+.fork-btn-arrow{font-size:16px;transition:transform .15s}
+.fork-btn:hover .fork-btn-arrow{transform:translateX(4px)}
+
+/* ── HOW IT WORKS ─────────────────────────────────────────────────────────── */
+#how{background:var(--surface);padding:96px 32px}
+.section-inner{max-width:1100px;margin:0 auto}
+.section-eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:14px}
+.section-headline{font-family:Georgia,serif;font-size:clamp(28px,3.5vw,44px);color:var(--t1);margin-bottom:16px}
+.section-sub{font-size:17px;color:var(--t2);max-width:600px;line-height:1.7;margin-bottom:56px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+.step-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:32px;position:relative;overflow:hidden}
+.step-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.step-card.s1::before{background:var(--blue)}
+.step-card.s2::before{background:var(--green)}
+.step-card.s3::before{background:var(--gold)}
+.step-number{font-family:Georgia,serif;font-size:48px;font-weight:700;color:var(--border);line-height:1;margin-bottom:16px}
+.step-title{font-family:Georgia,serif;font-size:20px;color:var(--t1);margin-bottom:10px}
+.step-body{font-size:14px;color:var(--t2);line-height:1.7}
+
+/* ── DECISION FAMILIES ────────────────────────────────────────────────────── */
+#decisions{background:var(--white);padding:96px 32px}
+.families{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+.family-card{border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.family-head{padding:24px;background:var(--navy);display:flex;align-items:center;gap:14px}
+.family-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.family-name{font-family:Georgia,serif;font-size:18px;color:var(--white)}
+.family-body{padding:20px 24px}
+.family-model{display:flex;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.family-model:last-child{border-bottom:none}
+.family-model-num{font-family:monospace;font-size:11px;font-weight:700;color:var(--t3);flex-shrink:0;width:20px}
+.family-model-name{color:var(--t2)}
+.family-free{display:inline-flex;align-items:center;gap:4px;background:var(--green-soft);color:var(--green);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:10px;margin-left:auto;flex-shrink:0}
+
+/* ── PRICING ──────────────────────────────────────────────────────────────── */
+#pricing{background:var(--navy);padding:96px 32px;position:relative;overflow:hidden}
+#pricing::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;border-radius:50%;background:rgba(27,63,110,0.3);pointer-events:none}
+.pricing-header{text-align:center;margin-bottom:64px}
+.pricing-header .section-eyebrow{color:var(--gold)}
+.pricing-header .section-headline{color:var(--white)}
+.pricing-header .section-sub{color:rgba(255,255,255,0.6);margin:0 auto}
+.pricing-toggle{display:flex;align-items:center;gap:14px;margin:28px auto 0;width:fit-content}
+.pricing-toggle span{font-size:14px;color:rgba(255,255,255,0.6)}
+.pricing-toggle span.active{color:var(--white);font-weight:600}
+.toggle-track{width:48px;height:26px;background:var(--green);border-radius:13px;position:relative;cursor:pointer;flex-shrink:0}
+.toggle-thumb{width:20px;height:20px;background:var(--white);border-radius:50%;position:absolute;top:3px;left:3px;transition:transform .2s}
+.toggle-track.annual .toggle-thumb{transform:translateX(22px)}
+.annual-badge{background:var(--gold);color:var(--navy);font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
+.pricing-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0;max-width:900px;margin:0 auto}
+.pricing-suite{padding:0 24px}
+.pricing-suite-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.1)}
+.pricing-suite-label.business-label{color:#A8C5E8}
+.pricing-suite-label.personal-label{color:#86D9A8}
+.pricing-plans{display:flex;flex-direction:column;gap:16px}
+.plan-card{border-radius:12px;padding:28px;position:relative}
+.plan-card.free-plan{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12)}
+.plan-card.paid-plan{background:var(--white);border:2px solid var(--white)}
+.plan-badge{position:absolute;top:-1px;right:20px;background:var(--gold);color:var(--navy);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:0 0 6px 6px}
+.plan-name{font-family:Georgia,serif;font-size:18px;margin-bottom:6px}
+.plan-card.free-plan .plan-name{color:rgba(255,255,255,0.85)}
+.plan-card.paid-plan .plan-name{color:var(--t1)}
+.plan-price{display:flex;align-items:baseline;gap:4px;margin-bottom:16px}
+.plan-amount{font-family:Georgia,serif;font-size:36px;font-weight:700}
+.plan-card.free-plan .plan-amount{color:var(--white)}
+.plan-card.paid-plan .plan-amount{color:var(--blue)}
+.plan-period{font-size:13px}
+.plan-card.free-plan .plan-period{color:rgba(255,255,255,0.5)}
+.plan-card.paid-plan .plan-period{color:var(--t3)}
+.plan-annual-note{font-size:11px;color:var(--t3);margin-top:-10px;margin-bottom:14px}
+.plan-divider{height:1px;margin-bottom:16px}
+.plan-card.free-plan .plan-divider{background:rgba(255,255,255,0.1)}
+.plan-card.paid-plan .plan-divider{background:var(--border)}
+.plan-features{display:flex;flex-direction:column;gap:9px;margin-bottom:22px}
+.plan-feature{display:flex;align-items:flex-start;gap:9px;font-size:13px}
+.plan-card.free-plan .plan-feature{color:rgba(255,255,255,0.75)}
+.plan-card.paid-plan .plan-feature{color:var(--t2)}
+.plan-check{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-size:9px;font-weight:800}
+.plan-card.free-plan .plan-check{background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.8)}
+.plan-card.paid-plan .plan-check{background:var(--green-soft);color:var(--green)}
+.plan-btn{width:100%;padding:12px;border-radius:8px;font-size:14px;font-weight:700;border:none;transition:all .15s}
+.plan-card.free-plan .plan-btn{background:rgba(255,255,255,0.12);color:var(--white)}
+.plan-card.free-plan .plan-btn:hover{background:rgba(255,255,255,0.18)}
+.plan-card.paid-plan.business-paid .plan-btn{background:var(--blue);color:var(--white)}
+.plan-card.paid-plan.business-paid .plan-btn:hover{background:var(--blue-mid)}
+.plan-card.paid-plan.personal-paid .plan-btn{background:var(--green);color:var(--white)}
+.plan-card.paid-plan.personal-paid .plan-btn:hover{background:var(--green-warm)}
+.pricing-divider{width:1px;background:rgba(255,255,255,0.1);margin:0 8px}
+
+/* ── TRUST / FOOTER ───────────────────────────────────────────────────────── */
+#trust{background:var(--surface);padding:72px 32px}
+.trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;max-width:900px;margin:0 auto;text-align:center}
+.trust-number{font-family:Georgia,serif;font-size:48px;color:var(--blue);font-weight:700;line-height:1}
+.trust-label{font-size:14px;color:var(--t2);margin-top:8px}
+#footer{background:var(--navy);padding:48px 32px}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+.footer-logo{font-family:Georgia,serif;font-size:18px;color:rgba(255,255,255,0.6)}
+.footer-logo span{color:rgba(255,255,255,0.3)}
+.footer-links{display:flex;gap:28px}
+.footer-links a{font-size:13px;color:rgba(255,255,255,0.45);transition:color .15s}
+.footer-links a:hover{color:rgba(255,255,255,0.8)}
+.footer-copy{font-size:12px;color:rgba(255,255,255,0.3);margin-top:4px}
+
+@media(max-width:768px){
+  .hero-fork{grid-template-columns:1fr}
+  .fork-divider{display:none}
+  .steps,.families,.pricing-grid,.trust-grid{grid-template-columns:1fr}
+  .pricing-grid{gap:32px}
+  .pricing-divider{display:none}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg>
+      </div>
+      <div class="nav-logo-text">Cap<span>Plan</span></div>
+    </div>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#decisions">Models</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#" style="color:rgba(255,255,255,0.75)">Sign in</a>
+      <button class="nav-cta">Start free</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-eyebrow">Capital planning · Made accessible</div>
+  <h1 class="hero-headline">Every capital decision deserves<br><em>a proper analysis</em></h1>
+  <p class="hero-sub">CapPlan puts rigorous financial modelling in the hands of the people who need it most — business owners making investment decisions, and individuals making the big purchases that shape their financial lives.</p>
+
+  <div class="hero-fork">
+    <!-- Business -->
+    <div class="fork-panel business">
+      <div class="fork-divider"></div>
+      <div class="fork-label">CapPlan Business</div>
+      <div class="fork-title">Capital planning for your organisation</div>
+      <div class="fork-desc">Thirteen models covering every asset decision — purchase, lease, rental rate-setting, replacement, and negotiation. Full tax treatment, depreciation methods, and cost of capital analysis.</div>
+      <div class="fork-models">
+        <span class="fork-chip">Asset purchase</span>
+        <span class="fork-chip">Lease vs buy</span>
+        <span class="fork-chip">Rental rates</span>
+        <span class="fork-chip">Sale &amp; leaseback</span>
+        <span class="fork-chip">Price negotiation</span>
+      </div>
+      <button class="fork-btn" onclick="window.location.href='capplan_business.html'">
+        Go to Business suite <span class="fork-btn-arrow">→</span>
+      </button>
+    </div>
+    <!-- Personal -->
+    <div class="fork-panel personal">
+      <div class="fork-label">CapPlan Personal</div>
+      <div class="fork-title">Capital planning for your personal finances</div>
+      <div class="fork-desc">Nine models for the financial decisions individuals face — when to buy, when to replace, whether to lease, what to pay, and what to accept. No financial training required.</div>
+      <div class="fork-models">
+        <span class="fork-chip">Should I buy?</span>
+        <span class="fork-chip">Lease vs buy</span>
+        <span class="fork-chip">When to replace</span>
+        <span class="fork-chip">Sell for how much?</span>
+        <span class="fork-chip">Pay how much?</span>
+      </div>
+      <button class="fork-btn" onclick="window.location.href='capplan_personal.html'">
+        Go to Personal suite <span class="fork-btn-arrow">→</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-inner">
+    <div class="section-eyebrow">How it works</div>
+    <h2 class="section-headline">From decision to answer<br>in three steps</h2>
+    <p class="section-sub">CapPlan turns complex capital planning calculations into guided, plain-language analyses anyone can complete.</p>
+    <div class="steps">
+      <div class="step-card s1">
+        <div class="step-number">01</div>
+        <div class="step-title">Identify your decision</div>
+        <div class="step-body">Use the solution finder to identify which model addresses your specific decision. Business owners, financial managers, and individuals all face different questions — the solution finder routes you to the right tool instantly.</div>
+      </div>
+      <div class="step-card s2">
+        <div class="step-number">02</div>
+        <div class="step-title">Enter your numbers</div>
+        <div class="step-body">Each model walks you through the inputs with plain-language labels, guidance on where to find data, and built-in estimators for figures that are hard to know precisely. Load an example to see how it works before entering your own data.</div>
+      </div>
+      <div class="step-card s3">
+        <div class="step-number">03</div>
+        <div class="step-title">Understand your answer</div>
+        <div class="step-body">Results include a clear decision recommendation, sensitivity analysis showing how the answer changes under different assumptions, and detailed DCF workings you can print or share. Every result tells you not just what, but why.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DECISION FAMILIES -->
+<section id="decisions">
+  <div class="section-inner">
+    <div class="section-eyebrow">The models</div>
+    <h2 class="section-headline">Thirteen business decisions.<br>Nine personal ones.</h2>
+    <p class="section-sub">Each model addresses a specific capital planning question, built on rigorous discounted cash flow analysis.</p>
+
+    <div style="margin-bottom:32px">
+      <div style="display:flex;gap:16px;border-bottom:2px solid var(--border);padding-bottom:0">
+        <button id="tab-bus" onclick="switchTab('business')" style="padding:12px 20px;border:none;background:none;font-size:14px;font-weight:700;color:var(--blue);border-bottom:2px solid var(--blue);margin-bottom:-2px;cursor:pointer">CapPlan Business</button>
+        <button id="tab-per" onclick="switchTab('personal')" style="padding:12px 20px;border:none;background:none;font-size:14px;font-weight:600;color:var(--t3);cursor:pointer">CapPlan Personal</button>
+      </div>
+    </div>
+
+    <div id="models-business" class="families">
+      <!-- Purchase/Replace family -->
+      <div class="family-card">
+        <div class="family-head">
+          <div class="family-icon" style="background:rgba(168,197,232,0.15)">🏗️</div>
+          <div class="family-name">Purchase &amp; Replacement</div>
+        </div>
+        <div class="family-body">
+          <div class="family-model"><span class="family-model-num">1</span><span class="family-model-name">Asset purchase analysis</span><span class="family-free">✦ Free</span></div>
+          <div class="family-model"><span class="family-model-num">2</span><span class="family-model-name">Asset purchase with alternatives</span></div>
+          <div class="family-model"><span class="family-model-num">3</span><span class="family-model-name">Asset replacement analysis</span></div>
+          <div class="family-model"><span class="family-model-num">4</span><span class="family-model-name">Asset replacement with alternatives</span></div>
+        </div>
+      </div>
+      <!-- Rental/Lease family -->
+      <div class="family-card">
+        <div class="family-head">
+          <div class="family-icon" style="background:rgba(168,197,232,0.15)">📋</div>
+          <div class="family-name">Rental, Lease &amp; Replacement</div>
+        </div>
+        <div class="family-body">
+          <div class="family-model"><span class="family-model-num">5</span><span class="family-model-name">Optimal replacement interval</span></div>
+          <div class="family-model"><span class="family-model-num">6</span><span class="family-model-name">Setting a lease rate</span></div>
+          <div class="family-model"><span class="family-model-num">7</span><span class="family-model-name">Setting a rental rate</span></div>
+          <div class="family-model"><span class="family-model-num">8</span><span class="family-model-name">Rental rate with operator</span></div>
+          <div class="family-model"><span class="family-model-num">9</span><span class="family-model-name">Lease vs purchase</span></div>
+          <div class="family-model"><span class="family-model-num">10</span><span class="family-model-name">Sale and leaseback</span></div>
+          <div class="family-model"><span class="family-model-num">11</span><span class="family-model-name">Implied cost of leasing</span></div>
+        </div>
+      </div>
+      <!-- Price-setting family -->
+      <div class="family-card">
+        <div class="family-head">
+          <div class="family-icon" style="background:rgba(168,197,232,0.15)">🎯</div>
+          <div class="family-name">Price-Setting &amp; Negotiation</div>
+        </div>
+        <div class="family-body">
+          <div class="family-model"><span class="family-model-num">12</span><span class="family-model-name">Minimum selling price</span></div>
+          <div class="family-model"><span class="family-model-num">13</span><span class="family-model-name">Maximum purchase price</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="models-personal" class="families" style="display:none">
+      <!-- Buying family -->
+      <div class="family-card">
+        <div class="family-head" style="background:var(--green)">
+          <div class="family-icon" style="background:rgba(255,255,255,0.15)">🛒</div>
+          <div class="family-name">Buying Decisions</div>
+        </div>
+        <div class="family-body">
+          <div class="family-model"><span class="family-model-num">P1</span><span class="family-model-name">Should I buy this asset?</span><span class="family-free">✦ Free</span></div>
+          <div class="family-model"><span class="family-model-num">P2</span><span class="family-model-name">Which option should I buy?</span></div>
+          <div class="family-model"><span class="family-model-num">P3</span><span class="family-model-name">Should I replace what I own?</span></div>
+          <div class="family-model"><span class="family-model-num">P4</span><span class="family-model-name">Which replacement is best?</span></div>
+          <div class="family-model"><span class="family-model-num">P5</span><span class="family-model-name">When should I replace it?</span></div>
+        </div>
+      </div>
+      <!-- Lease family -->
+      <div class="family-card">
+        <div class="family-head" style="background:var(--green)">
+          <div class="family-icon" style="background:rgba(255,255,255,0.15)">🔑</div>
+          <div class="family-name">Lease vs Buy</div>
+        </div>
+        <div class="family-body">
+          <div class="family-model"><span class="family-model-num">P9</span><span class="family-model-name">Should I lease or buy?</span></div>
+          <div class="family-model"><span class="family-model-num">P11</span><span class="family-model-name">What is this lease costing me?</span></div>
+        </div>
+      </div>
+      <!-- Negotiation family -->
+      <div class="family-card">
+        <div class="family-head" style="background:var(--green)">
+          <div class="family-icon" style="background:rgba(255,255,255,0.15)">🤝</div>
+          <div class="family-name">Negotiation</div>
+        </div>
+        <div class="family-body">
+          <div class="family-model"><span class="family-model-num">P12</span><span class="family-model-name">What's the minimum I should accept?</span></div>
+          <div class="family-model"><span class="family-model-num">P13</span><span class="family-model-name">What's the maximum I should pay?</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-inner">
+    <div class="pricing-header">
+      <div class="section-eyebrow">Pricing</div>
+      <h2 class="section-headline">Start free. Upgrade when<br>the decisions get bigger.</h2>
+      <p class="section-sub">Every plan includes the solution finder and your first model at no cost. Full suite access unlocks all models and unlimited analyses.</p>
+      <div class="pricing-toggle">
+        <span class="active" id="monthly-label">Monthly</span>
+        <div class="toggle-track" id="billing-toggle" onclick="toggleBilling()">
+          <div class="toggle-thumb"></div>
+        </div>
+        <span id="annual-label">Annual</span>
+        <span class="annual-badge" id="annual-badge" style="display:none">Save 20%</span>
+      </div>
+    </div>
+
+    <div class="pricing-grid">
+      <!-- Business column -->
+      <div class="pricing-suite">
+        <div class="pricing-suite-label business-label">CapPlan Business</div>
+        <div class="pricing-plans">
+          <!-- Free -->
+          <div class="plan-card free-plan">
+            <div class="plan-name">Starter</div>
+            <div class="plan-price"><span class="plan-amount">$0</span><span class="plan-period">/ month</span></div>
+            <div class="plan-divider"></div>
+            <div class="plan-features">
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Solution finder — all 13 decisions</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Model 1 — Asset purchase analysis</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Load examples &amp; print summaries</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>All additional assistance features</span></div>
+            </div>
+            <button class="plan-btn">Start free — no card required</button>
+          </div>
+          <!-- Paid -->
+          <div class="plan-card paid-plan business-paid">
+            <div class="plan-badge">Most popular</div>
+            <div class="plan-name">Full Suite</div>
+            <div class="plan-price">
+              <span class="plan-amount" id="bus-price">$37</span>
+              <span class="plan-period" id="bus-period">/ month</span>
+            </div>
+            <div class="plan-annual-note" id="bus-annual-note" style="display:none">$444 / year · save $89</div>
+            <div class="plan-divider"></div>
+            <div class="plan-features">
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Everything in Starter</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>All 13 models — unlimited use</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>US &amp; non-US depreciation methods</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>MACRS &amp; bonus depreciation (US)</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Save &amp; return to analyses</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Priority support</span></div>
+            </div>
+            <button class="plan-btn">Start 14-day free trial</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pricing-divider"></div>
+
+      <!-- Personal column -->
+      <div class="pricing-suite">
+        <div class="pricing-suite-label personal-label">CapPlan Personal</div>
+        <div class="pricing-plans">
+          <!-- Free -->
+          <div class="plan-card free-plan">
+            <div class="plan-name">Starter</div>
+            <div class="plan-price"><span class="plan-amount">$0</span><span class="plan-period">/ month</span></div>
+            <div class="plan-divider"></div>
+            <div class="plan-features">
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Solution finder — all 9 decisions</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Model P1 — Should I buy this?</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Asset-type defaults &amp; guidance</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Plain-language results</span></div>
+            </div>
+            <button class="plan-btn">Start free — no card required</button>
+          </div>
+          <!-- Paid -->
+          <div class="plan-card paid-plan personal-paid">
+            <div class="plan-badge" style="background:var(--green);color:white">Best value</div>
+            <div class="plan-name">Full Suite</div>
+            <div class="plan-price">
+              <span class="plan-amount" id="per-price">$12</span>
+              <span class="plan-period" id="per-period">/ month</span>
+            </div>
+            <div class="plan-annual-note" id="per-annual-note" style="display:none">$115 / year · save $29</div>
+            <div class="plan-divider"></div>
+            <div class="plan-features">
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Everything in Starter</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>All 9 models — unlimited use</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Asset-class O&amp;M library (Model P5)</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Monthly-equivalent cost expressions</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Save &amp; return to analyses</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div><span>Priority support</span></div>
+            </div>
+            <button class="plan-btn">Start 14-day free trial</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:40px">All prices in USD. Annual plans billed once yearly. Cancel anytime. 14-day free trial — no credit card required to start.</p>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section id="trust">
+  <div class="section-inner">
+    <div class="trust-grid">
+      <div>
+        <div class="trust-number">13</div>
+        <div class="trust-label">Business capital planning models covering every asset decision type</div>
+      </div>
+      <div>
+        <div class="trust-number">9</div>
+        <div class="trust-label">Personal finance models for the decisions that shape your financial life</div>
+      </div>
+      <div>
+        <div class="trust-number">0</div>
+        <div class="trust-label">Financial training required — every model works for a first-time user</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">Cap<span>Plan</span></div>
+      <div class="footer-copy">© 2026 CapPlan. Capital planning for business and personal finance.</div>
+    </div>
+    <div class="footer-links">
+      <a href="#">Business suite</a>
+      <a href="#">Personal suite</a>
+      <a href="#">Pricing</a>
+      <a href="#">Sign in</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+var isAnnual=false;
+function toggleBilling(){
+  isAnnual=!isAnnual;
+  var track=document.getElementById('billing-toggle');
+  track.classList.toggle('annual',isAnnual);
+  document.getElementById('monthly-label').classList.toggle('active',!isAnnual);
+  document.getElementById('annual-label').classList.toggle('active',isAnnual);
+  document.getElementById('annual-badge').style.display=isAnnual?'inline-flex':'none';
+  // Business pricing: $37/mo or $444/yr ($37 * 12 * 0.8)
+  document.getElementById('bus-price').textContent=isAnnual?'$37':'$37';
+  document.getElementById('bus-period').textContent=isAnnual?'/ month, billed annually':'/ month';
+  document.getElementById('bus-annual-note').style.display=isAnnual?'block':'none';
+  // Personal pricing: $12/mo or $115/yr
+  document.getElementById('per-price').textContent=isAnnual?'$12':'$12';
+  document.getElementById('per-period').textContent=isAnnual?'/ month, billed annually':'/ month';
+  document.getElementById('per-annual-note').style.display=isAnnual?'block':'none';
+}
+function switchTab(tab){
+  var isBus=tab==='business';
+  document.getElementById('models-business').style.display=isBus?'grid':'none';
+  document.getElementById('models-personal').style.display=isBus?'none':'grid';
+  document.getElementById('tab-bus').style.color=isBus?'var(--blue)':'var(--t3)';
+  document.getElementById('tab-bus').style.borderBottom=isBus?'2px solid var(--blue)':'2px solid transparent';
+  document.getElementById('tab-bus').style.fontWeight=isBus?'700':'600';
+  document.getElementById('tab-per').style.color=isBus?'var(--t3)':'var(--green)';
+  document.getElementById('tab-per').style.borderBottom=isBus?'2px solid transparent':'2px solid var(--green)';
+  document.getElementById('tab-per').style.fontWeight=isBus?'600':'700';
+}
+// Smooth scroll for nav links
+document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click',function(e){
+    var target=document.querySelector(this.getAttribute('href'));
+    if(target){e.preventDefault();target.scrollIntoView({behavior:'smooth'})}
+  });
+});
+</script>
+</body>
+</html>

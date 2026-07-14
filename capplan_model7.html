@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan — Setting a Rental Rate</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#F7F8FA;color:#0F1D2E;font-size:14px}
+input,select,button{font-family:inherit;font-size:14px}
+button{cursor:pointer;background:none;border:none}
+select{-webkit-appearance:none;appearance:none}
+:root{--blue:#1B3F6E;--green:#2E7D52;--surface:#F7F8FA;--panel:#fff;--border:#E2E6EC;--t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;--warn:#C84B31;--blue-soft:rgba(27,63,110,0.08);--green-soft:rgba(46,125,82,0.09);--amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7}
+#masthead{background:var(--blue);height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:34px;height:34px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:Georgia,serif;font-size:22px;color:white}.logo-text span{color:#A8C5E8}
+.module-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)}
+#stepper{background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px}
+.step{display:flex;align-items:center;gap:8px;padding:13px 4px;border-bottom:2px solid transparent}
+.step.active{border-bottom-color:var(--blue)}.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--border);color:var(--t3)}
+.step.active .step-num{background:var(--blue);color:white}.step.done .step-num{background:var(--green);color:white}
+.step-label{font-size:13px;font-weight:500;color:var(--t3)}.step.active .step-label{color:var(--blue)}.step.done .step-label{color:var(--green)}
+.step-sep{color:var(--border);margin:0 8px;font-size:16px}
+.page{max-width:1100px;margin:0 auto;padding:24px 22px}
+.page-grid{display:grid;grid-template-columns:310px 1fr;gap:22px}
+.p2-grid{display:grid;grid-template-columns:280px 1fr;gap:22px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-bottom:18px}
+.panel-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr}
+.field{padding:13px 18px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.field.full{grid-column:1/-1;border-right:none}.field.last{border-bottom:none}
+.field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:6px}
+.field-note{font-size:10px;color:var(--t3);margin-top:4px}
+.ui{display:flex;align-items:center;gap:6px}
+.ui .pfx,.ui .sfx{font-family:monospace;font-size:12px;color:var(--t3);flex-shrink:0}
+.ui input{font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none}
+.ui input:focus{border-bottom-color:var(--blue)}
+.ui input:disabled{color:var(--t3);opacity:.6}
+.ui select{font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none;cursor:pointer}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.pill{display:flex;align-items:center;gap:6px;padding:6px 13px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;user-select:none}
+.pill.active{border-color:var(--blue);background:var(--blue-soft);color:var(--blue)}
+.pill-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--t3);flex-shrink:0}
+.pill.active .pill-dot{border-color:var(--blue);background:var(--blue)}
+.btn-primary{background:var(--blue);color:white;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-ghost{background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn{display:flex;align-items:center;gap:6px;background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn:hover{border-color:var(--blue);color:var(--blue)}
+.action-row{display:flex;gap:10px;margin-top:4px}
+.bn-item{border-bottom:1px solid var(--border)}.bn-item:last-child{border-bottom:none}
+.bn-head{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;cursor:pointer}
+.bn-head:hover{background:var(--surface)}
+.bn-qmark{width:21px;height:21px;border-radius:50%;background:var(--blue-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--blue);flex-shrink:0;margin-top:1px;margin-right:5px}
+.bn-q{font-size:13px;line-height:1.5;color:var(--blue);flex:1}
+.bn-arr{color:var(--t3);font-size:14px;flex-shrink:0;margin-top:2px;transition:transform .2s}
+.bn-body{padding:10px 13px 12px 44px;font-size:12.5px;line-height:1.7;color:var(--t2);background:var(--surface);border-top:1px solid var(--border);display:none}
+.bn-body.open{display:block}
+.watch-btn{margin-top:10px;display:flex;width:fit-content;align-items:center;gap:5px;border:1px solid var(--blue);border-radius:5px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--blue);background:none;cursor:pointer}
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:11px}
+.helper-card{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.helper-head{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--amber-mid)}
+.helper-head:hover{background:#fde68a}
+.helper-icon{font-size:18px;flex-shrink:0}
+.helper-title{font-size:13px;font-weight:700;color:var(--amber-dark);flex:1}
+.helper-toggle{font-size:11px;font-weight:600;color:var(--amber-dark);opacity:.7}
+.helper-body{padding:16px;border-top:1.5px solid var(--amber);display:flex;flex-direction:column;gap:14px}
+.helper-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dark)}
+.helper-result{background:var(--green-soft);border:1.5px solid var(--green);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.helper-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.result-banner{border-radius:10px;padding:20px 24px;margin-bottom:18px;background:var(--green-soft);border:1.5px solid var(--green);display:flex;align-items:center;justify-content:space-between;gap:20px}
+.banner-headline{font-family:Georgia,serif;font-size:22px;color:var(--green);line-height:1.3}
+.rate-box{background:var(--green);border-radius:10px;padding:16px 22px;text-align:center;flex-shrink:0}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.metric{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.metric-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:7px}
+.metric-val{font-family:monospace;font-size:18px;font-weight:700;color:var(--t1)}
+.metric-val.ok{color:var(--green)}
+.metric-sub{font-size:10px;color:var(--t3);margin-top:3px}
+.chart-box{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:18px}
+.chart-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:14px}
+.collapsible{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:14px;overflow:hidden}
+.coll-head{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.coll-head:hover{background:var(--surface)}
+.coll-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.coll-arr{color:var(--t3);font-size:14px;transition:transform .2s}
+.coll-body{display:none;border-top:1px solid var(--border)}.coll-body.open{display:block}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{padding:8px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}
+th.left{text-align:left}
+td{padding:8px 14px;text-align:right;font-family:monospace;border-bottom:1px solid var(--border)}
+td.left{text-align:left;font-family:inherit;color:var(--t1)}
+td.sub{text-align:left;font-family:inherit;color:var(--t3);font-size:11px}
+td.neg{color:var(--warn)}
+tr.total-row td{font-weight:700;background:var(--surface)}
+tr:nth-child(even){background:var(--surface)}
+tr.highlight td{background:var(--blue-soft)!important;font-weight:700;color:var(--blue)}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,29,46,.82);z-index:9999;display:flex;align-items:center;justify-content:center}
+.modal-box{background:white;border-radius:10px;overflow:hidden;width:min(820px,95vw)}
+.modal-head{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.modal-close{font-size:22px;color:var(--t3);line-height:1;cursor:pointer}
+.video-wrap{position:relative;padding-bottom:56.25%;height:0}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{margin:0;padding:0;background:white}
+  #masthead{position:static!important;height:auto!important;padding:8px 0!important;box-shadow:none!important}
+  #stepper,.btn-ghost,.print-btn,.coll-arr{display:none!important}
+  .page-grid,.p2-grid{display:block!important}
+  aside{display:none!important}
+  .coll-body{display:block!important}
+  .coll-head{break-after:avoid!important}
+  .result-banner,.metric,.chart-box,.collapsible,.helper-card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid}
+  table{font-size:9px;table-layout:fixed}
+  th,td{padding:3px 5px}
+  thead{display:table-header-group}
+  tr{break-inside:avoid}
+  @page{margin:0.5in;size:landscape}
+}
+</style>
+</head>
+<body>
+<div id="masthead">
+  <div class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg></div>
+    <div class="logo-text">Cap<span>Plan</span></div>
+  </div>
+  <div class="module-name">Setting a Rental Rate</div>
+  <div style="position:relative">
+    <button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600" id="cur-btn" onclick="toggleCur()"><span id="cur-label">$ USD</span> ▾</button>
+    <div id="cur-dropdown" style="display:none;position:absolute;right:0;top:110%;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,29,46,.16);min-width:200px;z-index:300;overflow:hidden"></div>
+  </div>
+</div>
+<div id="stepper">
+  <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Asset &amp; Rental Details</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step2"><div class="step-num" id="sn2">2</div><div class="step-label">Results</div></div>
+</div>
+<div id="main-content"></div>
+<script>
+var CURRENCIES=[
+  {code:"USD",symbol:"$",label:"US Dollar"},{code:"EUR",symbol:"€",label:"Euro"},
+  {code:"JPY",symbol:"¥",label:"Japanese Yen"},{code:"GBP",symbol:"£",label:"British Pound"},
+  {code:"INR",symbol:"₹",label:"Indian Rupee"},{code:"CHF",symbol:"CHF",label:"Swiss Franc"},
+  {code:"CAD",symbol:"CA$",label:"Canadian Dollar"},{code:"AUD",symbol:"AU$",label:"Australian Dollar"},
+  {code:"NZD",symbol:"NZ$",label:"New Zealand Dollar"}
+];
+function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
+
+var S={
+  page:1,currency:"USD",cur_open:false,
+  coc_open:false,coc_mode:"wacc",coc_kd:6,coc_ke:12,coc_wd:40,
+  coc_rf:4.5,coc_beta:1.0,coc_mrp:5.5,
+  res:null,show_dcf:false,show_depr:false,show_hrs_sens:false,show_life_sens:false,
+  missingFields:null,hrs_open:false,
+  // inputs — blank by default
+  cost:"",itcPct:"",life:"",salvage:"",
+  method:"Double-declining",hyr:true,ddbRate:"",
+  om1:"",omType:"Constant amount",omInc:"",yearlyOM:[],
+  hours:"",taxRate:"",coc:""
+};
+
+function toggleCur(){
+  S.cur_open=!S.cur_open;
+  var dd=document.getElementById("cur-dropdown");
+  dd.style.display=S.cur_open?"block":"none";
+  if(S.cur_open){
+    dd.innerHTML="";
+    CURRENCIES.forEach(function(c){
+      var b=document.createElement("button");
+      b.style.cssText="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:"+(c.code===S.currency?"var(--blue-soft)":"transparent")+";border:none;border-bottom:1px solid var(--border);cursor:pointer";
+      b.innerHTML='<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--blue);width:36px">'+c.symbol+'</span><span>'+c.label+'</span>';
+      b.onclick=function(){S.currency=c.code;S.cur_open=false;render()};
+      dd.appendChild(b);
+    });
+  }
+}
+
+// ── CALC ──────────────────────────────────────────────────────────────────────
+function calcDepr(cost,itcPct,life,method,hyr,ddbRate){
+  var base=cost-cost*itcPct/100;
+  var d=[];
+  if(method==="Double-declining"){
+    var rate=ddbRate/100;d.push(base*rate*(hyr?0.5:1));
+    for(var y=2;y<=life;y++)d.push((base-d.reduce(function(s,v){return s+v},0))*rate);
+  }else if(method==="Straight-line"){
+    var y1=base/life*(hyr?0.5:1);d.push(y1);
+    for(var y=2;y<=life;y++)d.push(hyr?(base-y1)/(life-1):base/life);
+  }else{
+    var y1=hyr?base/(life+1):2*base/(life+1);d.push(y1);
+    if(hyr)for(var y=2;y<=life;y++)d.push(2*base*(life-y+1)/((life+1)*(life-1)));
+    else    for(var y=2;y<=life;y++)d.push(base*(life-y+1)*2/(life*(life+1)));
+  }
+  return d;
+}
+
+function buildOM(life){
+  var om=[];
+  for(var i=0;i<life;i++){
+    if(S.omType==="Variable amount"){
+      om.push(+(S.yearlyOM[i]||0));
+    }else if(i===0){
+      om.push(+S.om1||0);
+    }else if(S.omType==="Constant amount"){
+      om.push(om[i-1]+(+S.omInc||0));
+    }else{
+      om.push(om[i-1]*(1+(+S.omInc||0)/100));
+    }
+  }
+  return om;
+}
+
+function calcRateFor(cost,itcPct,life,method,hyr,ddbRate,om1_,omType_,omInc_,yearlyOM_,hours,taxRate,coc){
+  var tx=taxRate/100,r=coc/100;
+  var itc=cost*itcPct/100;
+  var depr=calcDepr(cost,itcPct,life,method,hyr,ddbRate);
+  var om=[];
+  for(var i=0;i<life;i++){
+    if(omType_==="Variable amount"){om.push(+(yearlyOM_[i]||0));}
+    else if(i===0){om.push(+om1_||0);}
+    else if(omType_==="Constant amount"){om.push(om[i-1]+(+omInc_||0));}
+    else{om.push(om[i-1]*(1+(+omInc_||0)/100));}
+  }
+  var n55=(cost
+    -itc/(1+r)
+    -depr.reduce(function(s,d,i){return s+d*tx/Math.pow(1+r,i+1)},0)
+    -itc  // wait — ITC reduces depreciable base in non-US? No, ITC is a separate inflow
+    // Actually: cost - PV(ITC) - PV(tax shields) - PV(salvage) + PV(loss of TS) + PV(AT O&M)
+    // Let me redo:
+  );
+  // Redo properly
+  var pvITC=itc/(1+r);
+  var pvTS=depr.reduce(function(s,d,i){return s+d*tx/Math.pow(1+r,i+1)},0);
+  var pvSalv=+(S.salvage||0)/Math.pow(1+r,life);
+  var pvLoss=+(S.salvage||0)*tx/Math.pow(1+r,life);
+  var pvOM=om.reduce(function(s,v,i){return s+v*(1-tx)/Math.pow(1+r,i+1)},0);
+  var n55=cost-pvITC-pvTS-pvSalv+pvLoss+pvOM;
+  var af=r>0?(1-Math.pow(1+r,-life))/r:life;
+  return hours>0?n55/((1-tx)*hours*af):0;
+}
+
+function calcAll(){
+  var cost=+S.cost,itcPct=+S.itcPct,life=+S.life||1,salvage=+S.salvage;
+  var ddbRate=+S.ddbRate,tx=+S.taxRate/100,r=+S.coc/100,hours=+S.hours;
+  var itc=cost*itcPct/100;
+  var depr=calcDepr(cost,itcPct,life,S.method,S.hyr,ddbRate);
+  var om=buildOM(life);
+
+  var pvITC=itc/(1+r);
+  var pvTS=depr.reduce(function(s,d,i){return s+d*tx/Math.pow(1+r,i+1)},0);
+  var pvSalv=salvage/Math.pow(1+r,life);
+  var pvLoss=salvage*tx/Math.pow(1+r,life);
+  var pvOM=om.reduce(function(s,v,i){return s+v*(1-tx)/Math.pow(1+r,i+1)},0);
+  var n55=cost-pvITC-pvTS-pvSalv+pvLoss+pvOM;
+  var af=r>0?(1-Math.pow(1+r,-life))/r:life;
+  var rentalRate=hours>0?n55/((1-tx)*hours*af):0;
+  var annualRevenue=rentalRate*hours;
+
+  // CoC sensitivity
+  var cocSens=[-4,-3,-2,-1,0,1,2,3,4].map(function(delta){
+    var rc=(+S.coc+delta)/100;if(rc<=0)return{label:(+S.coc+delta)+"%",rate:0};
+    var pvITC2=itc/(1+rc);
+    var pvTS2=depr.reduce(function(s,d,i){return s+d*tx/Math.pow(1+rc,i+1)},0);
+    var pvSalv2=salvage/Math.pow(1+rc,life);
+    var pvLoss2=salvage*tx/Math.pow(1+rc,life);
+    var pvOM2=om.reduce(function(s,v,i){return s+v*(1-tx)/Math.pow(1+rc,i+1)},0);
+    var n55_2=cost-pvITC2-pvTS2-pvSalv2+pvLoss2+pvOM2;
+    var af2=rc>0?(1-Math.pow(1+rc,-life))/rc:life;
+    return{label:(+S.coc+delta)+"%",rate:hours>0?n55_2/((1-tx)*hours*af2):0};
+  });
+
+  return{rentalRate:rentalRate,annualRevenue:annualRevenue,
+    cost:cost,pvITC:pvITC,pvTS:pvTS,pvSalv:pvSalv,pvLoss:pvLoss,pvOM:pvOM,
+    n55:n55,af:af,depr:depr,om:om,itc:itc,cocSens:cocSens};
+}
+
+// ── FORMAT ────────────────────────────────────────────────────────────────────
+function fmt(n,d){if(n==null||isNaN(n))return"--";d=d||0;return n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmtM(n){if(n==null||isNaN(n))return"--";var s=getSym();return n<0?"-"+s+fmt(Math.abs(n)):s+fmt(n)}
+function fmtR(n){if(n==null||isNaN(n))return"--";return getSym()+fmt(n,2)}
+
+// ── STEPPER ───────────────────────────────────────────────────────────────────
+function updateStepper(){
+  for(var i=1;i<=2;i++){
+    var step=document.getElementById("step"+i),sn=document.getElementById("sn"+i);
+    step.className="step";
+    if(i<S.page){step.classList.add("done");sn.textContent="✓"}
+    else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}
+    else sn.textContent=String(i);
+    var n=i;
+    (function(n,step){step.onclick=function(){if(n<S.page||(n===2&&S.res)){S.page=n;render()}}})(n,step);
+    step.style.cursor=(i<S.page||(i===2&&S.res))?"pointer":"default";
+  }
+}
+
+// ── BRIEFING NOTES ────────────────────────────────────────────────────────────
+var NOTES1=[
+  {q:"What does this model provide beyond the rental rate?",
+   a:"In addition to the minimum rental rate, this model provides three pieces of additional assistance on the results page. First, a rental rate by hours sensitivity table showing how the rate changes as annual rental hours vary — essential for understanding how sensitive your rate is to utilisation. Second, a rental rate by term length table showing how economic life affects the rate. Third, on the inputs page, a rental hours estimator to help you arrive at a realistic annual hours figure from utilisation rates and available working time.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"What is included in the cost of the asset?",
+   a:"The cost includes the purchase price plus transportation, installation, training, and all other costs required to put the asset in service. Tax authorities in most jurisdictions require that installation costs be added to the purchase price to determine the depreciable value. If in doubt, consult your accountant.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"How do I estimate economic life and salvage value?",
+   a:"Economic life is how long the asset will be productive as a rental asset. Use your experience with similar assets or industry replacement data. Salvage value at end of life depends on obsolescence, market conditions, and physical condition — use your experience with similar assets or industry data.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"What depreciation method should I use and what is the half-year rule?",
+   a:"The applicable method is set by your tax jurisdiction. Double-declining gives the largest early deductions; straight-line spreads them evenly; sum-of-years-digits falls in between. The half-year rule assumes the asset is placed in service at mid-year, halving the first year's deduction.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"What are operating expenses and how do I estimate them?",
+   a:"Operating expenses include fuel, electricity, lubrication, parts, repairs, and scheduled maintenance. Enter year-1 expenses from your own records or industry data. Subsequent years can be modelled as a constant dollar increase, a constant percentage increase, or entered year by year.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"How do I estimate rental hours per year?",
+   a:"There are two sources: your own records for similar assets, or industry and trade data for new asset types. The rental hours estimator on the inputs page can help you build up an estimate from utilisation rate and available working days. Whatever estimate you use, test its sensitivity — run the analysis at 2 or 3 different hour levels to see how the rental rate changes. If hours fall below estimate you may need to raise rates; if hours exceed estimate you may be able to reduce them.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"How do I calculate a required rate of return?",
+   a:"Your required rate of return reflects the cost of the funds invested in the asset — a blend of your borrowing rate and your opportunity cost. Use the Cost of Capital Calculator to estimate it using WACC or CAPM.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+];
+var NOTES2=[
+  {q:"What does this analysis tell me?",
+   a:"The analysis calculates the minimum rental rate that recovers your full investment in the asset — including the cost of the asset, operating expenses, and cost of capital — while accounting for all tax benefits. Any rate above this figure earns more than your required return; any rate below it means you are not fully recovering your investment.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"How do I use this to make a pricing decision?",
+   a:"This is a floor rate — the minimum you must charge to recover your investment. Your actual pricing decision must also consider market rates for similar rental assets. If market rates are below your calculated floor, reconsider the investment. If market rates are above your floor, you have flexibility to price competitively while still exceeding your required return.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"What does the sensitivity chart tell me?",
+   a:"The chart shows how the rental rate changes as your required return varies. A steeper slope means the rate is more sensitive to your financing costs. Use this to understand how much your rental rate would need to change if your cost of capital changed.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"Why does the rental hours estimate matter so much?",
+   a:"Rental hours appear in the denominator of the rate formula — doubling hours roughly halves the rate. This makes hours one of the most sensitive inputs in the model. The hours sensitivity table on this page shows exactly how much the rate changes for different utilisation levels, helping you understand the range of rates you may need to consider.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"What does the DCF summary tell me?",
+   a:"The DCF summary shows the present value of each component of your outflows — the net cost of the asset after tax benefits, plus the after-tax present value of operating expenses. The rental rate is calculated to recover this total present value through the after-tax rental revenue stream over the asset's economic life.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+];
+
+function makeBNList(notes,containerId){
+  var list=document.getElementById(containerId);if(!list)return;list.innerHTML="";
+  notes.forEach(function(n,i){
+    var item=document.createElement("div");item.className="bn-item";
+    var head=document.createElement("div");head.className="bn-head";
+    head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+containerId+i+'">›</div>';
+    var body=document.createElement("div");body.className="bn-body";body.textContent=n.a;
+    if(n.v){var vb=document.createElement("button");vb.className="watch-btn";vb.textContent="▶ Learn More";vb.onclick=function(e){e.stopPropagation();openVideo(n.v)};body.appendChild(vb)}
+    head.onclick=function(){var open=body.classList.contains("open");body.classList.toggle("open");document.getElementById("arr"+containerId+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";head.style.background=open?"":"var(--surface)";};
+    item.appendChild(head);item.appendChild(body);list.appendChild(item);
+  });
+}
+function openVideo(url){
+  var id=url.split(/[/?=v]/).filter(function(s){return s.length>5}).pop()||"";
+  var ov=document.createElement("div");ov.className="modal-overlay";
+  ov.innerHTML='<div class="modal-box"><div class="modal-head"><span style="font-size:13px;font-weight:700;color:var(--t2)">Learn More</span><button class="modal-close">×</button></div><div class="video-wrap"><iframe src="https://www.youtube.com/embed/'+id+'" allowfullscreen frameborder="0"></iframe></div></div>';
+  ov.querySelector(".modal-close").onclick=function(){ov.remove()};
+  ov.onclick=function(e){if(e.target===ov)ov.remove()};
+  document.body.appendChild(ov);
+}
+
+// ── CoC CALCULATOR ────────────────────────────────────────────────────────────
+function renderCoC(){
+  var box=document.getElementById("coc-box");if(!box)return;box.innerHTML="";
+  var tx=35,we=100-S.coc_wd;
+  var wacc=+(S.coc_kd*(1-tx/100)*S.coc_wd/100+S.coc_ke*we/100).toFixed(2);
+  var capm=+(S.coc_rf+S.coc_beta*S.coc_mrp).toFixed(2);
+  var result=S.coc_mode==="wacc"?wacc:capm;
+  if(!S.coc_open){
+    box.innerHTML='<button onclick="S.coc_open=true;renderCoC()" style="display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;background:none;border:none;cursor:pointer;text-align:left"><div style="width:34px;height:34px;background:var(--green-soft);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="9" r="3"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2"/></svg></div><div><div style="font-size:13px;font-weight:700;color:var(--blue)">Cost of Capital Calculator</div><div style="font-size:11px;color:var(--t3);margin-top:2px">WACC · CAPM</div></div><span style="margin-left:auto;color:var(--t3)">›</span></button>';
+    return;
+  }
+  var html='<div style="border:1px solid var(--blue);border-radius:8px;overflow:hidden"><div style="background:var(--blue);padding:11px 14px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:700;color:white">Cost of Capital Calculator</span><button onclick="S.coc_open=false;renderCoC()" style="color:rgba(255,255,255,.7);font-size:20px">×</button></div><div style="padding:12px 14px 0;display:flex;gap:8px">';
+  [{k:"wacc",n:"WACC",s:"Borrowing rate"},{k:"capm",n:"CAPM",s:"Market risk"}].forEach(function(t){
+    html+='<button onclick="S.coc_mode=\''+t.k+'\';renderCoC()" style="flex:1;padding:8px 10px;border-radius:7px;border:1.5px solid '+(S.coc_mode===t.k?"var(--blue)":"var(--border)")+';background:'+(S.coc_mode===t.k?"var(--blue-soft)":"transparent")+';cursor:pointer;text-align:left"><div style="font-size:12px;font-weight:700;color:'+(S.coc_mode===t.k?"var(--blue)":"var(--t2)")+'">'+t.n+'</div><div style="font-size:10px;color:var(--t3)">'+t.s+'</div></button>';
+  });
+  html+='</div><div style="padding:14px">';
+  if(S.coc_mode==="wacc"){html+=cR("Cost of Debt (pre-tax)","coc_kd",S.coc_kd,"%");html+=cR("Cost of Equity","coc_ke",S.coc_ke,"%");html+=cR("Debt Weighting","coc_wd",S.coc_wd,"%");html+='<div style="background:var(--surface);border-radius:5px;padding:8px 10px;font-size:11px">WACC = <strong style="color:var(--green)">'+wacc+'%</strong></div>';}
+  else{html+=cR("Risk-Free Rate","coc_rf",S.coc_rf,"%");html+=cR("Beta","coc_beta",S.coc_beta,"");html+=cR("Market Risk Premium","coc_mrp",S.coc_mrp,"%");html+='<div style="background:var(--surface);border-radius:5px;padding:8px 10px;font-size:11px">Ke = '+S.coc_rf+'% + '+S.coc_beta+' × '+S.coc_mrp+'% = <strong style="color:var(--green)">'+capm+'%</strong></div>';}
+  html+='<div style="margin-top:12px;padding:10px 14px;background:var(--green-soft);border-radius:8px;border:1px solid var(--green);display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--green)">Calculated Rate</div><div style="font-family:monospace;font-size:22px;font-weight:700;color:var(--green)">'+result+'%</div></div><button onclick="S.coc='+result+';renderCoC();var el=document.getElementById(\'inp-coc\');if(el)el.value='+result+'" style="background:var(--green);color:white;border:none;border-radius:7px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer">Use this rate →</button></div></div></div>';
+  box.innerHTML=html;
+}
+function cR(l,k,v,s){return'<div style="margin-bottom:11px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:5px">'+l+'</div><div class="ui"><input type="text" value="'+v+'" onchange="S.'+k+'=+this.value||0;renderCoC()" onfocus="this.style.borderBottomColor=\'var(--blue)\'" onblur="this.style.borderBottomColor=\'var(--border)\'" style="font-family:monospace;font-size:15px;font-weight:600;border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;outline:none;padding:2px 0">'+(s?'<span style="font-size:12px;color:var(--t3)">'+s+'</span>':'')+'</div></div>'}
+
+// ── FIELD HELPERS ─────────────────────────────────────────────────────────────
+function field(label,inputHtml,fullWidth,last,note){
+  return'<div class="field'+(fullWidth?" full":"")+(last?" last":"")+'"><div class="field-label">'+label+'</div>'+inputHtml+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';
+}
+function uInput(prefix,value,id,onblur,suffix,disabled){
+  return'<div class="ui">'+(prefix?'<span class="pfx">'+prefix+'</span>':'')+
+    '<input type="text" id="'+id+'" value="'+(value==null?"":value)+'" '+(disabled?'disabled ':'')+
+    'onblur="'+onblur+'" onfocus="this.style.borderBottomColor=\'var(--blue)\'">'+(suffix?'<span class="sfx">'+suffix+'</span>':'')+'</div>';
+}
+
+// ── VALIDATION ────────────────────────────────────────────────────────────────
+function goToResults(){
+  var missing=[];
+  if(!S.cost)missing.push("Cost of Asset");
+  if(S.itcPct===""||S.itcPct==null)missing.push("ITC");
+  if(!S.life)missing.push("Economic Life");
+  if(!S.salvage&&S.salvage!==0)missing.push("Salvage Value");
+  if(S.method==="Double-declining"&&!S.ddbRate)missing.push("Depreciation Rate");
+  if(!S.om1)missing.push("Year 1 Operating Expenses");
+  if(S.omType!=="Variable amount"&&!S.omInc&&S.omInc!==0)missing.push("Annual O&M Increase");
+  if(!S.hours)missing.push("Rental Hours per Year");
+  if(!S.taxRate)missing.push("Tax Rate");
+  if(!S.coc)missing.push("Required Rate of Return");
+  if(missing.length>0){S.missingFields=missing;render();return;}
+  S.missingFields=null;
+  try{S.res=calcAll();S.page=2;render();}
+  catch(e){alert("Calculation error: "+e.message)}
+}
+
+function resetInputs(){
+  S.cost="";S.itcPct="";S.life="";S.salvage="";
+  S.method="Double-declining";S.hyr=true;S.ddbRate="";
+  S.om1="";S.omType="Constant amount";S.omInc="";S.yearlyOM=[];
+  S.hours="";S.taxRate="";S.coc="";S.missingFields=null;S.hrs_open=false;
+  render();
+}
+function loadExample(){
+  S.cost=100000;S.itcPct=15;S.life=5;S.salvage=9000;
+  S.method="Double-declining";S.hyr=true;S.ddbRate=20;
+  S.om1=3000;S.omType="Constant amount";S.omInc=900;S.yearlyOM=[];
+  S.hours=500;S.taxRate=40;S.coc=10;S.missingFields=null;
+  render();
+}
+
+// ── CHART ─────────────────────────────────────────────────────────────────────
+function drawChart(canvasId,data){
+  var canvas=document.getElementById(canvasId);if(!canvas)return;
+  var ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;
+  var pad={top:12,bottom:48,left:72,right:12};
+  var cw=W-pad.left-pad.right,ch=H-pad.top-pad.bottom;
+  ctx.clearRect(0,0,W,H);
+  var vals=data.map(function(d){return d.rate}).filter(function(v){return v>0});
+  if(!vals.length)return;
+  var minV=Math.min.apply(null,vals),maxV=Math.max.apply(null,vals);
+  var rng=maxV-minV||maxV*0.2;var lo=minV-rng*0.15,hi=maxV+rng*0.15;
+  ctx.strokeStyle="#E2E6EC";ctx.lineWidth=1;
+  for(var i=0;i<=4;i++){
+    var y=pad.top+ch*(1-i/4);ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();
+    ctx.fillStyle="#8A96A6";ctx.font="10px system-ui";ctx.textAlign="right";
+    ctx.fillText(getSym()+fmt(lo+(hi-lo)*(i/4),2),pad.left-3,y+3);
+  }
+  var bw=Math.floor(cw/data.length*0.55),gap=cw/data.length;
+  var midIdx=Math.floor(data.length/2);
+  data.forEach(function(d,i){
+    if(d.rate<=0)return;
+    var x=pad.left+gap*i+(gap-bw)/2,bh=(d.rate-lo)/(hi-lo)*ch,y=pad.top+ch-bh;
+    ctx.fillStyle=i===midIdx?"#1B3F6E":"#93B4D8";ctx.fillRect(x,y,bw,bh);
+    ctx.fillStyle=i===midIdx?"var(--blue)":"#8A96A6";
+    ctx.font=i===midIdx?"bold 10px system-ui":"10px system-ui";
+    ctx.textAlign="center";ctx.fillText(d.label,x+bw/2,H-pad.bottom+13);
+  });
+  ctx.strokeStyle="#4A5568";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(pad.left,pad.top+ch);ctx.lineTo(pad.left+cw,pad.top+ch);ctx.stroke();
+  ctx.fillStyle="#4A5568";ctx.font="bold 12px system-ui";ctx.textAlign="center";
+  ctx.fillText("Required Rate of Return (%)",pad.left+cw/2,H-3);
+}
+
+// ── PAGE 1 ────────────────────────────────────────────────────────────────────
+function renderPage1(){
+  var sym=getSym(),isDDB=S.method==="Double-declining";
+  var html='<div class="page"><div class="page-grid"><aside>';
+  html+='<div class="section-label">Briefing Notes</div>';
+  html+='<div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div>';
+  html+='<div class="section-label">Tools</div>';
+  html+='<div class="panel"><div id="coc-box"></div></div>';
+  html+='</aside><main>';
+
+  // Rental hours estimator (amber helper card)
+  html+='<div class="helper-card">';
+  html+='<div class="helper-head" onclick="S.hrs_open=!S.hrs_open;render()">';
+  html+='<span class="helper-icon">⏱️</span>';
+  html+='<span class="helper-title">Estimate annual rental hours</span>';
+  html+='<span class="helper-toggle">'+(S.hrs_open?'▲ hide':'▼ show')+'</span>';
+  html+='</div>';
+  if(S.hrs_open){
+    var wdays=+S.hrs_wdays||250,hpday=+S.hrs_hpday||8,util=+S.hrs_util||70;
+    var suggested=Math.round(wdays*hpday*util/100);
+    html+='<div class="helper-body">';
+    html+='<div style="font-size:13px;color:var(--t2);line-height:1.6">Build up an annual hours estimate from available working time and expected utilisation rate. Adjust each figure to match your specific situation.</div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">';
+    html+='<div><div class="helper-label">Working days per year</div>';
+    html+='<div class="ui"><input type="text" value="'+(S.hrs_wdays||250)+'" onblur="S.hrs_wdays=+this.value||250;render()" onfocus="this.style.borderBottomColor=\'var(--blue)\'" style="font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none"><span class="sfx">days</span></div>';
+    html+='<div class="field-note">e.g. 250 days (5-day week less holidays)</div></div>';
+    html+='<div><div class="helper-label">Hours available per day</div>';
+    html+='<div class="ui"><input type="text" value="'+(S.hrs_hpday||8)+'" onblur="S.hrs_hpday=+this.value||8;render()" onfocus="this.style.borderBottomColor=\'var(--blue)\'" style="font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none"><span class="sfx">hrs</span></div>';
+    html+='<div class="field-note">e.g. 8 hrs (single shift)</div></div>';
+    html+='<div><div class="helper-label">Expected utilisation rate</div>';
+    html+='<div class="ui"><input type="text" value="'+(S.hrs_util||70)+'" onblur="S.hrs_util=+this.value||70;render()" onfocus="this.style.borderBottomColor=\'var(--blue)\'" style="font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none"><span class="sfx">%</span></div>';
+    html+='<div class="field-note">% of available time actually rented</div></div>';
+    html+='</div>';
+    html+='<div class="helper-result">';
+    html+='<div><div style="font-size:13px;color:var(--t2)">Estimated annual rental hours: <strong style="color:var(--green)">'+fmt(suggested)+' hours</strong></div>';
+    html+='<div style="font-size:11px;color:var(--t3);margin-top:3px">'+fmt(wdays)+' days × '+fmt(hpday)+' hrs × '+fmt(util)+'% utilisation</div></div>';
+    html+='<button class="helper-use" onclick="S.hours='+suggested+';S.hrs_open=false;render()">Use this estimate ›</button>';
+    html+='</div>';
+    html+='</div>';
+  }
+  html+='</div>';
+
+  // Asset Data
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Data</div></div><div class="field-grid">';
+  html+=field("Cost of Asset",uInput(sym,S.cost,"inp-cost","S.cost=+this.value||0","",false));
+  html+=field("Investment Tax Credit",uInput("",S.itcPct,"inp-itc","S.itcPct=+this.value||0","%",false));
+  html+=field("Economic Life",uInput("",S.life,"inp-life","S.life=+this.value||0","years",false));
+  html+=field("Salvage Value",uInput(sym,S.salvage,"inp-salv","S.salvage=+this.value||0","",false),false,true);
+  html+='</div></div>';
+
+  // Depreciation
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--green)"></div><div class="panel-title">Depreciation</div></div><div class="field-grid">';
+  html+=field("Method",'<div class="ui"><select onchange="S.method=this.value;render()">'+["Double-declining","Straight-line","Sum-of-years-digits"].map(function(m){return'<option'+(m===S.method?" selected":"")+'>'+m+'</option>'}).join("")+'</select></div>');
+  html+=field(isDDB?"Depreciation Rate":"Depreciation Rate — N/A",
+    uInput("",isDDB?S.ddbRate:"N/A","inp-rate","if(S.method===\'Double-declining\')S.ddbRate=+this.value||0","%",!isDDB)+
+    (!isDDB?'<div class="field-note">Not applicable — defined by method formula</div>':""));
+  html+=field("Half-Year Rule",'<div class="pills"><div class="pill'+(S.hyr?" active":"")+'" onclick="S.hyr=true;render()"><div class="pill-dot"></div>Yes</div><div class="pill'+(!S.hyr?" active":"")+'" onclick="S.hyr=false;render()"><div class="pill-dot"></div>No</div></div>',true,true);
+  html+='</div></div>';
+
+  // Operating Expenses
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:#9F7AEA"></div><div class="panel-title">Operating Expenses</div></div><div class="field-grid">';
+  html+=field("Year 1 Operating Expenses",uInput(sym,S.om1,"inp-om1","S.om1=+this.value||0","",false));
+  html+=field("Annual Increase Method",'<div class="ui"><select id="om-type-sel" onchange="S.omType=this.value;render()">'+["Constant amount","Constant percentage","Variable amount"].map(function(t){return'<option value="'+t+'"'+(t===S.omType?" selected":"")+'>'+t+'</option>'}).join("")+'</select></div>');
+  if(S.omType!=="Variable amount"){
+    var lbl=S.omType==="Constant amount"?"Annual Increase Amount":"Annual Increase Rate";
+    var sfx=S.omType==="Constant percentage"?"%":"";
+    html+=field(lbl,uInput(S.omType==="Constant amount"?sym:"",S.omInc,"inp-ominc","S.omInc=+this.value||0",sfx,false),false,true);
+  }else{
+    html+=field("Variable amount — enter each year on next page",'<div style="font-size:11px;color:var(--t3);padding-top:4px">O&M costs will be entered year by year</div>',false,true);
+  }
+  html+='</div></div>';
+
+  // Rental & Firm Data
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--t3)"></div><div class="panel-title">Rental &amp; Firm Data</div></div><div class="field-grid">';
+  html+=field("Annual Rental Hours",uInput("",S.hours,"inp-hrs","S.hours=+this.value||0","hrs/yr",false),false,false,"Total hours the asset is available for rent per year");
+  html+=field("Tax Rate",uInput("",S.taxRate,"inp-tax","S.taxRate=+this.value||0","%",false));
+  html+=field("Required Rate of Return",uInput("",S.coc,"inp-coc","S.coc=+this.value||0","%",false),false,true);
+  html+='</div></div>';
+
+  if(S.missingFields&&S.missingFields.length>0){
+    html+='<div style="background:rgba(200,75,49,.07);border:1.5px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)"><strong>Please complete the following before continuing:</strong> '+S.missingFields.join(", ")+'.</div>';
+  }
+  html+='<div class="action-row" style="justify-content:space-between;align-items:center">';
+  html+='<span style="font-size:11.5px;color:var(--t3)">New here? Try <strong style="color:var(--t2)">Load Example</strong> to see how it works.</span>';
+  html+='<div style="display:flex;gap:10px"><button class="btn-ghost" onclick="loadExample()">Load Example</button><button class="btn-ghost" onclick="resetInputs()">Reset</button>';
+  if(S.omType==="Variable amount"&&S.life){
+    html+='<button class="btn-primary" onclick="goToVariableOM()">Next: Enter O&M ›</button>';
+  }else{
+    html+='<button class="btn-primary" onclick="goToResults()">Calculate ›</button>';
+  }
+  html+='</div></div>';
+  html+='</main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES1,"bn-list1");
+  renderCoC();
+  var omSel=document.getElementById("om-type-sel");
+  if(omSel)omSel.value=S.omType;
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+}
+
+// ── PAGE 1.5: Variable O&M ────────────────────────────────────────────────────
+function goToVariableOM(){
+  var missing=[];
+  if(!S.cost)missing.push("Cost");if(!S.life)missing.push("Economic Life");
+  if(!S.om1)missing.push("Year 1 O&M");if(!S.hours)missing.push("Rental Hours");
+  if(!S.taxRate)missing.push("Tax Rate");if(!S.coc)missing.push("Cost of Capital");
+  if(missing.length>0){S.missingFields=missing;render();return;}
+  S.missingFields=null;S.page=1.5;render();
+}
+function renderVariableOM(){
+  var sym=getSym(),life=+S.life||1;
+  while(S.yearlyOM.length<life)S.yearlyOM.push(S.yearlyOM.length===0?(+S.om1||0):0);
+  var html='<div class="page" style="max-width:700px"><div class="panel">';
+  html+='<div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Operating Expenses by Year</div></div>';
+  html+='<div style="padding:10px 18px 8px;display:grid;grid-template-columns:72px 1fr;gap:0 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);border-bottom:1px solid var(--border)"><span>Year</span><span>O&M Cost</span></div>';
+  html+='<div style="max-height:420px;overflow-y:auto">';
+  for(var i=0;i<life;i++){
+    html+='<div style="padding:9px 18px;display:grid;grid-template-columns:72px 1fr;gap:0 14px;align-items:center;border-bottom:1px solid var(--border);background:'+(i%2===0?"var(--surface)":"transparent")+'">';
+    html+='<span style="font-size:12px;font-weight:600;color:var(--t2)">Year '+(i+1)+'</span>';
+    html+='<div class="ui"><span class="pfx">'+sym+'</span><input type="text" value="'+(S.yearlyOM[i]||"")+'" placeholder="0" data-idx="'+i+'" onblur="S.yearlyOM[+this.dataset.idx]=+this.value||0" onfocus="this.style.borderBottomColor=\'var(--blue)\'"></div>';
+    html+='</div>';
+  }
+  html+='</div></div>';
+  html+='<div style="display:flex;justify-content:space-between;gap:10px"><button class="btn-ghost" onclick="S.page=1;render()">‹ Back</button><button class="btn-primary" onclick="goToResults()">Calculate ›</button></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+}
+
+// ── PAGE 2: Results ────────────────────────────────────────────────────────────
+function renderPage2(){
+  var res=S.res,sym=getSym();
+  var html='<div class="page"><div class="p2-grid"><aside>';
+  html+='<div class="section-label">Understanding Results</div>';
+  html+='<div class="panel" style="margin-bottom:14px"><div id="bn-list2"></div></div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px"><button class="btn-ghost" onclick="S.page=1;render()">‹ Edit Inputs</button><button class="print-btn" onclick="printSummary()">🖶 Print Summary</button></div>';
+  html+='</aside><main>';
+
+  // Banner
+  html+='<div class="result-banner">';
+  html+='<div><div class="banner-headline">Set your rental rate at <strong>'+fmtR(res.rentalRate)+'</strong> per hour.</div>';
+  html+='<div style="font-size:13px;color:var(--t2);margin-top:6px;line-height:1.6">This rate recovers your full investment of '+fmtM(res.cost)+' including operating expenses and earns your required return of '+S.coc+'% on '+fmt(+S.hours)+' rental hours per year.</div></div>';
+  html+='<div class="rate-box"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.75)">Minimum Rental Rate</div>';
+  html+='<div style="font-family:monospace;font-size:28px;font-weight:800;color:white;margin-top:4px">'+fmtR(res.rentalRate)+'</div>';
+  html+='<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">per hour</div></div></div>';
+
+  // Orientation strip
+  html+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 18px;margin-bottom:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
+  html+='<span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);flex-shrink:0">This page also provides:</span>';
+  html+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  html+='<span style="font-size:12px;color:var(--t2);background:white;border:1px solid var(--border);border-radius:5px;padding:3px 10px">⏱️ Rate by rental hours</span>';
+  html+='<span style="font-size:12px;color:var(--t2);background:white;border:1px solid var(--border);border-radius:5px;padding:3px 10px">📅 Rate by economic life</span>';
+  html+='<span style="font-size:12px;color:var(--t2);background:white;border:1px solid var(--border);border-radius:5px;padding:3px 10px">⏱️ Hours estimator (inputs page)</span>';
+  html+='</div></div>';
+
+  // Metrics
+  html+='<div class="metrics">';
+  html+='<div class="metric"><div class="metric-label">Annual Revenue</div><div class="metric-val ok">'+fmtM(res.annualRevenue)+'</div><div class="metric-sub">'+fmt(+S.hours)+' hrs × '+fmtR(res.rentalRate)+'/hr</div></div>';
+  html+='<div class="metric"><div class="metric-label">PV Net Cost to Recover</div><div class="metric-val">'+fmtM(res.n55)+'</div><div class="metric-sub">Capital + O&M net of tax benefits</div></div>';
+  html+='<div class="metric"><div class="metric-label">After-Tax Annuity Factor</div><div class="metric-val">'+fmt(res.af*(1-S.taxRate/100),4)+'</div><div class="metric-sub">'+S.life+' yrs at '+S.coc+'% × (1−'+S.taxRate+'%)</div></div>';
+  html+='</div>';
+
+  // CoC sensitivity chart
+  html+='<div class="chart-box"><div class="chart-title">Rental Rate by Required Return on Investment</div>';
+  html+='<canvas id="sens-chart" width="700" height="240" style="width:100%;height:auto;display:block"></canvas></div>';
+
+  // Rate by rental hours sensitivity
+  html+='<div class="collapsible"><div class="coll-head" onclick="S.show_hrs_sens=!S.show_hrs_sens;renderPage2()"><span class="coll-title">Rental Rate by Annual Hours</span><span class="coll-arr" style="transform:'+(S.show_hrs_sens?'rotate(90deg)':'rotate(0deg)')+'" >›</span></div>';
+  if(S.show_hrs_sens){
+    var baseHrs=+S.hours;
+    html+='<div class="coll-body open" style="padding:4px 0">';
+    html+='<div style="padding:10px 18px 6px;font-size:12px;color:var(--t2);line-height:1.6">How the rental rate changes as annual utilisation hours vary. Since hours appear in the denominator of the formula, this is one of the most sensitive inputs in the model.</div>';
+    html+='<table><thead><tr><th class="left">Annual Hours</th><th>Rental Rate</th><th>Annual Revenue</th><th>vs Current</th></tr></thead><tbody>';
+    [0.60,0.70,0.80,0.90,1.00,1.10,1.20,1.30,1.40].forEach(function(mult){
+      var hrs=Math.round(baseHrs*mult);
+      var r2=hrs>0?res.n55/((1-S.taxRate/100)*hrs*res.af):0;
+      var diff=r2-res.rentalRate;
+      var isCurrent=Math.abs(mult-1.0)<0.001;
+      html+='<tr'+(isCurrent?' class="highlight"':'')+'><td class="left">'+(isCurrent?'★ ':'')+fmt(hrs)+' hrs ('+(Math.round(mult*100))+'%)</td>';
+      html+='<td>'+fmtR(r2)+'</td><td>'+fmtM(r2*hrs)+'</td>';
+      html+='<td style="color:'+(isCurrent?"var(--t3)":diff>0?"var(--warn)":"var(--green)")+'\">'+(isCurrent?"current":(diff>0?"+":"")+fmtR(diff))+'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+  }
+  html+='</div>';
+
+  // Rate by economic life sensitivity
+  html+='<div class="collapsible"><div class="coll-head" onclick="S.show_life_sens=!S.show_life_sens;renderPage2()"><span class="coll-title">Rental Rate by Economic Life</span><span class="coll-arr" style="transform:'+(S.show_life_sens?'rotate(90deg)':'rotate(0deg)')+'" >›</span></div>';
+  if(S.show_life_sens){
+    var baseLife=+S.life;
+    html+='<div class="coll-body open" style="padding:4px 0">';
+    html+='<div style="padding:10px 18px 6px;font-size:12px;color:var(--t2);line-height:1.6">How the rental rate changes as the asset\'s economic life varies. Longer life spreads the capital cost over more years but also means more O&M expense.</div>';
+    html+='<table><thead><tr><th class="left">Economic Life</th><th>Rental Rate</th><th>vs Current</th></tr></thead><tbody>';
+    for(var lifeV=Math.max(1,baseLife-3);lifeV<=baseLife+3;lifeV++){
+      var deprV=calcDepr(+S.cost,+S.itcPct,lifeV,S.method,S.hyr,+S.ddbRate);
+      var omV=[];var om_=+S.om1;
+      for(var ii=0;ii<lifeV;ii++){
+        if(ii===0){omV.push(om_);}
+        else if(S.omType==="Constant amount"){omV.push(omV[ii-1]+(+S.omInc||0));}
+        else if(S.omType==="Constant percentage"){omV.push(omV[ii-1]*(1+(+S.omInc||0)/100));}
+        else{omV.push(+(S.yearlyOM[ii]||0));}
+      }
+      var r2=+S.coc/100,tx2=+S.taxRate/100;
+      var pvITC2=(+S.cost*+S.itcPct/100)/(1+r2);
+      var pvTS2=deprV.reduce(function(s,d,i){return s+d*tx2/Math.pow(1+r2,i+1)},0);
+      var pvSalv2=+S.salvage/Math.pow(1+r2,lifeV);
+      var pvLoss2=+S.salvage*tx2/Math.pow(1+r2,lifeV);
+      var pvOM2=omV.reduce(function(s,v,i){return s+v*(1-tx2)/Math.pow(1+r2,i+1)},0);
+      var n55V=+S.cost-pvITC2-pvTS2-pvSalv2+pvLoss2+pvOM2;
+      var afV=r2>0?(1-Math.pow(1+r2,-lifeV))/r2:lifeV;
+      var rate2=afV>0?n55V/((1-tx2)*(+S.hours)*afV):0;
+      var diff2=rate2-res.rentalRate;
+      var isCurrent=(lifeV===baseLife);
+      html+='<tr'+(isCurrent?' class="highlight"':'')+'><td class="left">'+(isCurrent?'★ ':'')+lifeV+' year'+(lifeV>1?'s':'')+'</td>';
+      html+='<td>'+fmtR(rate2)+'</td>';
+      html+='<td style="color:'+(isCurrent?"var(--t3)":diff2>0?"var(--warn)":"var(--green)")+'\">'+(isCurrent?"current":(diff2>0?"+":"")+fmtR(diff2))+'</td></tr>';
+    }
+    html+='</tbody></table></div>';
+  }
+  html+='</div>';
+
+  // DCF Summary
+  html+='<div class="collapsible"><div class="coll-head" onclick="S.show_dcf=!S.show_dcf;renderPage2()"><span class="coll-title">DCF Summary</span><span class="coll-arr" style="transform:'+(S.show_dcf?'rotate(90deg)':'rotate(0deg)')+'" >›</span></div>';
+  if(S.show_dcf){
+    html+='<div class="coll-body open"><table><tbody>';
+    html+='<tr class="total-row"><td class="left" colspan="2">Present Value of Net Costs to Recover</td><td>'+fmtM(res.n55)+'</td></tr>';
+    var dcfRows=[
+      ["Cost of Asset","Year 0",res.cost,false],
+      ["Less: Investment Tax Credit","Year 1",-res.pvITC,true],
+      ["Less: Tax Shields (all years)","Years 1–"+S.life,-res.pvTS,true],
+      ["Less: Salvage Value","Year "+S.life,-res.pvSalv,true],
+      ["Plus: Loss of Tax Shield on Salvage","Year "+S.life,res.pvLoss,false],
+      ["Plus: Operating Expenses (AT, all years)","Years 1–"+S.life,res.pvOM,false]
+    ];
+    dcfRows.forEach(function(r){
+      html+='<tr><td class="left">'+r[0]+'</td><td class="sub">'+r[1]+'</td><td class="'+(r[2]<0?"neg":"")+'">'+fmtM(r[2])+'</td></tr>';
+    });
+    html+='<tr class="total-row"><td class="left" colspan="2">Total PV of Net Costs</td><td>'+fmtM(res.n55)+'</td></tr>';
+    html+='<tr><td class="left">After-Tax Annuity Factor</td><td class="sub">'+S.life+' yrs at '+S.coc+'%</td><td>'+fmt(res.af,5)+'</td></tr>';
+    html+='<tr><td class="left">After-Tax factor × (1 − tax rate)</td><td class="sub"></td><td>'+fmt(res.af*(1-S.taxRate/100),5)+'</td></tr>';
+    html+='<tr><td class="left">Annual Rental Hours</td><td class="sub"></td><td>'+fmt(+S.hours)+'</td></tr>';
+    html+='<tr class="total-row" style="border-top:2px solid var(--blue)"><td class="left" colspan="2">Rental Rate = N55 ÷ (hours × AT annuity factor)</td><td style="color:var(--blue);font-size:15px;font-weight:800">'+fmtR(res.rentalRate)+'/hr</td></tr>';
+    html+='</tbody></table></div>';
+  }
+  html+='</div>';
+
+  // Depreciation schedule
+  html+='<div class="collapsible"><div class="coll-head" onclick="S.show_depr=!S.show_depr;renderPage2()"><span class="coll-title">Depreciation &amp; O&amp;M Schedule</span><span class="coll-arr" style="transform:'+(S.show_depr?'rotate(90deg)':'rotate(0deg)')+'" >›</span></div>';
+  if(S.show_depr){
+    html+='<div class="coll-body open"><table><thead><tr><th class="left">Year</th><th>Depreciation</th><th>AT Tax Shield</th><th>O&M Cost</th><th>AT O&M</th><th>PV AT O&M</th></tr></thead><tbody>';
+    var r3=+S.coc/100,tx3=+S.taxRate/100;
+    res.depr.forEach(function(d,i){
+      var yr=i+1,ts=d*tx3,om_v=res.om[i],atOM=om_v*(1-tx3),pvOM=atOM/Math.pow(1+r3,yr);
+      html+='<tr><td class="left">'+yr+'</td><td>'+fmtM(d)+'</td><td>'+fmtM(ts)+'</td><td>'+fmtM(om_v)+'</td><td>'+fmtM(atOM)+'</td><td>'+fmtM(pvOM)+'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+  }
+  html+='</div>';
+  html+='</main></div></div>';
+
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES2,"bn-list2");
+  setTimeout(function(){drawChart("sens-chart",res.cocSens)},50);
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+}
+
+// ── PRINT ─────────────────────────────────────────────────────────────────────
+function printSummary(){
+  var res=S.res;if(!res)return;
+  var pd=S.show_dcf,pd2=S.show_depr,pd3=S.show_hrs_sens,pd4=S.show_life_sens;
+  S.show_dcf=true;S.show_depr=true;S.show_hrs_sens=true;S.show_life_sens=true;
+  renderPage2();
+  setTimeout(function(){
+    document.querySelectorAll('canvas').forEach(function(c){
+      var img=document.createElement('img');img.src=c.toDataURL('image/png');
+      img.style.cssText='width:100%;height:auto;display:block';c.parentNode.replaceChild(img,c);
+    });
+    window.print();
+    S.show_dcf=pd;S.show_depr=pd2;S.show_hrs_sens=pd3;S.show_life_sens=pd4;
+    renderPage2();
+  },300);
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render(){
+  updateStepper();
+  if(S.page===1)renderPage1();
+  else if(S.page===1.5)renderVariableOM();
+  else if(S.page===2&&S.res)renderPage2();
+  var cl=document.getElementById("cur-label");
+  if(cl)cl.textContent=getSym()+" "+S.currency;
+}
+render();
+</script>
+</body>
+</html>

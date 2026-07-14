@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan Personal — Lease or Buy?</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#F0F4F0;color:#0F1D2E;font-size:14px;-webkit-font-smoothing:antialiased}
+input,select,button{font-family:inherit;font-size:14px}button{cursor:pointer;background:none;border:none}select{-webkit-appearance:none;appearance:none}
+:root{--green:#2E7D52;--green-warm:#3D8B5A;--green-soft:rgba(46,125,82,0.10);--green-mid:#EBF5EE;--green-dark:#1A5C35;
+--blue:#1B3F6E;--blue-soft:rgba(27,63,110,0.08);
+--amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7;
+--surface:#F7FAF7;--panel:#fff;--border:#D8E8DC;--t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;--warn:#C84B31;--warn-soft:rgba(200,75,49,.07)}
+#masthead{background:var(--green);height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}.logo-mark{width:30px;height:30px;background:rgba(255,255,255,0.2);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:Georgia,serif;font-size:20px;color:white}.logo-text span{color:rgba(255,255,255,0.6)}
+.logo-sub{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-left:4px;padding-left:12px;border-left:1px solid rgba(255,255,255,0.25)}
+.module-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.9)}
+#stepper{background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px}
+.step{display:flex;align-items:center;gap:8px;padding:13px 4px;border-bottom:2px solid transparent}
+.step.active{border-bottom-color:var(--green)}.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--border);color:var(--t3)}
+.step.active .step-num{background:var(--green);color:white}.step.done .step-num{background:var(--green-warm);color:white}
+.step-label{font-size:13px;font-weight:500;color:var(--t3)}.step.active .step-label{color:var(--green)}.step.done .step-label{color:var(--green-warm)}
+.step-sep{color:var(--border);margin:0 8px;font-size:16px}
+.page{max-width:1040px;margin:0 auto;padding:24px 22px}
+.page-grid{display:grid;grid-template-columns:300px 1fr;gap:22px}
+.p2-grid{display:grid;grid-template-columns:270px 1fr;gap:22px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);overflow:hidden;margin-bottom:18px}
+.panel-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr}
+.field{padding:13px 18px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.field.full{grid-column:1/-1;border-right:none}.field.last{border-bottom:none}
+.field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:6px}
+.field-note{font-size:10px;color:var(--t3);margin-top:4px;line-height:1.5}
+.ui{display:flex;align-items:center;gap:6px}
+.ui .pfx,.ui .sfx{font-family:monospace;font-size:12px;color:var(--t3);flex-shrink:0}
+.ui input{font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none}
+.ui input:focus{border-bottom-color:var(--green)}.ui input:disabled{color:var(--t3);opacity:.6}
+.ui select{font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none;cursor:pointer}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.pill{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;user-select:none}
+.pill.active{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+.pill-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--t3);flex-shrink:0}.pill.active .pill-dot{border-color:var(--green);background:var(--green)}
+.btn-primary{background:var(--green);color:white;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-primary:hover{background:var(--green-warm)}
+.btn-ghost{background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn{display:flex;align-items:center;gap:6px;background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn:hover{border-color:var(--green);color:var(--green)}
+.action-row{display:flex;gap:10px;margin-top:4px}
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:11px}
+.bn-item{border-bottom:1px solid var(--border)}.bn-item:last-child{border-bottom:none}
+.bn-head{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;cursor:pointer}.bn-head:hover{background:var(--surface)}
+.bn-qmark{width:21px;height:21px;border-radius:50%;background:var(--green-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--green);flex-shrink:0;margin-top:1px;margin-right:5px}
+.bn-q{font-size:13px;line-height:1.5;color:var(--green);flex:1}.bn-arr{color:var(--t3);font-size:14px;flex-shrink:0;margin-top:2px;transition:transform .2s}
+.bn-body{padding:10px 13px 12px 44px;font-size:12.5px;line-height:1.7;color:var(--t2);background:var(--surface);border-top:1px solid var(--border);display:none}.bn-body.open{display:block}
+.watch-btn{margin-top:10px;display:flex;width:fit-content;align-items:center;gap:5px;border:1px solid var(--green);border-radius:5px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--green);background:none;cursor:pointer}
+.helper-card{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.helper-head{padding:11px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--amber-mid)}.helper-head:hover{background:#fde68a}
+.helper-icon{font-size:18px;flex-shrink:0}.helper-title{font-size:13px;font-weight:700;color:var(--amber-dark);flex:1}.helper-toggle{font-size:11px;font-weight:600;color:var(--amber-dark);opacity:.7}
+.helper-body{padding:16px;border-top:1.5px solid var(--amber);display:flex;flex-direction:column;gap:12px}
+.helper-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dark)}
+.helper-result{background:var(--green-soft);border:1.5px solid var(--green);border-radius:8px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.helper-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.result-banner{border-radius:10px;padding:20px 24px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.result-banner.good{background:var(--green-soft);border:1.5px solid var(--green)}
+.result-banner.warn{background:var(--warn-soft);border:1.5px solid var(--warn)}
+.result-banner.neutral{background:var(--surface);border:1.5px solid var(--border)}
+.result-banner.info{background:var(--blue-soft);border:1.5px solid #93B4D8}
+.result-box{border-radius:10px;padding:14px 20px;text-align:center;flex-shrink:0}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.metric{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.metric-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:7px}
+.metric-val{font-family:monospace;font-size:18px;font-weight:700;color:var(--t1)}.metric-val.good{color:var(--green)}.metric-val.warn{color:var(--warn)}.metric-val.info{color:var(--blue)}
+.metric-sub{font-size:10px;color:var(--t3);margin-top:3px;line-height:1.4}
+.chart-box{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:18px}
+.chart-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:4px}.chart-sub{font-size:11px;color:var(--t3);margin-bottom:12px}
+.collapsible{background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:14px;overflow:hidden}
+.coll-head{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}.coll-head:hover{background:var(--surface)}
+.coll-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}.coll-arr{color:var(--t3);font-size:14px;transition:transform .2s}
+.coll-body{display:none;border-top:1px solid var(--border)}.coll-body.open{display:block}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{padding:8px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}th.left{text-align:left}
+td{padding:8px 14px;text-align:right;font-family:monospace;border-bottom:1px solid var(--border)}td.left{text-align:left;font-family:inherit;color:var(--t1)}td.sub{text-align:left;font-family:inherit;color:var(--t3);font-size:11px}
+tr.total-row td{font-weight:700;background:var(--surface)}tr:nth-child(even){background:var(--surface)}
+tr.highlight td{background:var(--green-soft)!important;font-weight:700;color:var(--green)}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,29,46,.82);z-index:9999;display:flex;align-items:center;justify-content:center}
+.modal-box{background:white;border-radius:10px;overflow:hidden;width:min(820px,95vw)}
+.modal-head{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.modal-close{font-size:22px;color:var(--t3);line-height:1;cursor:pointer}
+.video-wrap{position:relative;padding-bottom:56.25%;height:0}.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;background:white}#masthead{position:static!important;height:auto!important;padding:8px 0!important}#stepper,.btn-ghost,.print-btn,.coll-arr{display:none!important}.page-grid,.p2-grid{display:block!important}aside{display:none!important}.coll-body{display:block!important}.coll-head{break-after:avoid!important}.result-banner,.metric,.chart-box,.collapsible,.helper-card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid}table{font-size:9px;table-layout:fixed}th,td{padding:3px 5px}thead{display:table-header-group}tr{break-inside:avoid}@page{margin:0.5in;size:landscape}}
+</style>
+</head>
+<body>
+<div id="masthead">
+  <div class="logo"><div class="logo-mark"><svg viewBox="0 0 18 18" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg></div><div class="logo-text">Cap<span>Plan</span></div><div class="logo-sub">Personal</div></div>
+  <div class="module-name">Lease or Buy?</div>
+  <div style="position:relative"><button style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600" id="cur-btn" onclick="toggleCur()"><span id="cur-label">$ USD</span> ▾</button><div id="cur-dropdown" style="display:none;position:absolute;right:0;top:110%;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,29,46,.16);min-width:200px;z-index:300;overflow:hidden"></div></div>
+</div>
+<div id="stepper">
+  <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Your details</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step2"><div class="step-num" id="sn2">2</div><div class="step-label">Results</div></div>
+</div>
+<div id="main-content"></div>
+<script>
+var CURRENCIES=[{code:"USD",symbol:"$",label:"US Dollar"},{code:"EUR",symbol:"€",label:"Euro"},{code:"GBP",symbol:"£",label:"British Pound"},{code:"CAD",symbol:"CA$",label:"Canadian Dollar"},{code:"AUD",symbol:"AU$",label:"Australian Dollar"},{code:"NZD",symbol:"NZ$",label:"New Zealand Dollar"},{code:"JPY",symbol:"¥",label:"Japanese Yen"},{code:"JPY",symbol:"¥",label:"Japanese Yen"},{code:"CHF",symbol:"CHF",label:"Swiss Franc"}];
+function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
+function toggleCur(){S.cur_open=!S.cur_open;var dd=document.getElementById("cur-dropdown");dd.style.display=S.cur_open?"block":"none";if(S.cur_open){dd.innerHTML="";CURRENCIES.forEach(function(c){var b=document.createElement("button");b.style.cssText="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:"+(c.code===S.currency?"var(--green-soft)":"transparent")+";border:none;border-bottom:1px solid var(--border);cursor:pointer";b.innerHTML='<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--green);width:36px">'+c.symbol+'</span><span>'+c.label+'</span>';b.onclick=function(){S.currency=c.code;S.cur_open=false;render()};dd.appendChild(b);});}}
+
+var S={
+  page:1,currency:"USD",cur_open:false,
+  show_pmt_sens:false,show_dcf:false,choosing_lease:false,
+  price:"",life:"",salvage:"",term:"",
+  deposit:true,depositAmt:"",depositReturned:true,
+  freq:1,leasePmt:"",borrowRate:"",
+  missingFields:null,res:null
+};
+
+// ── CALC ──────────────────────────────────────────────────────────────────────
+function pvPurchase(price,salvage,life,r){return price-salvage/Math.pow(1+r,life);}
+
+function pvLease(term,depAmt,depositReturned,pmt,freq,r){
+  // depAmt=0 means no deposit
+  var rp=Math.pow(1+r,1/freq)-1;
+  var totalN=term*freq;
+  if(depAmt>0){
+    if(depositReturned){
+      // Deposit paid t=0, returned t=term; full payment schedule runs
+      var af=rp>0?(1-Math.pow(1+rp,-totalN))/rp:totalN;
+      return depAmt + pmt*af - depAmt/Math.pow(1+r,term);
+    } else {
+      // Deposit = first payment, not returned; remaining (totalN-1) payments follow
+      var n2=totalN-1;
+      var af2=rp>0&&n2>0?(1-Math.pow(1+rp,-n2))/rp:n2;
+      return depAmt + pmt*af2;
+    }
+  } else {
+    var af=rp>0?(1-Math.pow(1+rp,-totalN))/rp:totalN;
+    return pmt*af;
+  }
+}
+
+function impliedRate(price,salvage,depAmt,depositReturned,pmt,freq,term){
+  // Search in annual rate space. pvLease > pvPurchase at low rates,
+  // so increasing rate brings pvLease down toward pvPurchase.
+  var lo=0.000001,hi=10.0,mid;
+  for(var i=0;i<120;i++){
+    mid=(lo+hi)/2;
+    var pv=pvLease(term,depAmt,depositReturned,pmt,freq,mid);
+    var target=price-salvage/Math.pow(1+mid,term);
+    if(pv>target)lo=mid;else hi=mid;
+  }
+  return mid*100;
+}
+
+function calcBreakEven(pvP,term,depAmt,depositReturned,freq,r){
+  var rp=Math.pow(1+r,1/freq)-1;var totalN=term*freq;
+  var pvDep=depAmt>0?depAmt:0;
+  var pvDepReturn=depAmt>0&&depositReturned?depAmt/Math.pow(1+r,term):0;
+  if(depAmt>0&&!depositReturned){
+    var n2=totalN-1;var af2=rp>0&&n2>0?(1-Math.pow(1+rp,-n2))/rp:n2;
+    return af2>0?(pvP-pvDep)/af2:0;
+  } else {
+    var af=rp>0?(1-Math.pow(1+rp,-totalN))/rp:totalN;
+    return af>0?(pvP-pvDep+pvDepReturn)/af:0;
+  }
+}
+
+function calcAll(){
+  var price=+S.price,life=+S.life||1,salvage=+S.salvage||0;
+  var term=+S.term||life,pmt=+S.leasePmt,freq=+S.freq,r=+S.borrowRate/100;
+  var depAmt=S.deposit?(+S.depositAmt||0):0;
+  var depRet=S.deposit?S.depositReturned:true;
+  var pvP=pvPurchase(price,salvage,life,r);
+  var pvL=pvLease(term,depAmt,depRet,pmt,freq,r);
+  var diff=pvP-pvL;var winner=diff<0?"purchase":"lease";
+  var costOfConstraint=winner==="purchase"?Math.abs(diff):0;
+  var rMonthly=r/12;var months=term*12;
+  var monthlyExtra=costOfConstraint>0&&rMonthly>0?costOfConstraint*rMonthly/(1-Math.pow(1+rMonthly,-months)):costOfConstraint/(months||1);
+  var ir=impliedRate(price,salvage,depAmt,depRet,pmt,freq,term);
+  var bePmt=calcBreakEven(pvP,term,depAmt,depRet,freq,r);
+  var pmtSens=[-0.40,-0.30,-0.20,-0.10,0,0.10,0.20,0.30,0.40].map(function(delta){
+    var p2=pmt*(1+delta);var pvL2=pvLease(term,depAmt,depRet,p2,freq,r);
+    return{pmt:p2,pvLease:pvL2,diff:pvP-pvL2,winner:pvP<pvL2?"purchase":"lease"};
+  });
+  var borrowSens=[-3,-2,-1,0,1,2,3].map(function(delta){
+    var r2=(+S.borrowRate+delta)/100;if(r2<=0)return{label:(+S.borrowRate+delta)+"%",diff:0,pvP:0,pvL:0};
+    var pvP2=pvPurchase(price,salvage,life,r2);var pvL2=pvLease(term,depAmt,depRet,pmt,freq,r2);
+    return{label:(+S.borrowRate+delta)+"%",pvP:pvP2,pvL:pvL2,diff:pvP2-pvL2};
+  });
+  return{pvPurchase:pvP,pvLease:pvL,diff:diff,winner:winner,ir:ir,bePmt:bePmt,
+    costOfConstraint:costOfConstraint,monthlyExtra:monthlyExtra,
+    pmtSens:pmtSens,borrowSens:borrowSens,depAmt:depAmt,depRet:depRet};
+}
+
+function fmt(n,d){if(n==null||isNaN(n))return"--";d=d||0;return n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmtM(n){if(n==null||isNaN(n))return"--";var s=getSym();return n<0?"-"+s+fmt(Math.abs(n)):s+fmt(n)}
+
+function updateStepper(){for(var i=1;i<=2;i++){var step=document.getElementById("step"+i),sn=document.getElementById("sn"+i);step.className="step";if(i<S.page){step.classList.add("done");sn.textContent="✓"}else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}else sn.textContent=String(i);var n=i;(function(n,step){step.onclick=function(){if(n<S.page||(n===2&&S.res)){S.page=n;render()}}})(n,step);step.style.cursor=(i<S.page||(i===2&&S.res))?"pointer":"default";}}
+
+var NOTES1=[
+  {q:"What does this model tell me?",a:"It compares the total cost of leasing versus buying in today's money. If buying is cheaper, it tells you by how much — and if you need to lease anyway (because you don't have the purchase price), it shows exactly what that decision costs you expressed as a monthly figure.",v:""},
+  {q:"How is the deposit treated — and why does it matter?",a:"In a standard lease, the deposit is security — you pay it upfront and get it back at the end of the lease term. That return makes it different from a sunk cost: the model accounts for the deposit going out at the start and coming back at the end. In some business leases, the deposit is treated as the first lease payment and is not returned. Use the toggle under the deposit amount to select the correct treatment — it makes a material difference to the lease cost.",v:""},
+  {q:"What if I can't afford to buy?",a:"Select 'I'll lease regardless' and the results page will show you the extra cost of leasing compared to buying — both as a total present value and as a monthly equivalent. This helps you understand the real cost of the capital constraint you're facing.",v:""},
+  {q:"What purchase price should I use?",a:"Use the cash price — what you'd pay buying outright with no financing. Ask the dealer or vendor for the cash price separately if you're negotiating a lease, because they often bundle charges differently.",v:""},
+  {q:"What resale value should I use?",a:"Your best estimate of what the asset will be worth at the end of the period. For cars, Kelley Blue Book or similar services give depreciation estimates by make, model, and mileage. For appliances, 10–20% of purchase price after useful life is a reasonable starting point.",v:""}
+];
+var NOTES2=[
+  {q:"What does the comparison show?",a:"The lower present value is the cheaper option. If buying has a lower present value, purchasing costs less in today's money over the full period. If leasing has a lower present value, the lease payments add up to less than the cost of buying, net of resale value.",v:""},
+  {q:"What is the implied interest rate?",a:"This is the effective rate the lessor is charging you through the lease payments — found by solving for the interest rate at which the present value of all payments (including any deposit and residual value) equals the purchase price. If it's higher than your borrowing rate, you'd be better off with a loan to buy.",v:""},
+  {q:"What is the break-even lease payment?",a:"The payment amount at which leasing and buying cost exactly the same. If the lessor charges less than this, leasing is cheaper. If more, buying is cheaper. Use it as a benchmark when negotiating.",v:""},
+  {q:"What does the payment sensitivity table show?",a:"How the comparison changes if the lease payment were higher or lower. It shows you exactly where the break-even point is and how quickly the cost difference grows as payments move away from it.",v:""}
+];
+function makeBNList(notes,id){var list=document.getElementById(id);if(!list)return;list.innerHTML="";notes.forEach(function(n,i){var item=document.createElement("div");item.className="bn-item";var head=document.createElement("div");head.className="bn-head";head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+id+i+'">›</div>';var body=document.createElement("div");body.className="bn-body";body.textContent=n.a;head.onclick=function(){var open=body.classList.contains("open");body.classList.toggle("open");document.getElementById("arr"+id+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";head.style.background=open?"":"var(--surface)";};item.appendChild(head);item.appendChild(body);list.appendChild(item);});}
+
+function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last?" last":"")+'"><div class="field-label">'+l+'</div>'+h+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';}
+function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--green)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
+
+function goToResults(){
+  var missing=[];
+  if(!S.price)missing.push("Purchase price");if(!S.life)missing.push("How long you'll keep it");
+  if(!S.salvage&&S.salvage!==0)missing.push("Expected resale value");
+  if(!S.term)missing.push("Lease term");
+  if(S.deposit&&(!S.depositAmt&&S.depositAmt!==0))missing.push("Deposit amount");
+  if(!S.leasePmt)missing.push("Lease payment");if(!S.borrowRate)missing.push("Your borrowing rate");
+  if(missing.length>0){S.missingFields=missing;render();return;}
+  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+}
+function resetInputs(){S.price="";S.life="";S.salvage="";S.term="";S.deposit=true;S.depositAmt="";S.depositReturned=true;S.freq=1;S.leasePmt="";S.borrowRate="";S.missingFields=null;S.choosing_lease=false;S.res=null;render();}
+function loadExample(){S.price=35000;S.life=4;S.salvage=12000;S.term=4;S.deposit=true;S.depositAmt=3000;S.depositReturned=true;S.freq=12;S.leasePmt=650;S.borrowRate=6;S.missingFields=null;render();}
+
+function drawChart(canvasId,data){
+  var canvas=document.getElementById(canvasId);if(!canvas)return;
+  var ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;
+  var pad={top:16,bottom:48,left:80,right:16};var cw=W-pad.left-pad.right,ch=H-pad.top-pad.bottom;
+  ctx.clearRect(0,0,W,H);
+  var vals=data.map(function(d){return d.diff});
+  var minV=Math.min.apply(null,vals),maxV=Math.max.apply(null,vals);
+  var rng=maxV-minV||Math.abs(maxV||1)*0.4;var lo=minV-rng*0.15,hi=maxV+rng*0.15;
+  var zeroY=(hi-lo)!==0?pad.top+ch*(hi/(hi-lo)):pad.top+ch*0.5;
+  ctx.strokeStyle="#D8E8DC";ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(pad.left,zeroY);ctx.lineTo(pad.left+cw,zeroY);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle="#D8E8DC";ctx.lineWidth=1;
+  for(var i=0;i<=4;i++){var y=pad.top+ch*(1-i/4);ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();var v=lo+(hi-lo)*(i/4);ctx.fillStyle="#8A96A6";ctx.font="10px system-ui";ctx.textAlign="right";ctx.fillText((v>=0?getSym():"-"+getSym())+fmt(Math.abs(v)/1000,1)+"k",pad.left-3,y+3);}
+  var bw=Math.floor(cw/data.length*0.6),gap=cw/data.length,midIdx=Math.floor(data.length/2);
+  data.forEach(function(d,i){var x=pad.left+gap*i+(gap-bw)/2,bh=Math.abs(d.diff)/(hi-lo)*ch,y=d.diff>=0?zeroY-bh:zeroY;
+    ctx.fillStyle=d.diff<0?"#3182CE":(i===midIdx?"#2E7D52":"#6DBF8A");ctx.fillRect(x,y,bw,bh);
+    // Mouseover tooltip stored as dataset - drawn as text on hover via title attr not available on canvas
+    ctx.fillStyle="#8A96A6";ctx.font=i===midIdx?"bold 10px system-ui":"10px system-ui";ctx.textAlign="center";ctx.fillText(d.label,x+bw/2,H-pad.bottom+13);
+    // Value label on bar
+    if(Math.abs(d.diff)>10){ctx.fillStyle=d.diff<0?"#3182CE":"#2E7D52";ctx.font="9px system-ui";ctx.textAlign="center";ctx.fillText(getSym()+fmt(Math.abs(d.diff)/1000,1)+"k",x+bw/2,d.diff>=0?y-3:y+bh+10);}
+  });
+  ctx.fillStyle="#4A5568";ctx.font="bold 11px system-ui";ctx.textAlign="center";ctx.fillText("Borrowing rate — bars above zero = buying cheaper · bars below = leasing cheaper",pad.left+cw/2,H-3);
+}
+
+function renderPage1(){
+  var sym=getSym();
+  var html='<div class="page"><div class="page-grid"><aside>';html+='<div class="section-label">About this model</div><div class="panel"><div id="bn-list1"></div></div>';
+  html+='</aside><main>';
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:16px 18px;margin-bottom:14px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:12px">Lease or buy — which costs less in present value terms?</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Buying.</strong> Pay the purchase price upfront and keep the resale value at the end.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Leasing.</strong> Regular payments over the term. A deposit is normally returned at end of lease — it is security, not a cost.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Fair comparison.</strong> All cash flows are converted to present value so both options are compared on equal terms.</div></div>';
+  html+='</div></div>';
+
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">The Asset</div></div><div class="field-grid">';
+  html+=field("Cash purchase price",uIn(sym,S.price,"inp-price","S.price=+this.value||0","",false),false,false,"What you'd pay buying it outright — ask for the cash price separately if negotiating a lease");
+  html+=field("Expected resale / end value",uIn(sym,S.salvage,"inp-salv","S.salvage=+this.value||0","",false),false,false,"What it'll be worth at the end of the period — enter 0 if you won't sell it");
+  html+=field("How long you'll keep it",uIn("",S.life,"inp-life","S.life=+this.value||0","years",false),false,true);
+  html+='</div></div>';
+
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">The Lease</div></div><div class="field-grid">';
+  html+=field("Lease term",uIn("",S.term,"inp-term","S.term=+this.value||0","years",false),false,false,"Should match how long you'll keep it");
+  html+=field("Payment frequency",'<div class="ui"><select id="freq-sel" onchange="S.freq=+this.value;render()">'+[{v:1,l:"Annual"},{v:2,l:"Every 6 months"},{v:4,l:"Quarterly"},{v:12,l:"Monthly"}].map(function(o){return'<option value="'+o.v+'"'+(+S.freq===o.v?" selected":"")+'>'+o.l+'</option>'}).join("")+'</select></div>');
+  html+=field("Initial deposit",'<div class="pills"><div class="pill'+(S.deposit?" active":"")+'\" onclick="S.deposit=true;render()"><div class="pill-dot"></div>Yes</div><div class="pill'+(!S.deposit?" active":"")+'\" onclick="S.deposit=false;render()"><div class="pill-dot"></div>No</div></div>');
+  if(S.deposit){
+    html+=field("Deposit amount",uIn(sym,S.depositAmt,"inp-dep","S.depositAmt=+this.value||0","",false),false,false);
+    html+='<div class="field full"><div class="field-label">Deposit treatment</div>';
+    html+='<div class="pills"><div class="pill'+(S.depositReturned?" active":"")+'\" onclick="S.depositReturned=true;render()"><div class="pill-dot"></div>Returned at end of lease</div><div class="pill'+(!S.depositReturned?" active":"")+'\" onclick="S.depositReturned=false;render()"><div class="pill-dot"></div>First payment — not returned</div></div>';
+    html+='<div class="field-note">'+(S.depositReturned?'Standard for consumer leases and most equipment leases — the deposit is security, returned when you hand the asset back.':'Common in some business leases — the deposit counts as the first payment and is not returned at the end.')+'</div></div>';
+  }
+  var pmtLbl={1:"per year",2:"per 6 months",4:"per quarter",12:"per month"}[+S.freq]||"per period";
+  html+=field("Lease payment",uIn(sym,S.leasePmt,"inp-pmt","S.leasePmt=+this.value||0",pmtLbl,false),false,true);
+  html+='</div></div>';
+
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Your Finances</div></div><div class="field-grid">';
+  html+=field("Your borrowing rate",uIn("",S.borrowRate,"inp-borrow","S.borrowRate=+this.value||0","%",false),true,true,"The interest rate on a personal loan you could use to buy");
+  html+='</div></div>';
+
+  html+='<div class="helper-card"><div class="helper-body" style="flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">';
+  html+='<div style="font-size:13px;color:var(--amber-dark);line-height:1.6">If you can\'t afford to buy and will lease regardless, tick this — the results will show what leasing is costing you.</div>';
+  html+='<div class="pills"><div class="pill'+(S.choosing_lease?" active":"")+'\" onclick="S.choosing_lease=true;render()"><div class="pill-dot"></div>I\'ll lease regardless</div><div class="pill'+(!S.choosing_lease?" active":"")+'\" onclick="S.choosing_lease=false;render()"><div class="pill-dot"></div>I\'ll choose the cheaper option</div></div>';
+  html+='</div></div>';
+
+  if(S.missingFields&&S.missingFields.length>0)html+='<div style="background:var(--warn-soft);border:1.5px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)"><strong>Please fill in:</strong> '+S.missingFields.join(", ")+'.</div>';
+  html+='<div class="action-row" style="justify-content:space-between;align-items:center"><span style="font-size:11.5px;color:var(--t3)">New here? Try <strong style="color:var(--t2)">Load Example</strong> to see how it works.</span><div style="display:flex;gap:10px"><button class="btn-ghost" onclick="loadExample()">Load Example</button><button class="btn-ghost" onclick="resetInputs()">Reset</button><button class="btn-primary" onclick="goToResults()">See my results ›</button></div></div>';
+  html+='</main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES1,"bn-list1");
+  var fs=document.getElementById("freq-sel");if(fs)fs.value=String(S.freq);
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+}
+
+function renderPage2(){
+  var res=S.res,sym=getSym();
+  var purchaseWins=res.winner==="purchase";
+  var isConstrained=S.choosing_lease&&purchaseWins;
+  var html='<div class="page"><div class="p2-grid"><aside>';
+  html+='<div class="section-label">Understanding results</div><div class="panel" style="margin-bottom:14px"><div id="bn-list2"></div></div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px"><button class="btn-ghost" onclick="S.page=1;render()">‹ Change my numbers</button><button class="print-btn" onclick="printSummary()">🖶 Print</button></div>';
+  html+='</aside><main>';
+
+  // Banner
+  if(isConstrained){
+    html+='<div class="result-banner warn"><div><div style="font-family:Georgia,serif;font-size:20px;color:var(--warn);line-height:1.3">Buying is cheaper — but you\'re choosing to lease.</div>';
+    html+='<div style="font-size:13px;color:var(--t2);margin-top:8px;line-height:1.6">The extra cost of leasing is <strong>'+fmtM(res.costOfConstraint)+'</strong> in today\'s money — roughly <strong>'+fmtM(res.monthlyExtra)+' per month</strong> over the '+S.term+'-year lease.</div></div>';
+    html+='<div class="result-box" style="background:var(--warn)"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.75)">Extra monthly cost</div><div style="font-family:monospace;font-size:26px;font-weight:800;color:white;margin-top:4px">'+fmtM(res.monthlyExtra)+'</div><div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">per month</div></div></div>';
+  } else {
+    var bannerColor=purchaseWins?"var(--green)":"var(--blue)";
+    html+='<div class="result-banner '+(purchaseWins?"good":"info")+'"><div><div style="font-family:Georgia,serif;font-size:22px;color:'+bannerColor+';line-height:1.3"><strong>'+(purchaseWins?"Buying":"Leasing")+'</strong> is the cheaper option.</div>';
+    html+='<div style="font-size:13px;color:var(--t2);margin-top:8px;line-height:1.6">'+(purchaseWins?"Buying":"Leasing")+' saves you <strong>'+fmtM(Math.abs(res.diff))+'</strong> in today\'s money compared to '+(purchaseWins?"leasing":"buying")+'.</div></div>';
+    html+='<div class="result-box" style="background:'+bannerColor+'"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.75)">You save</div><div style="font-family:monospace;font-size:26px;font-weight:800;color:white;margin-top:4px">'+fmtM(Math.abs(res.diff))+'</div><div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">by '+(purchaseWins?"buying":"leasing")+'</div></div></div>';
+  }
+
+  html+='<div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 16px 0;align-items:center">';
+  html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-right:4px">Also on this page</span>';
+  html+='<span style="font-size:12px;color:var(--t2);padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:20px">💰 Implied interest rate</span>';
+  html+='<span style="font-size:12px;color:var(--t2);padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:20px">⚖️ Break-even payment</span>';
+  html+='<span style="font-size:12px;color:var(--t2);padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:20px">📊 Payment sensitivity</span>';
+  html+='</div>';
+  // Deposit note
+  if(res.depAmt>0){
+    var depNote=res.depRet?'Deposit of '+fmtM(res.depAmt)+' is returned at end of lease — treated as security, not a permanent cost.':'Deposit of '+fmtM(res.depAmt)+' counts as the first payment and is not returned.';
+    html+='<div style="background:var(--blue-soft);border:1px solid #93B4D8;border-radius:8px;padding:10px 16px;margin-bottom:16px;font-size:12px;color:var(--t2)">ℹ️ '+depNote+'</div>';
+  }
+
+  // Comparison cards
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">';
+  html+='<div style="border-radius:8px;padding:18px;border:2px solid '+(purchaseWins?"var(--green)":"var(--border)")+';background:'+(purchaseWins?"var(--green-soft)":"var(--surface)")+'"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:'+(purchaseWins?"var(--green)":"var(--t3)")+';margin-bottom:8px">Buy it '+(purchaseWins?"✓ cheaper":"")+'</div><div style="font-family:monospace;font-size:26px;font-weight:800;color:'+(purchaseWins?"var(--green)":"var(--t1)")+'">'+fmtM(res.pvPurchase)+'</div><div style="font-size:11px;color:var(--t3);margin-top:4px">Total cost in today\'s money</div></div>';
+  html+='<div style="border-radius:8px;padding:18px;border:2px solid '+(!purchaseWins?"var(--blue)":"var(--border)")+';background:'+(!purchaseWins?"var(--blue-soft)":"var(--surface)")+'"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:'+(!purchaseWins?"var(--blue)":"var(--t3)")+';margin-bottom:8px">Lease it '+(!purchaseWins?"✓ cheaper":"")+(isConstrained?" ⚠ more expensive — your choice":"")+'</div><div style="font-family:monospace;font-size:26px;font-weight:800;color:'+(!purchaseWins?"var(--blue)":isConstrained?"var(--warn)":"var(--t1)")+'">'+fmtM(res.pvLease)+'</div><div style="font-size:11px;color:var(--t3);margin-top:4px">Total cost in today\'s money</div></div>';
+  html+='</div>';
+
+  // Metrics
+  html+='<div class="metrics">';
+  html+='<div class="metric"><div class="metric-label">Implied interest rate</div><div class="metric-val '+(res.ir>+S.borrowRate?"warn":"good")+'">'+fmt(res.ir,2)+'%</div><div class="metric-sub">'+(res.ir>+S.borrowRate?"Higher than your "+S.borrowRate+"% loan rate — lease costs more":"Lower than your "+S.borrowRate+"% loan rate — lease is good value")+'</div></div>';
+  html+='<div class="metric"><div class="metric-label">Break-even payment</div><div class="metric-val">'+fmtM(res.bePmt)+'</div><div class="metric-sub">Leasing is cheaper below this figure</div></div>';
+  html+='<div class="metric"><div class="metric-label">'+(isConstrained?"Monthly extra cost":"Cost difference")+'</div><div class="metric-val '+(isConstrained?"warn":"good")+'">'+fmtM(isConstrained?res.monthlyExtra:Math.abs(res.diff))+'</div><div class="metric-sub">'+(isConstrained?"Extra per month by leasing":"Total "+(purchaseWins?"purchase":"lease")+" advantage in today's money")+'</div></div>';
+  html+='</div>';
+
+  // Chart
+  html+='<div class="chart-box"><div class="chart-title">How the comparison changes with your borrowing rate</div><div class="chart-sub">Green bars = buying cheaper · Blue bars = leasing cheaper</div><canvas id="borrow-chart" width="700" height="220" style="width:100%;height:auto;display:block"></canvas></div>';
+
+  // Payment sensitivity
+  html+='<div class="collapsible"><div class="coll-head" onclick="S.show_pmt_sens=!S.show_pmt_sens;renderPage2()"><span class="coll-title">How does the payment level affect the comparison?</span><span class="coll-arr" style="transform:'+(S.show_pmt_sens?'rotate(90deg)':'rotate(0deg)')+'">›</span></div>';
+  if(S.show_pmt_sens){
+    html+='<div class="coll-body open" style="padding:4px 0"><div style="padding:10px 18px 6px;font-size:12px;color:var(--t2)">Break-even payment: <strong>'+fmtM(res.bePmt)+'</strong>. Below this, leasing is cheaper; above it, buying is cheaper.</div>';
+    html+='<table><thead><tr><th class="left">Payment</th><th>Buy costs</th><th>Lease costs</th><th>Difference</th><th>Cheaper option</th></tr></thead><tbody>';
+    res.pmtSens.forEach(function(row){
+      var isCur=Math.abs(row.pmt-+S.leasePmt)<0.5;
+      var leaseWins=row.diff>0;  // diff = pvP - pvL; positive means purchase costs more → lease wins
+      html+='<tr'+(isCur?' class="highlight"':'')+'><td class="left">'+(isCur?"★ ":"")+fmtM(row.pmt)+'</td><td>'+fmtM(res.pvPurchase)+'</td><td>'+fmtM(row.pvLease)+'</td><td style="color:'+(leaseWins?"var(--blue)":"var(--green)")+'">'+fmtM(Math.abs(row.diff))+'</td><td class="left" style="font-weight:700;color:'+(leaseWins?"var(--blue)":"var(--green")+')\">'+(leaseWins?"Lease":"Buy")+'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+  }
+  html+='</div></main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES2,"bn-list2");
+  setTimeout(function(){drawChart("borrow-chart",res.borrowSens)},50);
+  initChartTooltip("borrow-chart",res.borrowSens,function(d){return d.label+" rate: "+(d.diff>=0?"buy cheaper by ":"lease cheaper by ")+fmtM(Math.abs(d.diff));});
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+}
+
+function printSummary(){
+  var pd=S.show_pmt_sens;S.show_pmt_sens=true;renderPage2();
+  setTimeout(function(){document.querySelectorAll('canvas').forEach(function(c){var img=document.createElement('img');img.src=c.toDataURL('image/png');img.style.cssText='width:100%;height:auto;display:block';c.parentNode.replaceChild(img,c);});window.print();S.show_pmt_sens=pd;renderPage2();},300);
+}
+function initChartTooltip(canvasId,data,labelFn){
+  setTimeout(function(){
+    var canvas=document.getElementById(canvasId);if(!canvas)return;
+    var par=canvas.parentNode;par.style.position='relative';
+    var old=par.querySelector('.ctip');if(old)old.remove();
+    var tip=document.createElement('div');tip.className='ctip';
+    tip.style.cssText='position:absolute;pointer-events:none;background:rgba(15,29,46,.88);color:white;font-size:11px;font-weight:600;padding:5px 10px;border-radius:5px;white-space:nowrap;display:none;z-index:99;transform:translateX(-50%);top:6px';
+    par.appendChild(tip);
+    canvas.style.cursor='crosshair';
+    canvas.onmousemove=function(e){
+      var r=canvas.getBoundingClientRect();
+      var scaleX=canvas.width/r.width;
+      var mx=(e.clientX-r.left)*scaleX;
+      var W=canvas.width,padL=80,cw=W-96;
+      var n=data.length,gap=cw/n,bw=Math.floor(gap*0.6);
+      var hit=null,hitPct=0;
+      for(var i=0;i<n;i++){
+        var bx=padL+gap*i+(gap-bw)/2;
+        if(mx>=bx&&mx<=bx+bw){hit=data[i];hitPct=((bx+bw/2)/W*100);break;}
+      }
+      if(hit){tip.textContent=labelFn(hit);tip.style.left=hitPct.toFixed(1)+'%';tip.style.display='block';}
+      else tip.style.display='none';
+    };
+    canvas.onmouseleave=function(){tip.style.display='none';};
+  },90);
+}
+
+function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();var cl=document.getElementById("cur-label");if(cl)cl.textContent=getSym()+" "+S.currency;}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan — Optimal Asset Replacement Interval</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#F7F8FA;color:#0F1D2E;font-size:14px}
+input,select,button{font-family:inherit;font-size:14px}
+button{cursor:pointer;background:none;border:none}
+select{-webkit-appearance:none;appearance:none}
+:root{
+  --blue:#1B3F6E;--green:#2E7D52;--surface:#F7F8FA;--panel:#fff;
+  --border:#E2E6EC;--t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;--warn:#C84B31;
+  --blue-soft:rgba(27,63,110,0.08);--green-soft:rgba(46,125,82,0.09);
+}
+#masthead{background:var(--blue);height:72px;min-height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:34px;height:34px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:Georgia,serif;font-size:22px;color:white}
+.logo-text span{color:#A8C5E8}
+.module-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)}
+#stepper{background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px}
+.step{display:flex;align-items:center;gap:8px;padding:13px 4px;border-bottom:2px solid transparent}
+.step.active{border-bottom-color:var(--blue)}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--border);color:var(--t3)}
+.step.active .step-num{background:var(--blue);color:white}
+.step.done .step-num{background:var(--green);color:white}
+.step-label{font-size:13px;font-weight:500;color:var(--t3);white-space:nowrap}
+.step.active .step-label{color:var(--blue)}
+.step.done .step-label{color:var(--green)}
+.step-sep{color:var(--border);margin:0 8px;font-size:16px}
+.page{max-width:1100px;margin:0 auto;padding:24px 22px}
+.page-grid{display:grid;grid-template-columns:310px 1fr;gap:22px}
+.p2-grid{display:grid;grid-template-columns:280px 1fr;gap:22px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-bottom:18px}
+.panel-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr}
+.field{padding:13px 18px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.field.full{grid-column:1/-1;border-right:none}
+.field.last{border-bottom:none}
+.field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:6px}
+.field-note{font-size:10px;color:var(--t3);margin-top:4px}
+.ui{display:flex;align-items:center;gap:6px}
+.ui .pfx,.ui .sfx{font-family:monospace;font-size:12px;color:var(--t3);flex-shrink:0}
+.ui input{font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none}
+.ui input:focus{border-bottom-color:var(--blue)}
+.ui select{font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none;cursor:pointer}
+.ui select:focus{border-bottom-color:var(--blue)}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:flex;align-items:center;gap:6px;padding:6px 13px;border:1.5px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;user-select:none}
+.pill.active{border-color:var(--blue);background:var(--blue-soft);color:var(--blue)}
+.btn-primary{background:var(--blue);color:white;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-ghost{background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn{display:flex;align-items:center;gap:6px;background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn:hover{border-color:var(--blue);color:var(--blue)}
+.action-row{display:flex;gap:10px;margin-top:4px}
+.bn-item{border-bottom:1px solid var(--border)}
+.bn-item:last-child{border-bottom:none}
+.bn-head{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;cursor:pointer}
+.bn-head:hover{background:var(--surface)}
+.bn-qmark{width:21px;height:21px;border-radius:50%;background:var(--blue-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--blue);flex-shrink:0;margin-top:1px;margin-right:5px}
+.bn-q{font-size:13px;line-height:1.5;color:var(--blue);flex:1}
+.bn-arr{color:var(--t3);font-size:14px;flex-shrink:0;margin-top:2px;transition:transform .2s}
+.bn-body{padding:10px 13px 12px 44px;font-size:12.5px;line-height:1.7;color:var(--t2);background:var(--surface);border-top:1px solid var(--border);display:none}
+.bn-body.open{display:block}
+.watch-btn{margin-top:10px;display:flex;width:fit-content;align-items:center;gap:5px;border:1px solid var(--blue);border-radius:5px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--blue);background:none;cursor:pointer}
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:11px}
+/* Result page */
+.result-banner{border-radius:10px;padding:20px 24px;margin-bottom:18px;background:var(--green-soft);border:1.5px solid var(--green);display:flex;align-items:center;justify-content:space-between}
+.result-banner.suboptimal{background:rgba(200,75,49,.07);border-color:var(--warn)}
+.banner-headline{font-family:Georgia,serif;font-size:22px;color:var(--green);line-height:1.3}
+.result-banner.suboptimal .banner-headline{color:var(--warn)}
+.optimal-year-circle{width:90px;height:90px;border-radius:50%;background:var(--green);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;margin-left:20px}
+.optimal-year-circle .num{font-family:monospace;font-size:32px;font-weight:800;color:white;line-height:1}
+.optimal-year-circle .lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.8)}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.metric{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.metric-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:7px}
+.metric-val{font-family:monospace;font-size:18px;font-weight:700;color:var(--t1)}
+.metric-val.ok{color:var(--green)}
+.metric-sub{font-size:10px;color:var(--t3);margin-top:3px}
+.chart-box{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:18px}
+.chart-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:14px}
+.collapsible{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:14px;overflow:hidden}
+.coll-head{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.coll-head:hover{background:var(--surface)}
+.coll-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.coll-arr{color:var(--t3);font-size:14px;transition:transform .2s}
+.coll-body{display:none;border-top:1px solid var(--border)}
+.coll-body.open{display:block}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{padding:8px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}
+th.left{text-align:left}
+td{padding:8px 14px;text-align:right;font-family:monospace;border-bottom:1px solid var(--border)}
+td.left{text-align:left;font-family:inherit;color:var(--t1)}
+tr:nth-child(even){background:var(--surface)}
+tr.optimal-row td{background:var(--green-soft)!important;font-weight:700;color:var(--green)}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,29,46,.82);z-index:9999;display:flex;align-items:center;justify-content:center}
+.modal-box{background:white;border-radius:10px;overflow:hidden;width:min(820px,95vw)}
+.modal-head{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.modal-close{font-size:22px;color:var(--t3);line-height:1;cursor:pointer}
+.video-wrap{position:relative;padding-bottom:56.25%;height:0}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+/* Asset class defaults dropdown */
+/* asset-picker now uses amber helper-card styling */
+/* asset-picker-label now in helper styles */
+
+/* ── HELPER / GUIDANCE ELEMENTS (amber) ──────────────────────────────────── */
+:root { --amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7; }
+.helper-card{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.helper-head{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--amber-mid)}
+.helper-head:hover{background:#fde68a}
+.helper-icon{font-size:18px;flex-shrink:0}
+.helper-title{font-size:13px;font-weight:700;color:var(--amber-dark);flex:1}
+.helper-toggle{font-size:11px;font-weight:600;color:var(--amber-dark);opacity:.7}
+.helper-body{padding:16px;border-top:1.5px solid var(--amber);display:flex;flex-direction:column;gap:14px}
+.helper-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dark)}
+.helper-result{background:var(--green-soft);border:1.5px solid var(--green);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.helper-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.asset-picker{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;padding:14px 16px;margin-bottom:18px}
+.asset-picker-label{font-size:12px;font-weight:700;color:var(--amber-dark);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{margin:0;padding:0;background:white}
+  #masthead{position:static!important;height:auto!important;padding:8px 0!important}
+  #stepper,.btn-ghost,.print-btn,.coll-arr{display:none!important}
+  .page-grid,.p2-grid{display:block!important}
+  aside{display:none!important}
+  .coll-body{display:block!important}
+  .result-banner,.metric,.chart-box,.collapsible{box-shadow:none!important;border:1px solid #ccc!important}
+  .collapsible{break-inside:auto}
+  .coll-head{break-after:avoid}
+  table{font-size:9px;table-layout:fixed}
+  th,td{padding:3px 5px}
+  thead{display:table-header-group}
+  tr{break-inside:avoid}
+  @page{margin:0.5in;size:landscape}
+}
+</style>
+</head>
+<body>
+<div id="masthead">
+  <div class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg></div>
+    <div class="logo-text">Cap<span>Plan</span></div>
+  </div>
+  <div class="module-name">Optimal Asset Replacement Interval</div>
+  <div style="position:relative">
+    <button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600" id="cur-btn" onclick="toggleCur()"><span id="cur-label">$ USD</span> ▾</button>
+    <div id="cur-dropdown" style="display:none;position:absolute;right:0;top:110%;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,29,46,.16);min-width:200px;z-index:300;overflow:hidden"></div>
+  </div>
+</div>
+
+<div id="stepper">
+  <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Asset Details</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step2"><div class="step-num" id="sn2">2</div><div class="step-label">Results</div></div>
+</div>
+
+<div id="main-content"></div>
+
+<script>
+// ── ASSET CLASS DEFAULTS ──────────────────────────────────────────────────────
+var ASSET_CLASSES = [
+  {name:"— Select asset class for suggested defaults —", sv:null, om1:null, omInc:null, omType:null},
+  {name:"Light Commercial Vehicle",     sv:22, om1:5,  omInc:15, omType:"Constant percentage",
+   note:"O&M costs increase 12–18%/yr after yr 3; salvage ~$0.20/mi range after 10 yrs"},
+  {name:"Heavy Truck / Commercial Vehicle", sv:18, om1:6,  omInc:12, omType:"Constant percentage",
+   note:"Fleet data: maintenance 25–30%/yr cost increase on aging vehicles"},
+  {name:"Heavy Construction Equipment", sv:18, om1:4,  omInc:10, omType:"Constant percentage",
+   note:"Based on Ritchie Bros auction data and fleet management benchmarks"},
+  {name:"Manufacturing Machinery",      sv:15, om1:4,  omInc:10, omType:"Constant percentage",
+   note:"SMRP benchmark: maintenance cost/replacement asset value 0.7–3.6%"},
+  {name:"Restaurant / Food Service Equipment", sv:25, om1:3, omInc:18, omType:"Constant percentage",
+   note:"IRS 5-yr class; rapid early wear on high-use items like fryers and ovens"},
+  {name:"HVAC / Mechanical Systems",    sv:10, om1:2,  omInc:7,  omType:"Constant percentage",
+   note:"IRS 15-yr class; slower wear but compressor and refrigerant costs rise"},
+  {name:"Agricultural Equipment",       sv:12, om1:3,  omInc:8,  omType:"Constant percentage",
+   note:"Well-maintained equipment; salvage value supported by strong used market"},
+  {name:"IT Hardware",                  sv:35, om1:10, omInc:7,  omType:"Constant percentage",
+   note:"Rapid obsolescence drives salvage decline; support costs rise with age"},
+  {name:"Office Equipment",             sv:30, om1:8,  omInc:8,  omType:"Constant percentage",
+   note:"Similar pattern to IT hardware; 5–7 yr useful life typical"},
+];
+
+var CURRENCIES=[
+  {code:"USD",symbol:"$",label:"US Dollar"},{code:"EUR",symbol:"€",label:"Euro"},
+  {code:"JPY",symbol:"¥",label:"Japanese Yen"},{code:"GBP",symbol:"£",label:"British Pound"},
+  {code:"INR",symbol:"₹",label:"Indian Rupee"},{code:"CHF",symbol:"CHF",label:"Swiss Franc"},
+  {code:"CAD",symbol:"CA$",label:"Canadian Dollar"},{code:"AUD",symbol:"AU$",label:"Australian Dollar"},
+  {code:"NZD",symbol:"NZ$",label:"New Zealand Dollar"}
+];
+function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var S={
+  page:1,currency:"USD",cur_open:false,
+  coc_open:false,coc_mode:"wacc",coc_kd:6,coc_ke:12,coc_wd:40,
+  coc_rf:4.5,coc_beta:1.0,coc_mrp:5.5,
+  res:null,show_table:false,missingFields:null,
+  // inputs — blank by default
+  cost:"",life:"",svRate:"",om1:"",omType:"Constant percentage",omInc:"",coc:"",
+  yearlyOM:[],  // for variable O&M mode
+  assetClass:0
+};
+
+function toggleCur(){
+  S.cur_open=!S.cur_open;
+  var dd=document.getElementById("cur-dropdown");
+  dd.style.display=S.cur_open?"block":"none";
+  if(S.cur_open){
+    dd.innerHTML="";
+    CURRENCIES.forEach(function(c){
+      var b=document.createElement("button");
+      b.style.cssText="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:"+(c.code===S.currency?"var(--blue-soft)":"transparent")+";border:none;border-bottom:1px solid var(--border);cursor:pointer";
+      b.innerHTML='<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--blue);width:36px">'+c.symbol+'</span><span>'+c.label+'</span>';
+      b.onclick=function(){S.currency=c.code;S.cur_open=false;render()};
+      dd.appendChild(b);
+    });
+  }
+}
+
+// ── CALC ──────────────────────────────────────────────────────────────────────
+function calcAll(){
+  var cost=+S.cost,life=+S.life,svRate=+S.svRate/100,
+      om1=+S.om1,omInc=+S.omInc,r=+S.coc/100;
+  var useVariable=(S.omType==="Variable amount (enter each year)");
+
+  var results=[];
+  var cumPvOM=0, om=om1;
+
+  for(var yr=1;yr<=life;yr++){
+    if(useVariable){
+      om = S.yearlyOM[yr-1]||0;
+    } else if(yr>1){
+      om = S.omType==="Constant percentage"
+        ? om*(1+omInc/100)
+        : om+omInc;
+    }
+    var pvOM=om/Math.pow(1+r,yr);
+    cumPvOM+=pvOM;
+    var sv=cost*Math.pow(1-svRate,yr);
+    var pvSV=sv/Math.pow(1+r,yr);
+    var crf=r>0?r/(1-Math.pow(1+r,-yr)):1/yr;
+    var eac=(cost+cumPvOM-pvSV)*crf;
+    results.push({yr:yr,om:om,pvOM:pvOM,cumPvOM:cumPvOM,sv:sv,pvSV:pvSV,crf:crf,eac:eac});
+  }
+
+  var optIdx=0;
+  for(var i=1;i<results.length;i++){
+    if(results[i].eac<results[optIdx].eac)optIdx=i;
+  }
+  return{rows:results,optYear:results[optIdx].yr,optEAC:results[optIdx].eac};
+}
+
+// ── FORMAT ────────────────────────────────────────────────────────────────────
+function fmt(n,d){if(n==null||isNaN(n))return"--";d=d||0;return n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmtM(n){if(n==null||isNaN(n))return"--";var s=getSym();return n<0?"-"+s+fmt(Math.abs(n)):s+fmt(n)}
+
+// ── STEPPER ───────────────────────────────────────────────────────────────────
+function updateStepper(){
+  for(var i=1;i<=2;i++){
+    var step=document.getElementById("step"+i),sn=document.getElementById("sn"+i);
+    step.className="step";
+    if(i<S.page){step.classList.add("done");sn.textContent="✓"}
+    else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}
+    else sn.textContent=String(i);
+    var n=i;
+    (function(n,step){step.onclick=function(){if(n<S.page||(n===2&&S.res)){S.page=n;render()}}})(n,step);
+    step.style.cursor=(i<S.page||(i===2&&S.res))?"pointer":"default";
+  }
+}
+
+// ── BRIEFING NOTES ────────────────────────────────────────────────────────────
+var NOTES1=[
+  {q:"What is the initial investment?",
+   a:"The initial investment includes the cost of acquiring, constructing, or modifying the asset, along with all related costs such as transportation, installation, additional personnel, and training. Most tax authorities require that installation costs be added to the purchase price to determine the depreciable value. If in doubt, consult your accountant.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"How do I estimate the physical life of the asset?",
+   a:"Physical life is how long the asset can function before it must be scrapped or replaced — not its economic life. If you have experience with similar assets, use that as your guide. Otherwise, look for industry data on typical replacement intervals for your asset class. The asset class defaults in this model provide typical starting points drawn from fleet management, IRS class-life, and industry maintenance data.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"How do I estimate the rate of decline in salvage value?",
+   a:"Salvage value declines faster in early years for most assets. The rate entered here is applied as a constant percentage each year — for example, 30% means the asset retains 70% of the prior year's value each year. The asset class defaults suggest typical starting rates based on auction data, IRS class lives, and fleet management benchmarks. For vehicles, Kelley Blue Book and NADA guides provide market-specific data.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"How do I estimate operating expenses?",
+   a:"Operating expenses are the costs associated with operating and maintaining the asset. They normally increase with age. Year 1 O&M typically ranges from 2–15% of asset cost depending on asset class — the defaults in this model suggest starting points by asset type. You can model subsequent years as a constant percentage increase, a constant dollar increase per year, or by entering each year separately.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"What are the asset class default values and where do they come from?",
+   a:"The asset class defaults are suggested starting points drawn from fleet management benchmarks (Fleetio 2026 Fleet Benchmark Report), IRS asset class lives, SMRP maintenance cost metrics, and published industry O&M data. They are illustrative ranges, not guarantees. Your own experience with similar assets is always the best source of data.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"How do I calculate a required rate of return?",
+   a:"Your required rate of return reflects the cost of funds you are investing — a blend of your borrowing rate and your opportunity cost. Use the Cost of Capital Calculator to estimate it using WACC or CAPM.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+];
+var NOTES2=[
+  {q:"What does the analysis tell me?",
+   a:"The analysis calculates the Equivalent Annual Cost (EAC) for every possible replacement interval from year 1 up to the physical life of the asset. The interval with the lowest EAC is the optimal replacement cycle — the point where rising O&M costs are exactly offset by savings from lower capital recovery costs.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"What is the Equivalent Annual Cost?",
+   a:"EAC converts the total cost of owning the asset over a given number of years — including the initial investment, all operating costs, and recovered salvage value — into a single annual figure using the capital recovery factor. This allows you to compare replacement cycles of different lengths on an equal footing.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"What is the capital recovery factor?",
+   a:"The capital recovery factor converts a present-value sum into an equivalent series of equal annual payments. It is the same calculation used to determine loan repayment amounts, and depends on your cost of capital and the number of years in the replacement cycle.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"What does the EAC chart tell me?",
+   a:"The chart shows how EAC changes across all replacement intervals. The curve typically declines in early years as capital recovery costs fall, then rises as O&M costs begin to dominate. The bottom of the curve is the optimal replacement interval. A flat curve means the decision is not very sensitive to the exact replacement year.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"Does a change in cost of capital affect the optimal replacement interval?",
+   a:"Changes in cost of capital shift the EAC curve up or down but do not necessarily change which year has the lowest EAC. If the curve is relatively flat near its minimum, changes in cost of capital are unlikely to change your replacement decision. If the curve is steep, higher capital costs may push the optimal interval earlier.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+];
+
+function makeBNList(notes,containerId){
+  var list=document.getElementById(containerId);if(!list)return;
+  list.innerHTML="";
+  notes.forEach(function(n,i){
+    var item=document.createElement("div");item.className="bn-item";
+    var head=document.createElement("div");head.className="bn-head";
+    head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+containerId+i+'">›</div>';
+    var body=document.createElement("div");body.className="bn-body";
+    body.textContent=n.a;
+    if(n.v){var vb=document.createElement("button");vb.className="watch-btn";vb.textContent="▶ Learn More";vb.onclick=function(e){e.stopPropagation();openVideo(n.v)};body.appendChild(vb)}
+    head.onclick=function(){
+      var open=body.classList.contains("open");
+      body.classList.toggle("open");
+      document.getElementById("arr"+containerId+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";
+      head.style.background=open?"":"var(--surface)";
+    };
+    item.appendChild(head);item.appendChild(body);list.appendChild(item);
+  });
+}
+function openVideo(url){
+  var id=url.split(/[/?=v]/).filter(function(s){return s.length>5}).pop()||"";
+  var ov=document.createElement("div");ov.className="modal-overlay";
+  ov.innerHTML='<div class="modal-box"><div class="modal-head"><span style="font-size:13px;font-weight:700;color:var(--t2)">Learn More</span><button class="modal-close">×</button></div><div class="video-wrap"><iframe src="https://www.youtube.com/embed/'+id+'" allowfullscreen frameborder="0"></iframe></div></div>';
+  ov.querySelector(".modal-close").onclick=function(){ov.remove()};
+  ov.onclick=function(e){if(e.target===ov)ov.remove()};
+  document.body.appendChild(ov);
+}
+
+// ── CoC CALCULATOR ────────────────────────────────────────────────────────────
+function renderCoC(){
+  var box=document.getElementById("coc-box");if(!box)return;box.innerHTML="";
+  var tx=35,we=100-S.coc_wd;
+  var wacc=+(S.coc_kd*(1-tx/100)*S.coc_wd/100+S.coc_ke*we/100).toFixed(2);
+  var capm=+(S.coc_rf+S.coc_beta*S.coc_mrp).toFixed(2);
+  var result=S.coc_mode==="wacc"?wacc:capm;
+  if(!S.coc_open){
+    box.innerHTML='<button onclick="S.coc_open=true;renderCoC()" style="display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;background:none;border:none;cursor:pointer;text-align:left"><div style="width:34px;height:34px;background:var(--green-soft);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="9" r="3"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2"/></svg></div><div><div style="font-size:13px;font-weight:700;color:var(--blue)">Cost of Capital Calculator</div><div style="font-size:11px;color:var(--t3);margin-top:2px">WACC · CAPM</div></div><span style="margin-left:auto;color:var(--t3)">›</span></button>';
+    return;
+  }
+  var html='<div style="border:1px solid var(--blue);border-radius:8px;overflow:hidden">'
+    +'<div style="background:var(--blue);padding:11px 14px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:700;color:white">Cost of Capital Calculator</span><button onclick="S.coc_open=false;renderCoC()" style="color:rgba(255,255,255,.7);font-size:20px">×</button></div>'
+    +'<div style="padding:12px 14px 0;display:flex;gap:8px">';
+  [{k:"wacc",n:"WACC",s:"Borrowing rate and equity mix"},{k:"capm",n:"CAPM",s:"Estimate from market risk"}].forEach(function(t){
+    html+='<button onclick="S.coc_mode=\''+t.k+'\';renderCoC()" style="flex:1;padding:8px 10px;border-radius:7px;border:1.5px solid '+(S.coc_mode===t.k?"var(--blue)":"var(--border)")+';background:'+(S.coc_mode===t.k?"var(--blue-soft)":"transparent")+';cursor:pointer;text-align:left"><div style="font-size:12px;font-weight:700;color:'+(S.coc_mode===t.k?"var(--blue)":"var(--t2)")+'">'+t.n+'</div><div style="font-size:10px;color:var(--t3)">'+t.s+'</div></button>';
+  });
+  html+='</div><div style="padding:14px">';
+  if(S.coc_mode==="wacc"){
+    html+=cRow("Cost of Debt (pre-tax)","coc_kd",S.coc_kd,"%");
+    html+=cRow("Cost of Equity","coc_ke",S.coc_ke,"%");
+    html+=cRow("Debt Weighting","coc_wd",S.coc_wd,"%");
+    html+='<div style="background:var(--surface);border-radius:5px;padding:8px 10px;font-size:11px">WACC = <strong style="color:var(--green)">'+wacc+'%</strong></div>';
+  } else {
+    html+=cRow("Risk-Free Rate","coc_rf",S.coc_rf,"%");
+    html+=cRow("Beta","coc_beta",S.coc_beta,"");
+    html+=cRow("Market Risk Premium","coc_mrp",S.coc_mrp,"%");
+    html+='<div style="background:var(--surface);border-radius:5px;padding:8px 10px;font-size:11px">Ke = '+S.coc_rf+'% + '+S.coc_beta+' × '+S.coc_mrp+'% = <strong style="color:var(--green)">'+capm+'%</strong></div>';
+  }
+  html+='<div style="margin-top:12px;padding:10px 14px;background:var(--green-soft);border-radius:8px;border:1px solid var(--green);display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--green)">Calculated Rate</div><div style="font-family:monospace;font-size:22px;font-weight:700;color:var(--green)">'+result+'%</div></div><button onclick="S.coc='+result+';renderCoC();var el=document.getElementById(\'inp-coc\');if(el)el.value='+result+'" style="background:var(--green);color:white;border:none;border-radius:7px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer">Use this rate →</button></div>';
+  html+='</div></div>';
+  box.innerHTML=html;
+}
+function cRow(l,k,v,s){return'<div style="margin-bottom:11px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:5px">'+l+'</div><div class="ui"><input type="text" value="'+v+'" onchange="S.'+k+'=+this.value||0;renderCoC()" onfocus="this.style.borderBottomColor=\'var(--blue)\'" onblur="this.style.borderBottomColor=\'var(--border)\'" style="font-family:monospace;font-size:15px;font-weight:600;border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;outline:none;padding:2px 0">'+(s?'<span style="font-size:12px;color:var(--t3)">'+s+'</span>':'')+'</div></div>'}
+
+// ── FIELD HELPERS ─────────────────────────────────────────────────────────────
+function field(label,inputHtml,fullWidth,last,note){
+  var cls="field"+(fullWidth?" full":"")+(last?" last":"");
+  return'<div class="'+cls+'"><div class="field-label">'+label+'</div>'+inputHtml+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';
+}
+function uInput(prefix,value,id,onblur,suffix){
+  return'<div class="ui">'+(prefix?'<span class="pfx">'+prefix+'</span>':'')+
+    '<input type="text" id="'+id+'" value="'+(value==null?"":value)+'" '+'onblur="'+onblur+'" onfocus="this.style.borderBottomColor=\'var(--blue)\'">'+(suffix?'<span class="sfx">'+suffix+'</span>':'')+'</div>';
+}
+
+// ── VALIDATION ────────────────────────────────────────────────────────────────
+function goToResults(){
+  var missing=[];
+  if(S.cost===""||S.cost==null)missing.push("Initial Investment");
+  if(S.life===""||S.life==null)missing.push("Physical Life");
+  if(S.svRate===""||S.svRate==null)missing.push("Salvage Value Decline Rate");
+  if(S.om1===""||S.om1==null)missing.push("Year 1 Operating Expenses");
+  if(S.omType!=="Variable amount (enter each year)"&&(S.omInc===""||S.omInc==null))missing.push("Annual O&M Increase");
+  if(S.coc===""||S.coc==null)missing.push("Cost of Capital");
+  if(missing.length>0){S.missingFields=missing;render();return;}
+  S.missingFields=null;
+  try{S.res=calcAll();S.page=2;render();}
+  catch(e){alert("Calculation error: "+e.message)}
+}
+
+function resetInputs(){
+  S.cost="";S.life="";S.svRate="";S.om1="";S.omType="Constant percentage";
+  S.omInc="";S.coc="";S.yearlyOM=[];S.assetClass=0;S.missingFields=null;
+  render();
+}
+
+function loadExample(){
+  S.cost=30000;S.life=10;S.svRate=30;S.om1=3000;
+  S.omType="Constant percentage";S.omInc=25;S.coc=14;
+  S.yearlyOM=[];S.assetClass=0;S.missingFields=null;
+  render();
+}
+
+function loadAssetClass(idx){
+  S.assetClass=+idx;
+  var ac=ASSET_CLASSES[+idx];
+  if(!ac||ac.sv==null)return;
+  S.svRate=ac.sv;S.om1=S.cost?(+S.cost*ac.om1/100).toFixed(0):"";
+  S.omInc=ac.omInc;S.omType=ac.omType;
+  render();
+}
+
+// ── CHART ─────────────────────────────────────────────────────────────────────
+function drawEACChart(canvasId,rows,optYear){
+  var canvas=document.getElementById(canvasId);if(!canvas)return;
+  var ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;
+  var pad={top:16,bottom:52,left:72,right:16};
+  var cw=W-pad.left-pad.right,ch=H-pad.top-pad.bottom;
+  ctx.clearRect(0,0,W,H);
+
+  var eacs=rows.map(function(r){return r.eac});
+  var minV=Math.min.apply(null,eacs),maxV=Math.max.apply(null,eacs);
+  var rng=maxV-minV; var lo=minV-rng*0.1, hi=maxV+rng*0.1;
+
+  // Grid lines
+  ctx.strokeStyle="#E2E6EC";ctx.lineWidth=1;
+  for(var i=0;i<=4;i++){
+    var y=pad.top+ch*(1-i/4);
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();
+    var v=lo+(hi-lo)*(i/4);
+    ctx.fillStyle="#8A96A6";ctx.font="10px system-ui";ctx.textAlign="right";
+    ctx.fillText("$"+Math.round(v/1000)+"k",pad.left-4,y+3);
+  }
+
+  // Line + area
+  var xStep=cw/(rows.length-1||1);
+  var pts=rows.map(function(r,i){return{x:pad.left+i*xStep,y:pad.top+ch*(1-(r.eac-lo)/(hi-lo))}});
+
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x,pad.top+ch);
+  pts.forEach(function(p){ctx.lineTo(p.x,p.y)});
+  ctx.lineTo(pts[pts.length-1].x,pad.top+ch);
+  ctx.closePath();
+  ctx.fillStyle="rgba(27,63,110,0.07)";ctx.fill();
+
+  ctx.beginPath();
+  pts.forEach(function(p,i){i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y)});
+  ctx.strokeStyle="#1B3F6E";ctx.lineWidth=2.5;ctx.stroke();
+
+  // Dots + x-labels
+  rows.forEach(function(r,i){
+    var p=pts[i],isOpt=r.yr===optYear;
+    ctx.beginPath();ctx.arc(p.x,p.y,isOpt?6:3.5,0,Math.PI*2);
+    ctx.fillStyle=isOpt?"#2E7D52":"#1B3F6E";ctx.fill();
+    if(isOpt){ctx.strokeStyle="white";ctx.lineWidth=2;ctx.stroke();}
+    ctx.fillStyle=isOpt?"#2E7D52":"#8A96A6";
+    ctx.font=isOpt?"bold 11px system-ui":"10px system-ui";
+    ctx.textAlign="center";
+    ctx.fillText("Yr "+r.yr,p.x,H-pad.bottom+14);
+    if(isOpt){
+      ctx.fillStyle="rgba(46,125,82,0.12)";
+      ctx.fillRect(p.x-22,p.y-22,44,44);
+      ctx.fillStyle="#2E7D52";ctx.font="bold 10px system-ui";
+      ctx.fillText("OPTIMAL",p.x,p.y-26);
+    }
+  });
+
+  // X-axis
+  ctx.strokeStyle="#4A5568";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(pad.left,pad.top+ch);ctx.lineTo(pad.left+cw,pad.top+ch);ctx.stroke();
+  ctx.fillStyle="#4A5568";ctx.font="bold 12px system-ui";ctx.textAlign="center";
+  ctx.fillText("Replacement Interval (Years)",pad.left+cw/2,H-4);
+}
+
+// ── PAGE 1 ────────────────────────────────────────────────────────────────────
+function renderPage1(){
+  var sym=getSym();
+  var html='<div class="page"><div class="page-grid">';
+
+  html+='<aside>';
+  html+='<div class="section-label">Briefing Notes</div>';
+  html+='<div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div>';
+  html+='<div class="section-label">Tools</div>';
+  html+='<div class="panel"><div id="coc-box"></div></div>';
+  html+='</aside>';
+
+  html+='<main>';
+
+  // Asset class defaults picker
+  html+='<div class="asset-picker helper-card">';
+  html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="helper-icon">📋</span><span class="helper-title">Suggest salvage decline rate &amp; O&amp;M defaults by asset class</span></div>';
+  html+='<div class="ui"><select onchange="loadAssetClass(this.value)" style="font-size:13px">';
+  ASSET_CLASSES.forEach(function(ac,i){
+    html+='<option value="'+i+'"'+(S.assetClass===i?" selected":"")+'>'+ac.name+'</option>';
+  });
+  html+='</select></div>';
+  if(S.assetClass>0&&ASSET_CLASSES[S.assetClass].note){
+    html+='<div style="font-size:11px;color:var(--t3);margin-top:8px">ⓘ '+ASSET_CLASSES[S.assetClass].note+'</div>';
+  }
+  html+='<div style="font-size:10px;color:var(--t3);margin-top:6px">These are starting-point estimates based on industry data. Your own experience is always the best guide.</div>';
+  html+='</div>';
+
+  // Asset data
+  html+='<div class="panel">';
+  html+='<div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Data</div></div>';
+  html+='<div class="field-grid">';
+  html+=field("Initial Investment",uInput(sym,S.cost,"inp-cost","S.cost=+this.value||0","",false));
+  html+=field("Physical Life",uInput("",S.life,"inp-life","S.life=+this.value||0","years",false));
+  html+=field("Salvage Value Decline Rate",uInput("",S.svRate,"inp-sv","S.svRate=+this.value||0","%",false),
+    false,false,"The asset retains (100 − rate)% of the prior year's salvage value each year");
+  html+=field("Year 1 Operating Expenses",uInput(sym,S.om1,"inp-om1","S.om1=+this.value||0","",false),false,true);
+  html+='</div></div>';
+
+  // O&M escalation
+  html+='<div class="panel">';
+  html+='<div class="panel-head"><div class="panel-dot" style="background:var(--green)"></div><div class="panel-title">Annual O&amp;M Increase</div></div>';
+  html+='<div class="field-grid">';
+  html+='<div class="field"><div class="field-label">Method</div>';
+  html+='<div class="ui"><select id="om-type-sel" onchange="S.omType=this.value;render()">';
+  ["Constant percentage","Constant amount","Variable amount (enter each year)"].forEach(function(t){
+    html+='<option value="'+t+'"'+(t===S.omType?" selected":"")+'>'+t+'</option>';
+  });
+  html+='</select></div></div>';
+  if(S.omType!=="Variable amount (enter each year)"){
+    var lbl=S.omType==="Constant percentage"?"Annual Increase Rate":"Annual Increase Amount";
+    var sfx=S.omType==="Constant percentage"?"%":"";
+    html+=field(lbl,uInput(S.omType==="Constant percentage"?"":sym,S.omInc,"inp-ominc","S.omInc=+this.value||0",sfx,false),false,true);
+  } else {
+    html+='<div class="field last"><div class="field-note" style="padding-top:4px">Enter each year\'s O&M on the next page.</div></div>';
+  }
+  html+='</div></div>';
+
+  // Firm data
+  html+='<div class="panel">';
+  html+='<div class="panel-head"><div class="panel-dot" style="background:var(--t3)"></div><div class="panel-title">Firm Data</div></div>';
+  html+='<div class="field-grid">';
+  html+=field("Cost of Capital",uInput("",S.coc,"inp-coc","S.coc=+this.value||0","%",false),true,true);
+  html+='</div></div>';
+
+  if(S.missingFields&&S.missingFields.length>0){
+    html+='<div style="background:rgba(200,75,49,.07);border:1.5px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)"><strong>Please complete the following before continuing:</strong> '+S.missingFields.join(", ")+'.</div>';
+  }
+
+  html+='<div class="action-row" style="justify-content:space-between;align-items:center">';
+  html+='<span style="font-size:11.5px;color:var(--t3)">New here? Try <strong style="color:var(--t2)">Load Example</strong> to see how it works.</span>';
+  html+='<div style="display:flex;gap:10px">';
+  html+='<button class="btn-ghost" onclick="loadExample()">Load Example</button>';
+  html+='<button class="btn-ghost" onclick="resetInputs()">Reset</button>';
+  if(S.omType==="Variable amount (enter each year)"&&S.life){
+    html+='<button class="btn-primary" onclick="goToVariableOM()">Next: Enter O&M Costs ›</button>';
+  } else {
+    html+='<button class="btn-primary" onclick="goToResults()">Calculate ›</button>';
+  }
+  html+='</div></div>';
+  html+='</main></div></div>';
+
+  document.getElementById("main-content").innerHTML=html;
+  // Force select to show correct value — browser may ignore 'selected' on innerHTML writes
+  var omSel=document.getElementById("om-type-sel");
+  if(omSel)omSel.value=S.omType;
+  makeBNList(NOTES1,"bn-list1");
+  renderCoC();
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+}
+
+function goToVariableOM(){
+  var missing=[];
+  if(!S.cost)missing.push("Initial Investment");
+  if(!S.life)missing.push("Physical Life");
+  if(!S.svRate&&S.svRate!==0)missing.push("Salvage Value Decline Rate");
+  if(!S.om1)missing.push("Year 1 Operating Expenses");
+  if(!S.coc)missing.push("Cost of Capital");
+  if(missing.length>0){S.missingFields=missing;render();return;}
+  S.missingFields=null;S.page=1.5;render();
+}
+
+// ── PAGE 1.5: Variable O&M input ──────────────────────────────────────────────
+function renderVariableOM(){
+  var sym=getSym(),life=+S.life||1;
+  while(S.yearlyOM.length<life)S.yearlyOM.push(S.yearlyOM.length===0?(+S.om1||0):0);
+  var html='<div class="page" style="max-width:700px">';
+  html+='<div class="panel">';
+  html+='<div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Operating Expenses by Year</div></div>';
+  html+='<div style="padding:10px 18px 8px;display:grid;grid-template-columns:72px 1fr;gap:0 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);border-bottom:1px solid var(--border)"><span>Year</span><span>O&M Cost (before tax)</span></div>';
+  html+='<div style="max-height:420px;overflow-y:auto">';
+  for(var i=0;i<life;i++){
+    html+='<div style="padding:9px 18px;display:grid;grid-template-columns:72px 1fr;gap:0 14px;align-items:center;border-bottom:1px solid var(--border);background:'+(i%2===0?"var(--surface)":"transparent")+'">';
+    html+='<span style="font-size:12px;font-weight:600;color:var(--t2)">Year '+(i+1)+'</span>';
+    html+='<div class="ui"><span class="pfx">'+sym+'</span><input type="text" value="'+(S.yearlyOM[i]||"")+'" placeholder="0" data-idx="'+i+'" onblur="S.yearlyOM[+this.dataset.idx]=+this.value||0" onfocus="this.style.borderBottomColor=\'var(--blue)\'"></div>';
+    html+='</div>';
+  }
+  html+='</div></div>';
+  html+='<div style="display:flex;justify-content:space-between;gap:10px">';
+  html+='<button class="btn-ghost" onclick="S.page=1;render()">‹ Back</button>';
+  html+='<button class="btn-primary" onclick="goToResults()">Calculate ›</button>';
+  html+='</div></div>';
+  document.getElementById("main-content").innerHTML=html;
+}
+
+// ── PAGE 2: Results ────────────────────────────────────────────────────────────
+function renderPage2(){
+  var res=S.res,sym=getSym();
+  var optRow=res.rows.find(function(r){return r.yr===res.optYear});
+
+  var html='<div class="page"><div class="p2-grid">';
+
+  // Aside
+  html+='<aside>';
+  html+='<div class="section-label">Understanding Results</div>';
+  html+='<div class="panel" style="margin-bottom:14px"><div id="bn-list2"></div></div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<button class="btn-ghost" onclick="S.page=1;render()">‹ Edit Inputs</button>';
+  html+='<button class="print-btn" onclick="printSummary()">🖶 Print Summary</button>';
+  html+='</div></aside>';
+
+  // Main
+  html+='<main>';
+
+  // Decision banner
+  html+='<div class="result-banner">';
+  html+='<div>';
+  html+='<div class="banner-headline">Replace every <strong>'+res.optYear+' year'+(res.optYear>1?"s":"")+'</strong> for the lowest annual cost.</div>';
+  html+='<div style="font-size:13px;color:var(--t2);margin-top:6px;line-height:1.6">At year '+res.optYear+', rising O&M costs are exactly offset by the savings from lower capital recovery costs. The equivalent annual cost is minimized at <strong>'+fmtM(res.optEAC)+'</strong>.</div>';
+  html+='</div>';
+  html+='<div class="optimal-year-circle"><div class="num">'+res.optYear+'</div><div class="lbl">yr'+(res.optYear>1?"s":"")+'</div></div>';
+  html+='</div>';
+
+  // Metrics
+  html+='<div class="metrics">';
+  html+='<div class="metric"><div class="metric-label">Optimal EAC</div><div class="metric-val ok">'+fmtM(res.optEAC)+'</div><div class="metric-sub">per year at year '+res.optYear+'</div></div>';
+  html+='<div class="metric"><div class="metric-label">Year 1 O&M Cost</div><div class="metric-val">'+fmtM(res.rows[0].om)+'</div><div class="metric-sub">'+fmt(S.svRate)+'% annual salvage decline</div></div>';
+  var lastRow=res.rows[res.rows.length-1];
+  html+='<div class="metric"><div class="metric-label">Year '+S.life+' O&M Cost</div><div class="metric-val">'+fmtM(lastRow.om)+'</div><div class="metric-sub">at end of physical life</div></div>';
+  html+='</div>';
+
+  // EAC Chart
+  html+='<div class="chart-box">';
+  html+='<div class="chart-title">Equivalent Annual Cost by Replacement Interval</div>';
+  html+='<canvas id="eac-chart" width="720" height="280" style="width:100%;height:auto;display:block"></canvas>';
+  html+='</div>';
+
+  // Year-by-year table
+  html+='<div class="collapsible" id="results-table">';
+  html+='<div class="coll-head" onclick="S.show_table=!S.show_table;renderPage2()"><span class="coll-title">Year-by-Year Analysis</span><span class="coll-arr" style="transform:'+(S.show_table?"rotate(90deg)":"rotate(0deg)")+'">›</span></div>';
+  if(S.show_table){
+    html+='<div class="coll-body open"><table>';
+    html+='<thead><tr><th class="left">Year</th><th>O&M Cost</th><th>PV O&M</th><th>Cum PV O&M</th><th>Salvage Value</th><th>PV Salvage</th><th>Cap Recovery Factor</th><th>Equiv Annual Cost</th></tr></thead><tbody>';
+    res.rows.forEach(function(row){
+      var isOpt=row.yr===res.optYear;
+      html+='<tr'+(isOpt?' class="optimal-row"':'')+'>';
+      html+='<td class="left"'+(isOpt?' style="color:var(--green);font-weight:700"':'')+'>Year '+row.yr+(isOpt?' ★':'')+' </td>';
+      html+='<td>'+fmtM(row.om)+'</td>';
+      html+='<td>'+fmtM(row.pvOM)+'</td>';
+      html+='<td>'+fmtM(row.cumPvOM)+'</td>';
+      html+='<td>'+fmtM(row.sv)+'</td>';
+      html+='<td>'+fmtM(row.pvSV)+'</td>';
+      html+='<td>'+fmt(row.crf,6)+'</td>';
+      html+='<td>'+fmtM(row.eac)+'</td>';
+      html+='</tr>';
+    });
+    html+='</tbody></table></div>';
+  }
+  html+='</div>';
+  html+='</main></div></div>';
+
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES2,"bn-list2");
+  setTimeout(function(){
+    drawEACChart("eac-chart",res.rows,res.optYear);
+  },50);
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+}
+
+// ── PRINT ─────────────────────────────────────────────────────────────────────
+function printSummary(){
+  var res=S.res;if(!res)return;
+  var prevTable=S.show_table;
+  S.show_table=true;
+  renderPage2();
+  setTimeout(function(){
+    // Capture chart canvas as image before printing
+    document.querySelectorAll('canvas').forEach(function(c){
+      var img=document.createElement('img');
+      img.src=c.toDataURL('image/png');
+      img.style.cssText='width:100%;height:auto;display:block';
+      c.parentNode.replaceChild(img,c);
+    });
+    window.print();
+    S.show_table=prevTable;
+    renderPage2();
+  },300);
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render(){
+  updateStepper();
+  if(S.page===1)renderPage1();
+  else if(S.page===1.5)renderVariableOM();
+  else if(S.page===2&&S.res)renderPage2();
+  var cl=document.getElementById("cur-label");
+  if(cl)cl.textContent=getSym()+" "+S.currency;
+}
+
+render();
+</script>
+</body>
+</html>

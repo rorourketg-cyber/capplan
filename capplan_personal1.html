@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan Personal — Should I Buy This?</title>
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#F0F4F0;color:#0F1D2E;font-size:14px;-webkit-font-smoothing:antialiased}
+input,select,button{font-family:inherit;font-size:14px}button{cursor:pointer;background:none;border:none}select{-webkit-appearance:none;appearance:none}
+:root{--green:#2E7D52;--green-warm:#3D8B5A;--green-soft:rgba(46,125,82,0.10);--green-mid:#EBF5EE;--green-dark:#1A5C35;
+--blue:#1B3F6E;--blue-soft:rgba(27,63,110,0.08);
+--amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7;
+--surface:#F7FAF7;--panel:#fff;--border:#D8E8DC;--t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;--warn:#C84B31;--warn-soft:rgba(200,75,49,.07)}
+#masthead{background:var(--green);height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}.logo-mark{width:30px;height:30px;background:rgba(255,255,255,0.2);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:Georgia,serif;font-size:20px;color:white}.logo-text span{color:rgba(255,255,255,0.6)}
+.logo-sub{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-left:4px;padding-left:12px;border-left:1px solid rgba(255,255,255,0.25)}
+.module-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.9)}
+#stepper{background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px}
+.step{display:flex;align-items:center;gap:8px;padding:13px 4px;border-bottom:2px solid transparent}
+.step.active{border-bottom-color:var(--green)}.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--border);color:var(--t3)}
+.step.active .step-num{background:var(--green);color:white}.step.done .step-num{background:var(--green-warm);color:white}
+.step-label{font-size:13px;font-weight:500;color:var(--t3)}.step.active .step-label{color:var(--green)}.step.done .step-label{color:var(--green-warm)}
+.step-sep{color:var(--border);margin:0 8px;font-size:16px}
+.page{max-width:1040px;margin:0 auto;padding:24px 22px}
+.page-grid{display:grid;grid-template-columns:300px 1fr;gap:22px}
+.p2-grid{display:grid;grid-template-columns:220px 1fr;gap:22px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);overflow:hidden;margin-bottom:18px}
+.panel-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr}
+.field{padding:13px 18px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.field.full{grid-column:1/-1;border-right:none}.field.last{border-bottom:none}
+.field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:6px}
+.field-note{font-size:10px;color:var(--t3);margin-top:4px;line-height:1.5}
+.ui{display:flex;align-items:center;gap:6px}
+.ui .pfx,.ui .sfx{font-family:monospace;font-size:12px;color:var(--t3);flex-shrink:0}
+.ui input{font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none}
+.ui input:focus{border-bottom-color:var(--green)}.ui input:disabled{color:var(--t3);opacity:.6}
+.ui select{font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none;cursor:pointer}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.pill{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;user-select:none}
+.pill.active{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+.pill-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--t3);flex-shrink:0}.pill.active .pill-dot{border-color:var(--green);background:var(--green)}
+.btn-primary{background:var(--green);color:white;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-primary:hover{background:var(--green-warm)}
+.btn-ghost{background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn{display:flex;align-items:center;gap:6px;background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn:hover{border-color:var(--green);color:var(--green)}
+.action-row{display:flex;gap:10px;margin-top:4px}
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:11px}
+.bn-item{border-bottom:1px solid var(--border)}.bn-item:last-child{border-bottom:none}
+.bn-head{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;cursor:pointer}.bn-head:hover{background:var(--surface)}
+.bn-qmark{width:21px;height:21px;border-radius:50%;background:var(--green-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--green);flex-shrink:0;margin-top:1px;margin-right:5px}
+.bn-q{font-size:13px;line-height:1.5;color:var(--green);flex:1}.bn-arr{color:var(--t3);font-size:14px;flex-shrink:0;margin-top:2px;transition:transform .2s}
+.bn-body{padding:10px 13px 12px 44px;font-size:12.5px;line-height:1.7;color:var(--t2);background:var(--surface);border-top:1px solid var(--border);display:none}.bn-body.open{display:block}
+.watch-btn{margin-top:10px;display:flex;width:fit-content;align-items:center;gap:5px;border:1px solid var(--green);border-radius:5px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--green);background:none;cursor:pointer}
+.helper-card{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.helper-head{padding:11px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--amber-mid)}.helper-head:hover{background:#fde68a}
+.helper-icon{font-size:18px;flex-shrink:0}.helper-title{font-size:13px;font-weight:700;color:var(--amber-dark);flex:1}.helper-toggle{font-size:11px;font-weight:600;color:var(--amber-dark);opacity:.7}
+.helper-body{padding:16px;border-top:1.5px solid var(--amber);display:flex;flex-direction:column;gap:12px}
+.helper-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dark)}
+.helper-result{background:var(--green-soft);border:1.5px solid var(--green);border-radius:8px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.helper-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.result-banner{border-radius:10px;padding:20px 24px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.result-banner.good{background:var(--green-soft);border:1.5px solid var(--green)}
+.result-banner.warn{background:var(--warn-soft);border:1.5px solid var(--warn)}
+.result-banner.neutral{background:var(--surface);border:1.5px solid var(--border)}
+.result-banner.info{background:var(--blue-soft);border:1.5px solid #93B4D8}
+.result-box{border-radius:10px;padding:14px 20px;text-align:center;flex-shrink:0}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.metric{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.metric-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:7px}
+.metric-val{font-family:monospace;font-size:18px;font-weight:700;color:var(--t1)}.metric-val.good{color:var(--green)}.metric-val.warn{color:var(--warn)}.metric-val.info{color:var(--blue)}
+.metric-sub{font-size:10px;color:var(--t3);margin-top:3px;line-height:1.4}
+.chart-box{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:18px}
+.chart-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:4px}.chart-sub{font-size:11px;color:var(--t3);margin-bottom:12px}
+.collapsible{background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:14px;overflow:hidden}
+.coll-head{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}.coll-head:hover{background:var(--surface)}
+.coll-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}.coll-arr{color:var(--t3);font-size:14px;transition:transform .2s}
+.coll-body{display:none;border-top:1px solid var(--border)}.coll-body.open{display:block}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{padding:8px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}th.left{text-align:left}
+td{padding:8px 14px;text-align:right;font-family:monospace;border-bottom:1px solid var(--border)}td.left{text-align:left;font-family:inherit;color:var(--t1)}td.sub{text-align:left;font-family:inherit;color:var(--t3);font-size:11px}
+tr.total-row td{font-weight:700;background:var(--surface)}tr:nth-child(even){background:var(--surface)}
+tr.highlight td{background:var(--green-soft)!important;font-weight:700;color:var(--green)}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,29,46,.82);z-index:9999;display:flex;align-items:center;justify-content:center}
+.modal-box{background:white;border-radius:10px;overflow:hidden;width:min(820px,95vw)}
+.modal-head{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.modal-close{font-size:22px;color:var(--t3);line-height:1;cursor:pointer}
+.video-wrap{position:relative;padding-bottom:56.25%;height:0}.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;background:white}#masthead{position:static!important;height:auto!important;padding:8px 0!important}#stepper,.btn-ghost,.print-btn,.coll-arr{display:none!important}.page-grid,.p2-grid{display:block!important}aside{display:none!important}.coll-body{display:block!important}.coll-head{break-after:avoid!important}.result-banner,.metric,.chart-box,.collapsible,.helper-card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid}table{font-size:9px;table-layout:fixed}th,td{padding:3px 5px}thead{display:table-header-group}tr{break-inside:avoid}@page{margin:0.5in;size:landscape}}
+.asset-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
+.asset-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:12px 10px;cursor:pointer;text-align:center;transition:all .15s}
+.asset-btn:hover{border-color:var(--green);background:var(--green-mid)}
+.asset-btn.active{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+.asset-icon{font-size:22px;display:block;margin-bottom:5px}
+.asset-label{font-size:12px;font-weight:600;color:inherit}
+.robustness-bar{height:10px;border-radius:5px;background:var(--border);overflow:hidden;margin:8px 0}
+.robustness-fill{height:100%;border-radius:5px;transition:width .4s}
+</style>
+</head>
+<body>
+<div id="masthead">
+  <div class="logo"><div class="logo-mark"><svg viewBox="0 0 18 18" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg></div><div class="logo-text">Cap<span>Plan</span></div><div class="logo-sub">Personal</div></div>
+  <div class="module-name">Should I Buy This?</div>
+  <div style="position:relative"><button style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600" id="cur-btn" onclick="toggleCur()"><span id="cur-label">$ USD</span> ▾</button><div id="cur-dropdown" style="display:none;position:absolute;right:0;top:110%;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,29,46,.16);min-width:200px;z-index:300;overflow:hidden"></div></div>
+</div>
+<div id="stepper">
+  <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">What you expect</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step2"><div class="step-num" id="sn2">2</div><div class="step-label">Results</div></div>
+</div>
+<div id="main-content"></div>
+<script>
+var CURRENCIES=[{code:"USD",symbol:"$",label:"US Dollar"},{code:"EUR",symbol:"€",label:"Euro"},{code:"GBP",symbol:"£",label:"British Pound"},{code:"CAD",symbol:"CA$",label:"Canadian Dollar"},{code:"AUD",symbol:"AU$",label:"Australian Dollar"},{code:"NZD",symbol:"NZ$",label:"New Zealand Dollar"},{code:"JPY",symbol:"¥",label:"Japanese Yen"}];
+function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
+function toggleCur(){S.cur_open=!S.cur_open;var dd=document.getElementById("cur-dropdown");dd.style.display=S.cur_open?"block":"none";if(S.cur_open){dd.innerHTML="";CURRENCIES.forEach(function(c){var b=document.createElement("button");b.style.cssText="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:"+(c.code===S.currency?"var(--green-soft)":"transparent")+";border:none;border-bottom:1px solid var(--border);cursor:pointer";b.innerHTML='<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--green);width:36px">'+c.symbol+'</span><span>'+c.label+'</span>';b.onclick=function(){S.currency=c.code;S.cur_open=false;render()};dd.appendChild(b);});}}
+
+// ── ASSET TYPES ───────────────────────────────────────────────────────────────
+var ASSET_TYPES=[
+  {id:"vehicle",    icon:"🚗", label:"Vehicle",        wizard:"What do you currently spend on transport alternatives?",    wunit:"year",hint:"Car rental, transit passes, rideshare — annual total"},
+  {id:"recreation", icon:"⛵", label:"Recreation",      wizard:"What do you currently spend on renting or hiring this type of asset?", wunit:"year",hint:"Boat charters, equipment rentals, club memberships"},
+  {id:"home",       icon:"🏠", label:"Home & Appliance",wizard:"What will this save you each year in energy or service costs?",wunit:"year",hint:"Electricity savings, service contract costs, etc."},
+  {id:"tools",      icon:"🔧", label:"Tools & Equipment",wizard:"What does this replace or save you each year?",              wunit:"year",hint:"Tool rental, contractor costs avoided"},
+  {id:"electronics",icon:"💻", label:"Electronics",     wizard:"What is the annual value of what this replaces or enables?", wunit:"year",hint:"Software subscriptions replaced, services avoided"},
+  {id:"other",      icon:"📦", label:"Other",           wizard:"What is the annual value you expect to receive?",            wunit:"year",hint:"Money saved, services replaced, or estimated value of use"}
+];
+
+var S={page:1,currency:"USD",cur_open:false,res:null,missingFields:null,
+  assetType:"",show_sensitivity:false,show_wwit:false,
+  bw_open:false,bw_spend:"",bw_pct:"",
+  price:"",life:"",salvage:"",benefits:"",coc:""};
+
+// ── CALC ──────────────────────────────────────────────────────────────────────
+function calcNPV(price,life,salvage,benefits,coc){
+  var r=coc/100;
+  var pvBen=benefits*((1-Math.pow(1+r,-life))/r);
+  var pvSalv=salvage/Math.pow(1+r,life);
+  return -price+pvBen+pvSalv;
+}
+function calcWWIT(price,life,salvage,coc){
+  // Min annual benefit needed for NPV=0
+  var r=coc/100;var af=(1-Math.pow(1+r,-life))/r;
+  var pvSalv=salvage/Math.pow(1+r,life);
+  return af>0?(price-pvSalv)/af:0;
+}
+function calcAll(){
+  var price=+S.price,life=+S.life||1,salvage=+S.salvage||0,ben=+S.benefits||0,coc=+S.coc||0;
+  var npv=calcNPV(price,life,salvage,ben,coc);
+  var wwit=calcWWIT(price,life,salvage,coc);
+  // Robustness: how far are we from break-even relative to price?
+  var robustness=Math.min(100,Math.abs(npv)/price*100);
+  var robustnessLabel=robustness<5?"Very close call":robustness<15?"Marginal":robustness<30?"Moderate":robustness<50?"Clear":"Very clear";
+  // Sensitivity: benefit levels at ±40%
+  var benSens=[-0.40,-0.30,-0.20,-0.10,0,0.10,0.20,0.30,0.40].map(function(delta){
+    var b2=ben*(1+delta);return{benefits:b2,npv:calcNPV(price,life,salvage,b2,coc),delta:delta*100};
+  });
+  // CoC sensitivity
+  var cocSens=[-3,-2,-1,0,1,2,3].map(function(delta){
+    var c2=coc+delta;if(c2<=0)return{coc:c2,npv:0};
+    return{coc:c2,npv:calcNPV(price,life,salvage,ben,c2)};
+  });
+  return{npv:npv,wwit:wwit,pvBen:ben*((1-Math.pow(1+coc/100,-life))/(coc/100)),
+    pvSalv:salvage/Math.pow(1+coc/100,life),robustness:robustness,robustnessLabel:robustnessLabel,
+    benSens:benSens,cocSens:cocSens};
+}
+
+function fmt(n,d){if(n==null||isNaN(n))return"--";d=d||0;return n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmtM(n){if(n==null||isNaN(n))return"--";var s=getSym();return n<0?"-"+s+fmt(Math.abs(n)):s+fmt(n)}
+function updateStepper(){for(var i=1;i<=2;i++){var step=document.getElementById("step"+i),sn=document.getElementById("sn"+i);step.className="step";if(i<S.page){step.classList.add("done");sn.textContent="✓"}else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}else sn.textContent=String(i);var n=i;(function(n,step){step.onclick=function(){if(n<S.page||(n===2&&S.res)){S.page=n;render()}}})(n,step);step.style.cursor=(i<S.page||(i===2&&S.res))?"pointer":"default";}}
+
+var NOTES=[
+  {q:"What does this model tell me?",a:"It works out whether buying the asset is worth the money — whether what you get from owning it, plus what you can sell it for later, is worth more than what you pay today. If it is, the purchase earns at least your target return."},
+  {q:"How do I estimate annual value?",a:"Think about what owning this asset does for you financially each year. For a car: money saved on alternatives. For solar panels: reduced electricity bills. For a tool: contractor costs avoided. Use the estimator to build the number step by step. Be realistic — overestimating value leads to overpaying."},
+  {q:"What resale value should I use?",a:"Your estimate of what the asset will sell for at the end of your ownership period. For cars, depreciation guides (like Kelley Blue Book) give good estimates. For appliances, 5-15% of purchase price after useful life is typical. Enter 0 if you do not expect to recover anything."},
+  {q:"What target return should I use?",a:"The return you could earn by investing the money elsewhere — a benchmark for what your money should earn. Five to eight percent is a reasonable range for most people, roughly matching long-term investment returns. If you borrowed to buy, use your loan rate."},
+];
+var NOTES2=[
+  {q:"What does a positive result mean?",a:"A positive result means the purchase is expected to earn at least your target return. The asset pays for itself — the value you receive plus the resale proceeds, in today's money, exceeds what you pay."},
+  {q:"What is decision robustness?",a:"Robustness measures how far the result is from the break-even point relative to the purchase price. A close call means small changes in your assumptions could flip the decision. A clear result means the purchase is justified (or not) even if your estimates are somewhat off."},
+  {q:"How do I use the sensitivity table?",a:"The sensitivity table shows how the NPV changes if your annual value estimate turns out to be higher or lower than expected. Look at the -20% and -30% rows — if the purchase is still justified there, your decision is robust to some optimism in your estimates."},
+  {q:"What does What Would It Take tell me?",a:"If the purchase is not currently justified, this tells you the annual value needed to make it worthwhile. Ask yourself whether that level of value is realistic for this asset. If not, the purchase price is too high for what you will get from it."}
+];
+
+function makeBNList(notes,id){var list=document.getElementById(id);if(!list)return;list.innerHTML="";notes.forEach(function(n,i){var item=document.createElement("div");item.className="bn-item";var head=document.createElement("div");head.className="bn-head";head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+id+i+'">›</div>';var body=document.createElement("div");body.className="bn-body";body.textContent=n.a;head.onclick=function(){var open=body.classList.contains("open");body.classList.toggle("open");document.getElementById("arr"+id+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";head.style.background=open?"":"var(--surface)";};item.appendChild(head);item.appendChild(body);list.appendChild(item);});}
+function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last?" last":"")+'"><div class="field-label">'+l+'</div>'+h+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';}
+function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--green)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
+
+function goToResults(){
+  var missing=[];
+  if(!S.price)missing.push("Purchase price");if(!S.life)missing.push("How long you will keep it");
+  if(!S.salvage&&S.salvage!==0)missing.push("Expected resale value");
+  if(!S.benefits&&S.benefits!==0)missing.push("Annual value you expect");if(!S.coc)missing.push("Target return");
+  if(missing.length>0){S.missingFields=missing;render();return;}
+  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+}
+function resetInputs(){S.price="";S.life="";S.salvage="";S.benefits="";S.coc="";S.assetType="";S.missingFields=null;S.bw_open=false;S.bw_spend="";S.bw_pct="";S.res=null;S.page=1;render();}
+function loadExample(){S.price=28000;S.life=6;S.salvage=8000;S.benefits=5500;S.coc=6;S.assetType="vehicle";S.missingFields=null;render();}
+
+function drawChart(canvasId,data,current){
+  var canvas=document.getElementById(canvasId);if(!canvas)return;
+  var ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;
+  var pad={top:16,bottom:48,left:80,right:16};var cw=W-pad.left-pad.right,ch=H-pad.top-pad.bottom;
+  ctx.clearRect(0,0,W,H);
+  var vals=data.map(function(d){return d.npv});var minV=Math.min.apply(null,vals),maxV=Math.max.apply(null,vals);
+  var rng=maxV-minV||Math.abs(maxV||1)*0.4;var lo=minV-rng*0.15,hi=maxV+rng*0.15;
+  var zeroY=(hi-lo)!==0?pad.top+ch*(hi/(hi-lo)):pad.top+ch*0.5;
+  ctx.strokeStyle="#D8E8DC";ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(pad.left,zeroY);ctx.lineTo(pad.left+cw,zeroY);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle="#D8E8DC";ctx.lineWidth=1;
+  for(var i=0;i<=4;i++){var y=pad.top+ch*(1-i/4);ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();var v=lo+(hi-lo)*(i/4);ctx.fillStyle="#8A96A6";ctx.font="10px system-ui";ctx.textAlign="right";ctx.fillText((v>=0?getSym():"-"+getSym())+fmt(Math.abs(v)/1000,1)+"k",pad.left-3,y+3);}
+  var bw=Math.floor(cw/data.length*0.6),gap=cw/data.length;
+  data.forEach(function(d,i){var x=pad.left+gap*i+(gap-bw)/2,bh=Math.abs(d.npv)/(hi-lo)*ch,y=d.npv>=0?zeroY-bh:zeroY;var isCur=Math.abs(d.delta)<0.001;ctx.fillStyle=d.npv>=0?(isCur?"#2E7D52":"#6DBF8A"):"#E88A8A";ctx.fillRect(x,y,bw,bh);ctx.fillStyle=isCur?"var(--green)":"#8A96A6";ctx.font=isCur?"bold 10px system-ui":"10px system-ui";ctx.textAlign="center";ctx.fillText((d.delta>0?"+":"")+fmt(d.delta,0)+"%",x+bw/2,H-pad.bottom+13);});
+  ctx.strokeStyle="#4A5568";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(pad.left,pad.top+ch);ctx.lineTo(pad.left+cw,pad.top+ch);ctx.stroke();ctx.fillStyle="#4A5568";ctx.font="bold 11px system-ui";ctx.textAlign="center";ctx.fillText("Change in annual value estimate — green = purchase justified",pad.left+cw/2,H-3);
+}
+
+function renderPage1(){
+  var sym=getSym();
+  var at=S.assetType?ASSET_TYPES.find(function(a){return a.id===S.assetType}):null;
+  var html='<div class="page"><div class="page-grid"><aside><div class="section-label">About this tool</div>';
+  html+='<div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div>';
+  html+='</aside><main>';
+
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:16px 18px;margin-bottom:14px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:12px">Is this purchase worth the money?</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">The cost.</strong> You pay the purchase price today. The model discounts it to a present value baseline.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">The value.</strong> You estimate the annual benefit the asset provides — savings, earnings, or cost avoided. The model converts this to today\'s money.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">The resale.</strong> At the end of your ownership period, you recover some of the purchase price. This is also discounted back to today.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">The verdict.</strong> If total value (benefits + resale) exceeds cost, the purchase earns at least your target return. If not, it does not.</div></div>';
+  html+='</div></div>';
+
+  // Asset type selector
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">What kind of asset is it?</div></div>';
+  html+='<div style="padding:16px"><div class="asset-grid">';
+  ASSET_TYPES.forEach(function(a){html+='<button class="asset-btn'+(S.assetType===a.id?" active":"")+'" onclick="S.assetType=\''+a.id+'\';render()"><span class="asset-icon">'+a.icon+'</span><span class="asset-label">'+a.label+'</span></button>';});
+  html+='</div><div style="font-size:11px;color:var(--t3);margin-top:10px">Selecting an asset type tailors the value estimator to your situation.</div></div></div>';
+
+  // Value estimator wizard
+  var wizardQ=at?at.wizard:"What is the annual value you expect to receive?";
+  var wizardHint=at?at.hint:"Money saved, services replaced, or value of use";
+  html+='<div class="helper-card"><div class="helper-head" onclick="S.bw_open=!S.bw_open;render()"><span class="helper-icon">💡</span><span class="helper-title">Help me estimate annual value</span><span class="helper-toggle">'+(S.bw_open?"▲ hide":"▼ show")+'</span></div>';
+  if(S.bw_open){
+    html+='<div class="helper-body"><div style="font-size:13px;color:var(--t2);line-height:1.6">'+wizardQ+'</div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">';
+    html+='<div><div class="helper-label">Current annual spend</div><div class="ui"><span class="pfx">'+sym+'</span><input type="text" value="'+(S.bw_spend||"")+'" placeholder="0" onblur="S.bw_spend=+this.value||0;render()" onfocus="this.style.borderBottomColor=\'var(--green)\'" style="font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none"><span class="sfx">/ yr</span></div><div class="field-note">'+wizardHint+'</div></div>';
+    html+='<div><div class="helper-label">% you expect to save or replace</div><div class="ui"><input type="text" value="'+(S.bw_pct||"")+'" placeholder="0" onblur="S.bw_pct=+this.value||0;render()" onfocus="this.style.borderBottomColor=\'var(--green)\'" style="font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none"><span class="sfx">%</span></div><div class="field-note">Be realistic — rarely 100%</div></div>';
+    html+='</div>';
+    if(S.bw_spend&&S.bw_pct){var sug=Math.round(S.bw_spend*S.bw_pct/100);html+='<div class="helper-result"><div style="font-size:13px;color:var(--t2)">Suggested annual value: <strong style="color:var(--green)">'+fmtM(sug)+'/year</strong></div><button class="helper-use" onclick="S.benefits='+sug+';S.bw_open=false;render()">Use this ›</button></div>';}
+    html+='</div></div>';
+  }
+  html+='</div>';
+
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">About the Purchase</div></div><div class="field-grid">';
+  html+=field("Purchase price",uIn(sym,S.price,"inp-price","S.price=+this.value||0","",false),false,false,"The price you would pay — shop around for the best price before running the numbers");
+  html+=field("How long you will keep it",uIn("",S.life,"inp-life","S.life=+this.value||0","years",false));
+  html+=field("Expected resale value",uIn(sym,S.salvage,"inp-salv","S.salvage=+this.value||0","",false),false,false,"What you think you can sell it for at the end — enter 0 if it will have no resale value");
+  html+=field("Annual value you expect",uIn(sym,S.benefits,"inp-ben","S.benefits=+this.value||0","/ yr",false),false,true,"Use the estimator above, or enter your own figure");
+  html+='</div></div>';
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Your Target Return</div></div><div class="field-grid">';
+  html+=field("Target return on your money",uIn("",S.coc,"inp-coc","S.coc=+this.value||0","%",false),true,true,"What you would expect to earn investing this money elsewhere — 5-8% is typical");
+  html+='</div></div>';
+
+  if(S.missingFields&&S.missingFields.length>0)html+='<div style="background:var(--warn-soft);border:1.5px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)"><strong>Please fill in:</strong> '+S.missingFields.join(", ")+'.</div>';
+  html+='<div class="action-row" style="justify-content:space-between;align-items:center"><span style="font-size:11.5px;color:var(--t3)">New here? Try <strong style="color:var(--t2)">Load Example</strong></span><div style="display:flex;gap:10px"><button class="btn-ghost" onclick="loadExample()">Load Example</button><button class="btn-ghost" onclick="resetInputs()">Reset</button><button class="btn-primary" onclick="goToResults()">See my results ›</button></div></div>';
+  html+='</main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES,"bn-list1");
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+}
+
+function renderPage2(){
+  var res=S.res,sym=getSym();var ok=res.npv>=0;
+  var html='<div class="page"><div class="p2-grid"><aside>';
+  html+='<div class="section-label">Understanding your results</div><div class="panel" style="margin-bottom:14px"><div id="bn-list2"></div></div><div style="display:flex;flex-direction:column;gap:10px"><button class="btn-ghost" onclick="S.page=1;render()">‹ Change my numbers</button><button class="print-btn" onclick="printSummary()">🖶 Print</button></div></aside><main>';
+
+  // Banner
+  html+='<div class="result-banner '+(ok?"good":"warn")+'"><div>';
+  if(ok){html+='<div style="font-family:Georgia,serif;font-size:22px;color:var(--green);line-height:1.3">Yes — this purchase is <strong>financially justified</strong>.</div><div style="font-size:13px;color:var(--t2);margin-top:8px;line-height:1.6">At your estimates, the purchase earns more than your '+S.coc+'% target return. The value you receive plus resale proceeds outweigh the cost by <strong>'+fmtM(res.npv)+'</strong> in today\'s money.</div>';}
+  else{html+='<div style="font-family:Georgia,serif;font-size:22px;color:var(--warn);line-height:1.3">At this price, the numbers do not add up.</div><div style="font-size:13px;color:var(--t2);margin-top:8px;line-height:1.6">At your estimates the purchase falls short of your '+S.coc+'% target return by <strong>'+fmtM(Math.abs(res.npv))+'</strong>. See <em>What Would It Take</em> below for the annual value that would change this.</div>';}
+  html+='</div><div class="result-box" style="background:'+(ok?"var(--green)":"var(--warn)")+'"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.75)">'+(ok?"Net gain":"Net shortfall")+'</div><div style="font-family:monospace;font-size:26px;font-weight:800;color:white;margin-top:4px">'+fmtM(Math.abs(res.npv))+'</div></div></div>';
+
+  html+='<div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 16px 0;align-items:center"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-right:4px">Also on this page</span>';
+  ['📊 Annual value sensitivity','🎯 What Would It Take','📈 Return sensitivity'].forEach(function(item){html+='<span style="font-size:12px;color:var(--t2);padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:20px">'+item+'</span>';}); html+='</div>';
+  // Robustness
+  html+='<div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:18px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3)">Decision robustness</span><span style="font-size:13px;font-weight:700;color:'+(ok?"var(--green)":"var(--warn)")+'">'+res.robustnessLabel+'</span></div>';
+  html+='<div class="robustness-bar"><div class="robustness-fill" style="width:'+Math.min(100,res.robustness)+'%;background:'+(ok?"var(--green)":"var(--warn)")+'"></div></div>';
+  html+='<div style="font-size:12px;color:var(--t2)">'+( res.robustness<10?"This is a close call — small changes in your estimates could flip the decision. Check your assumptions carefully.":res.robustness<25?"Moderate confidence. The decision holds unless your estimates are significantly off.":"Strong result. The decision is unlikely to change even if your cash inflow estimates improve moderately.")+'</div></div>';
+
+  // Metrics
+  html+='<div class="metrics"><div class="metric"><div class="metric-label">Net result</div><div class="metric-val '+(ok?"good":"warn")+'">'+fmtM(res.npv)+'</div><div class="metric-sub">'+(ok?"Gain over your target return":"Shortfall from your target return")+'</div></div><div class="metric"><div class="metric-label">PV of annual value</div><div class="metric-val">'+fmtM(res.pvBen)+'</div><div class="metric-sub">'+fmtM(+S.benefits)+'/yr for '+S.life+' years in today\'s money</div></div><div class="metric"><div class="metric-label">PV of resale</div><div class="metric-val">'+fmtM(res.pvSalv)+'</div><div class="metric-sub">'+fmtM(+S.salvage)+' recovered in year '+S.life+'</div></div></div>';
+
+  // Sensitivity chart
+  html+='<div class="chart-box"><div class="chart-title">How the result changes if annual value is different</div><div class="chart-sub">Green bars = purchase justified · Current estimate is highlighted</div><canvas id="ben-chart" width="700" height="210" style="width:100%;height:auto;display:block"></canvas></div>';
+
+  // What Would It Take
+  html+='<div class="collapsible"><div class="coll-head" onclick="S.show_wwit=!S.show_wwit;renderPage2()"><span class="coll-title">What would it take to justify '+(ok?"an even better return?":"this purchase?")+'</span><span class="coll-arr" style="transform:'+(S.show_wwit?'rotate(90deg)':'rotate(0deg)')+'" >›</span></div>';
+  if(S.show_wwit){
+    html+='<div class="coll-body open"><div style="padding:16px 18px">';
+    var aboveBelow=(+S.benefits>=res.wwit?(fmtM(+S.benefits-res.wwit)+' above'):(fmtM(res.wwit-+S.benefits)+' below'));
+    html+='<div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:14px">At a purchase price of <strong>'+fmtM(+S.price)+'</strong> and a '+S.coc+'% target return, you need at least <strong style="color:var(--green)">'+fmtM(res.wwit)+' per year</strong> in value from this asset to break even. Your current estimate of '+fmtM(+S.benefits)+'/yr is <strong>'+aboveBelow+'</strong> the threshold.</div>';
+    html+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--t3);margin-bottom:8px">Or: negotiate a lower price</div>';
+    // Breakeven price at current benefit
+    var r2=+S.coc/100;var af2=(1-Math.pow(1+r2,-+S.life))/r2;var pvS2=+S.salvage/Math.pow(1+r2,+S.life);var bePrice=+S.benefits*af2+pvS2;
+    html+='<div style="font-size:13px;color:var(--t2)">At your current value estimate of <strong>'+fmtM(+S.benefits)+'/yr</strong>, the maximum price that earns your target return is <strong style="color:var(--green)">'+fmtM(bePrice)+'</strong>.'+(+S.price<=bePrice?' You are within this ceiling.':' The current price of '+fmtM(+S.price)+' exceeds it by '+fmtM(+S.price-bePrice)+'.')+'</div></div></div></div>';
+  }
+  html+='</div>';
+
+  // Benefit sensitivity table
+  html+='<div class="collapsible"><div class="coll-head" onclick="S.show_sensitivity=!S.show_sensitivity;renderPage2()"><span class="coll-title">What if my value estimate is off?</span><span class="coll-arr" style="transform:'+(S.show_sensitivity?'rotate(90deg)':'rotate(0deg)')+'" >›</span></div>';
+  if(S.show_sensitivity){
+    html+='<div class="coll-body open" style="padding:4px 0"><div style="padding:10px 18px 6px;font-size:12px;color:var(--t2)">Use the -20% or -30% row as a conservative check on your estimate.</div>';
+    html+='<table><thead><tr><th class="left">Annual value</th><th>Net result</th><th>Verdict</th></tr></thead><tbody>';
+    res.benSens.forEach(function(row){var isCur=Math.abs(row.delta)<0.001;html+='<tr'+(isCur?' class="highlight"':'')+'><td class="left">'+(isCur?"★ ":"")+fmtM(row.benefits)+(row.delta!==0?" ("+(row.delta>0?"+":"")+fmt(row.delta,0)+"%)":"")+'</td><td style="color:'+(row.npv>=0?"var(--green)":"var(--warn)")+'">'+fmtM(row.npv)+'</td><td class="left" style="font-weight:700;color:'+(row.npv>=0?"var(--green)":"var(--warn)")+'\">'+(row.npv>=0?"Yes — justified":"No — not justified")+'</td></tr>';});
+    html+='</tbody></table></div></div>';
+  }
+  html+='</div></main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES2,"bn-list2");
+  setTimeout(function(){drawChart("ben-chart",res.benSens,+S.coc)},50);
+  initChartTooltip("ben-chart",res.benSens,function(d){return (d.delta>=0?"+":"")+fmt(d.delta,0)+"% value: NPV "+fmtM(d.npv);});
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+}
+function printSummary(){var pd=S.show_sensitivity,pd2=S.show_wwit;S.show_sensitivity=true;S.show_wwit=true;renderPage2();setTimeout(function(){document.querySelectorAll('canvas').forEach(function(c){var img=document.createElement('img');img.src=c.toDataURL('image/png');img.style.cssText='width:100%;height:auto;display:block';c.parentNode.replaceChild(img,c);});window.print();S.show_sensitivity=pd;S.show_wwit=pd2;renderPage2();},300);}
+function initChartTooltip(canvasId,data,labelFn){
+  setTimeout(function(){
+    var canvas=document.getElementById(canvasId);if(!canvas)return;
+    var par=canvas.parentNode;par.style.position='relative';
+    var old=par.querySelector('.ctip');if(old)old.remove();
+    var tip=document.createElement('div');tip.className='ctip';
+    tip.style.cssText='position:absolute;pointer-events:none;background:rgba(15,29,46,.88);color:white;font-size:11px;font-weight:600;padding:5px 10px;border-radius:5px;white-space:nowrap;display:none;z-index:99;transform:translateX(-50%);top:6px';
+    par.appendChild(tip);
+    canvas.style.cursor='crosshair';
+    canvas.onmousemove=function(e){
+      var r=canvas.getBoundingClientRect();
+      var scaleX=canvas.width/r.width;
+      var mx=(e.clientX-r.left)*scaleX;
+      var W=canvas.width,padL=80,cw=W-96;
+      var n=data.length,gap=cw/n,bw=Math.floor(gap*0.6);
+      var hit=null,hitPct=0;
+      for(var i=0;i<n;i++){
+        var bx=padL+gap*i+(gap-bw)/2;
+        if(mx>=bx&&mx<=bx+bw){hit=data[i];hitPct=((bx+bw/2)/W*100);break;}
+      }
+      if(hit){tip.textContent=labelFn(hit);tip.style.left=hitPct.toFixed(1)+'%';tip.style.display='block';}
+      else tip.style.display='none';
+    };
+    canvas.onmouseleave=function(){tip.style.display='none';};
+  },90);
+}
+
+function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();var cl=document.getElementById("cur-label");if(cl)cl.textContent=getSym()+" "+S.currency;}
+render();
+</script></body></html>

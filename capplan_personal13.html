@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan Personal — What's the Most I Should Pay?</title>
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#F0F4F0;color:#0F1D2E;font-size:14px;-webkit-font-smoothing:antialiased}
+input,select,button{font-family:inherit;font-size:14px}button{cursor:pointer;background:none;border:none}select{-webkit-appearance:none;appearance:none}
+:root{--green:#2E7D52;--green-warm:#3D8B5A;--green-soft:rgba(46,125,82,0.10);--green-mid:#EBF5EE;--green-dark:#1A5C35;
+--blue:#1B3F6E;--blue-soft:rgba(27,63,110,0.08);
+--amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7;
+--surface:#F7FAF7;--panel:#fff;--border:#D8E8DC;--t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;--warn:#C84B31;--warn-soft:rgba(200,75,49,.07)}
+#masthead{background:var(--green);height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}.logo-mark{width:30px;height:30px;background:rgba(255,255,255,0.2);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:Georgia,serif;font-size:20px;color:white}.logo-text span{color:rgba(255,255,255,0.6)}
+.logo-sub{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-left:4px;padding-left:12px;border-left:1px solid rgba(255,255,255,0.25)}
+.module-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.9)}
+#stepper{background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px}
+.step{display:flex;align-items:center;gap:8px;padding:13px 4px;border-bottom:2px solid transparent}
+.step.active{border-bottom-color:var(--green)}.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--border);color:var(--t3)}
+.step.active .step-num{background:var(--green);color:white}.step.done .step-num{background:var(--green-warm);color:white}
+.step-label{font-size:13px;font-weight:500;color:var(--t3)}.step.active .step-label{color:var(--green)}.step.done .step-label{color:var(--green-warm)}
+.step-sep{color:var(--border);margin:0 8px;font-size:16px}
+.page{max-width:1040px;margin:0 auto;padding:24px 22px}
+.page-grid{display:grid;grid-template-columns:300px 1fr;gap:22px}
+.p2-grid{display:grid;grid-template-columns:220px 1fr;gap:22px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);overflow:hidden;margin-bottom:18px}
+.panel-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr}
+.field{padding:13px 18px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.field.full{grid-column:1/-1;border-right:none}.field.last{border-bottom:none}
+.field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:6px}
+.field-note{font-size:10px;color:var(--t3);margin-top:4px;line-height:1.5}
+.ui{display:flex;align-items:center;gap:6px}
+.ui .pfx,.ui .sfx{font-family:monospace;font-size:12px;color:var(--t3);flex-shrink:0}
+.ui input{font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none}
+.ui input:focus{border-bottom-color:var(--green)}.ui input:disabled{color:var(--t3);opacity:.6}
+.ui select{font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none;cursor:pointer}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.pill{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;user-select:none}
+.pill.active{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+.pill-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--t3);flex-shrink:0}.pill.active .pill-dot{border-color:var(--green);background:var(--green)}
+.btn-primary{background:var(--green);color:white;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-primary:hover{background:var(--green-warm)}
+.btn-ghost{background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn{display:flex;align-items:center;gap:6px;background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn:hover{border-color:var(--green);color:var(--green)}
+.action-row{display:flex;gap:10px;margin-top:4px}
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:11px}
+.bn-item{border-bottom:1px solid var(--border)}.bn-item:last-child{border-bottom:none}
+.bn-head{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;cursor:pointer}.bn-head:hover{background:var(--surface)}
+.bn-qmark{width:21px;height:21px;border-radius:50%;background:var(--green-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--green);flex-shrink:0;margin-top:1px;margin-right:5px}
+.bn-q{font-size:13px;line-height:1.5;color:var(--green);flex:1}.bn-arr{color:var(--t3);font-size:14px;flex-shrink:0;margin-top:2px;transition:transform .2s}
+.bn-body{padding:10px 13px 12px 44px;font-size:12.5px;line-height:1.7;color:var(--t2);background:var(--surface);border-top:1px solid var(--border);display:none}.bn-body.open{display:block}
+.watch-btn{margin-top:10px;display:flex;width:fit-content;align-items:center;gap:5px;border:1px solid var(--green);border-radius:5px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--green);background:none;cursor:pointer}
+.helper-card{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.helper-head{padding:11px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--amber-mid)}.helper-head:hover{background:#fde68a}
+.helper-icon{font-size:18px;flex-shrink:0}.helper-title{font-size:13px;font-weight:700;color:var(--amber-dark);flex:1}.helper-toggle{font-size:11px;font-weight:600;color:var(--amber-dark);opacity:.7}
+.helper-body{padding:16px;border-top:1.5px solid var(--amber);display:flex;flex-direction:column;gap:12px}
+.helper-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dark)}
+.helper-result{background:var(--green-soft);border:1.5px solid var(--green);border-radius:8px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.helper-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.result-banner{border-radius:10px;padding:20px 24px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.result-banner.good{background:var(--green-soft);border:1.5px solid var(--green)}
+.result-banner.warn{background:var(--warn-soft);border:1.5px solid var(--warn)}
+.result-banner.neutral{background:var(--surface);border:1.5px solid var(--border)}
+.result-banner.info{background:var(--blue-soft);border:1.5px solid #93B4D8}
+.result-box{border-radius:10px;padding:14px 20px;text-align:center;flex-shrink:0}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.metric{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.metric-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:7px}
+.metric-val{font-family:monospace;font-size:18px;font-weight:700;color:var(--t1)}.metric-val.good{color:var(--green)}.metric-val.warn{color:var(--warn)}.metric-val.info{color:var(--blue)}
+.metric-sub{font-size:10px;color:var(--t3);margin-top:3px;line-height:1.4}
+.chart-box{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:18px}
+.chart-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:4px}.chart-sub{font-size:11px;color:var(--t3);margin-bottom:12px}
+.collapsible{background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:14px;overflow:hidden}
+.coll-head{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}.coll-head:hover{background:var(--surface)}
+.coll-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}.coll-arr{color:var(--t3);font-size:14px;transition:transform .2s}
+.coll-body{display:none;border-top:1px solid var(--border)}.coll-body.open{display:block}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{padding:8px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}th.left{text-align:left}
+td{padding:8px 14px;text-align:right;font-family:monospace;border-bottom:1px solid var(--border)}td.left{text-align:left;font-family:inherit;color:var(--t1)}td.sub{text-align:left;font-family:inherit;color:var(--t3);font-size:11px}
+tr.total-row td{font-weight:700;background:var(--surface)}tr:nth-child(even){background:var(--surface)}
+tr.highlight td{background:var(--green-soft)!important;font-weight:700;color:var(--green)}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,29,46,.82);z-index:9999;display:flex;align-items:center;justify-content:center}
+.modal-box{background:white;border-radius:10px;overflow:hidden;width:min(820px,95vw)}
+.modal-head{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.modal-close{font-size:22px;color:var(--t3);line-height:1;cursor:pointer}
+.video-wrap{position:relative;padding-bottom:56.25%;height:0}.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;background:white}#masthead{position:static!important;height:auto!important;padding:8px 0!important}#stepper,.btn-ghost,.print-btn,.coll-arr{display:none!important}.page-grid,.p2-grid{display:block!important}aside{display:none!important}.coll-body{display:block!important}.coll-head{break-after:avoid!important}.result-banner,.metric,.chart-box,.collapsible,.helper-card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid}table{font-size:9px;table-layout:fixed}th,td{padding:3px 5px}thead{display:table-header-group}tr{break-inside:avoid}@page{margin:0.5in;size:landscape}}</style>
+</head>
+<body>
+<div id="masthead">
+  <div class="logo"><div class="logo-mark"><svg viewBox="0 0 18 18" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg></div><div class="logo-text">Cap<span>Plan</span></div><div class="logo-sub">Personal</div></div>
+  <div class="module-name">What's the Most I Should Pay?</div>
+  <div style="position:relative"><button style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600" id="cur-btn" onclick="toggleCur()"><span id="cur-label">$ USD</span> ▾</button><div id="cur-dropdown" style="display:none;position:absolute;right:0;top:110%;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,29,46,.16);min-width:200px;z-index:300;overflow:hidden"></div></div>
+</div>
+<div id="stepper">
+  <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">What you expect</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step2"><div class="step-num" id="sn2">2</div><div class="step-label">Results</div></div>
+</div>
+<div id="main-content"></div>
+<script>
+var CURRENCIES=[{code:"USD",symbol:"$",label:"US Dollar"},{code:"EUR",symbol:"€",label:"Euro"},{code:"GBP",symbol:"£",label:"British Pound"},{code:"CAD",symbol:"CA$",label:"Canadian Dollar"},{code:"AUD",symbol:"AU$",label:"Australian Dollar"},{code:"NZD",symbol:"NZ$",label:"New Zealand Dollar"},{code:"JPY",symbol:"¥",label:"Japanese Yen"}];
+function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
+function toggleCur(){S.cur_open=!S.cur_open;var dd=document.getElementById("cur-dropdown");dd.style.display=S.cur_open?"block":"none";if(S.cur_open){dd.innerHTML="";CURRENCIES.forEach(function(c){var b=document.createElement("button");b.style.cssText="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:"+(c.code===S.currency?"var(--green-soft)":"transparent")+";border:none;border-bottom:1px solid var(--border);cursor:pointer";b.innerHTML='<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--green);width:36px">'+c.symbol+'</span><span>'+c.label+'</span>';b.onclick=function(){S.currency=c.code;S.cur_open=false;render()};dd.appendChild(b);});}}
+
+var S={page:1,currency:"USD",cur_open:false,res:null,missingFields:null,
+  show_ben_sens:false,show_return_sens:false,bw_open:false,bw_val:"",bw_pct:"",
+  benefits:"",life:"",svPct:"",coc:""};
+
+function calcMaxPrice(benefits,life,svPct,coc){
+  var r=coc/100;
+  var pvBen=benefits*((1-Math.pow(1+r,-life))/r);
+  var pvSalvF=(svPct/100)/Math.pow(1+r,life);
+  var denom=1-pvSalvF;
+  return denom>0?pvBen/denom:0;
+}
+function calcAll(){
+  var ben=+S.benefits||0,life=+S.life||1,svPct=+S.svPct||0,coc=+S.coc||0;
+  var maxP=calcMaxPrice(ben,life,svPct,coc);
+  var pvBen=ben*((1-Math.pow(1+coc/100,-life))/(coc/100));
+  var pvSalvF=(svPct/100)/Math.pow(1+coc/100,life);
+  var ceiling0=ben>0?(ben*life)/(1-svPct/100):0;
+  var cocSens=[-4,-3,-2,-1,0,1,2,3,4].map(function(delta){var c2=coc+delta;if(c2<=0)return{coc:c2,price:0};return{coc:c2,price:calcMaxPrice(ben,life,svPct,c2)};});
+  var benSens=[-0.40,-0.30,-0.20,-0.10,0,0.10,0.20,0.30,0.40].map(function(delta){var b2=ben*(1+delta);return{benefits:b2,price:calcMaxPrice(b2,life,svPct,coc),delta:delta*100};});
+  return{maxPrice:maxP,pvBen:pvBen,pvSalvF:pvSalvF,ceiling:ceiling0,cocSens:cocSens,benSens:benSens};
+}
+function fmt(n,d){if(n==null||isNaN(n))return"--";d=d||0;return n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmtM(n){if(n==null||isNaN(n))return"--";var s=getSym();return n<0?"-"+s+fmt(Math.abs(n)):s+fmt(n)}
+function updateStepper(){for(var i=1;i<=2;i++){var step=document.getElementById("step"+i),sn=document.getElementById("sn"+i);step.className="step";if(i<S.page){step.classList.add("done");sn.textContent="✓"}else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}else sn.textContent=String(i);var n=i;(function(n,step){step.onclick=function(){if(n<S.page||(n===2&&S.res)){S.page=n;render()}}})(n,step);step.style.cursor=(i<S.page||(i===2&&S.res))?"pointer":"default";}}
+
+var NOTES1=[
+  {q:"What does this model calculate?",a:"The maximum price you should pay for an asset — worked backwards from the value you expect to receive. Any price above this means you'd earn less than your target return on your investment. This is your private walk-away number in any negotiation."},
+  {q:"How do I estimate annual value?",a:"Think about what the asset replaces or enables: money saved on renting a car, transit costs avoided, electricity bills reduced by solar, services you'd otherwise pay for. Be honest and conservative — it's better to set a realistic maximum than to overpay on optimistic assumptions."},
+  {q:"What is the resale value percentage?",a:"Your estimate of what fraction of the purchase price you'll recover when you eventually sell or dispose of the asset. Cars typically retain 30–50% over 5 years depending on make. Appliances might retain 5–15%. Enter 0 if the asset will have no resale value."},
+  {q:"How do I use this when negotiating?",a:"Never tell the seller your maximum — that's your private ceiling. Start lower and work up. If the seller won't go below your maximum, be prepared to walk away. The model is most useful as a discipline: once you have a number, stick to it."},
+];
+var NOTES2=[
+  {q:"What is the negotiation range?",a:"The gap between your maximum at your target return and the ceiling at 0% return (just getting your money back in nominal terms). Anything in between still means you recover your investment — just at a lower return than you'd prefer."},
+  {q:"How is the maximum price calculated?",a:"The salvage value is a percentage of whatever you pay — so it scales with the price, which appears on both sides of the equation. The model resolves this circular dependency algebraically: at your target return, PV of benefits + (salvage% × price) ÷ (1+r)^life = price. Rearranging gives: price = PV of benefits ÷ (1 − PV factor of salvage%). You do not need to know the price in advance — the formula finds it. The higher the salvage percentage, the more you get back relative to what you paid, which is why a higher salvage percentage produces a higher maximum price. The nominal ceiling uses the same logic with no discounting: total benefits divided by (1 − salvage fraction)."},
+  {q:"What does the maximum price mean?",a:"Any price at or below this earns at least your target return. Any price above it means your actual return will fall below your target. It's the financial break-even for your required return, not a break-even in the accounting sense."},
+  {q:"How do I use the benefit sensitivity table?",a:"It shows how your maximum price changes if the asset delivers more or less value than you estimated. If your benefit estimate might be 20% optimistic, look at the -20% row — that's your more conservative maximum. Use the conservative number as your true walk-away price."},
+  {q:"What if the asking price is above my maximum?",a:"Walk away, or try to renegotiate the benefits (longer warranty, bundled services). Alternatively, revisit your return target — if you'd accept a lower return, your maximum rises. But don't talk yourself into overpaying just because you want the asset."}
+];
+function makeBNList(notes,id){var list=document.getElementById(id);if(!list)return;list.innerHTML="";notes.forEach(function(n,i){var item=document.createElement("div");item.className="bn-item";var head=document.createElement("div");head.className="bn-head";head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+id+i+'">›</div>';var body=document.createElement("div");body.className="bn-body";body.textContent=n.a;head.onclick=function(){var open=body.classList.contains("open");body.classList.toggle("open");document.getElementById("arr"+id+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";head.style.background=open?"":"var(--surface)";};item.appendChild(head);item.appendChild(body);list.appendChild(item);});}
+function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last?" last":"")+'"><div class="field-label">'+l+'</div>'+h+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';}
+function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--green)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
+
+function goToResults(){
+  var missing=[];
+  if(!S.benefits&&S.benefits!==0)missing.push("Annual value you expect");if(!S.life)missing.push("How long you'll keep it");
+  if(!S.svPct&&S.svPct!==0)missing.push("Expected resale %");if(!S.coc)missing.push("Target return");
+  if(missing.length>0){S.missingFields=missing;render();return;}
+  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+}
+function resetInputs(){S.benefits="";S.life="";S.svPct="";S.coc="";S.missingFields=null;S.bw_open=false;S.bw_val="";S.bw_pct="";render();}
+function loadExample(){S.benefits=4500;S.life=5;S.svPct=30;S.coc=6;S.missingFields=null;render();}
+
+function drawChart(canvasId,data,current){
+  var canvas=document.getElementById(canvasId);if(!canvas)return;
+  var ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;
+  var pad={top:16,bottom:48,left:80,right:16};var cw=W-pad.left-pad.right,ch=H-pad.top-pad.bottom;
+  ctx.clearRect(0,0,W,H);
+  var vals=data.map(function(d){return d.price}).filter(function(v){return v>0});if(!vals.length)return;
+  var minV=Math.min.apply(null,vals),maxV=Math.max.apply(null,vals);var rng=maxV-minV||maxV*0.2;var lo=minV-rng*0.1,hi=maxV+rng*0.15;
+  ctx.strokeStyle="#D8E8DC";ctx.lineWidth=1;for(var i=0;i<=4;i++){var y=pad.top+ch*(1-i/4);ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();ctx.fillStyle="#8A96A6";ctx.font="10px system-ui";ctx.textAlign="right";ctx.fillText(getSym()+fmt((lo+(hi-lo)*(i/4))/1000,0)+"k",pad.left-3,y+3);}
+  var bw=Math.floor(cw/data.length*0.6),gap=cw/data.length;
+  data.forEach(function(d,i){if(!d.price)return;var x=pad.left+gap*i+(gap-bw)/2,bh=(d.price-lo)/(hi-lo)*ch,y=pad.top+ch-bh;var isCur=d.coc===current;ctx.fillStyle=isCur?"#1B3F6E":"#93B4D8";ctx.fillRect(x,y,bw,bh);ctx.fillStyle=isCur?"var(--blue)":"#8A96A6";ctx.font=isCur?"bold 10px system-ui":"10px system-ui";ctx.textAlign="center";ctx.fillText(d.coc+"%",x+bw/2,H-pad.bottom+13);});
+  ctx.strokeStyle="#4A5568";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(pad.left,pad.top+ch);ctx.lineTo(pad.left+cw,pad.top+ch);ctx.stroke();ctx.fillStyle="#4A5568";ctx.font="bold 11px system-ui";ctx.textAlign="center";ctx.fillText("Target return — higher return = lower maximum price",pad.left+cw/2,H-3);
+}
+
+function renderPage1(){
+  var sym=getSym();
+  var html='<div class="page"><div class="page-grid"><aside><div class="section-label">About this tool</div>';
+  html+='<div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div>';
+  html+='</aside><main>';
+
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:16px 18px;margin-bottom:14px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:12px">What is the most you should pay for this asset?</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Value you will receive.</strong> The model starts with the annual benefit the asset will provide and converts it to today\'s money over the ownership period.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Resale value.</strong> You estimate what fraction of the purchase price you will recover when you eventually sell or dispose of the asset.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Maximum price.</strong> The model solves for the price at which total discounted returns exactly equal the price paid at your target return. Any higher price earns less than your target.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Nominal ceiling.</strong> The model also shows the maximum you would pay to simply get your money back with no return at all — the absolute upper limit.</div></div>';
+  html+='</div></div>';
+
+  html+='<div class="helper-card"><div class="helper-head" onclick="S.bw_open=!S.bw_open;render()"><span class="helper-icon">💡</span><span class="helper-title">Help me estimate annual value</span><span class="helper-toggle">'+(S.bw_open?"▲ hide":"▼ show")+'</span></div>';
+  if(S.bw_open){
+    html+='<div class="helper-body"><div style="font-size:13px;color:var(--t2);line-height:1.6">Estimate the annual value this asset will provide — money saved, services replaced, or costs avoided:</div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+    html+='<div><div class="helper-label">What it replaces annually</div><div class="ui"><span class="pfx">'+sym+'</span><input type="text" value="'+(S.bw_val||"")+'" placeholder="e.g. 5000" onblur="S.bw_val=+this.value||0;render()" onfocus="this.style.borderBottomColor=\'var(--green)\'" style="font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none"><span class="sfx">/ yr</span></div><div class="field-note">Car rental, transit, fees, etc.</div></div>';
+    html+='<div><div class="helper-label">Realistic % you\'ll actually save</div><div class="ui"><input type="text" value="'+(S.bw_pct||"")+'" placeholder="e.g. 85" onblur="S.bw_pct=+this.value||0;render()" onfocus="this.style.borderBottomColor=\'var(--green)\'" style="font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none"><span class="sfx">%</span></div><div class="field-note">Be conservative</div></div>';
+    html+='</div>';
+    if(S.bw_val&&S.bw_pct){var sug=Math.round(S.bw_val*S.bw_pct/100);html+='<div class="helper-result"><div style="font-size:13px;color:var(--t2)">Suggested annual value: <strong style="color:var(--green)">'+fmtM(sug)+'/year</strong></div><button class="helper-use" onclick="S.benefits='+sug+';S.bw_open=false;render()">Use this ›</button></div>';}
+    html+='</div></div>';
+  }
+  html+='</div>';
+
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">What You Expect from the Asset</div></div><div class="field-grid">';
+  html+=field("Annual value you expect",uIn(sym,S.benefits,"inp-ben","S.benefits=+this.value||0","/ yr",false),false,false,"Money saved or value received each year — use the estimator above if unsure");
+  html+=field("How long you'll keep it",uIn("",S.life,"inp-life","S.life=+this.value||0","years",false));
+  html+=field("Expected resale value",uIn("",S.svPct,"inp-sv","S.svPct=+this.value||0","% of what you pay",false),false,true,"e.g. 30 means you expect to recover 30% of the price when you sell");
+  html+='</div></div>';
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Your Target Return</div></div><div class="field-grid">';
+  html+=field("Target return on your money",uIn("",S.coc,"inp-coc","S.coc=+this.value||0","%",false),true,true,"What you'd expect to earn investing elsewhere — 5–8% is typical");
+  html+='</div></div>';
+
+  if(S.missingFields&&S.missingFields.length>0)html+='<div style="background:var(--warn-soft);border:1.5px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)"><strong>Please fill in:</strong> '+S.missingFields.join(", ")+'.</div>';
+  html+='<div class="action-row" style="justify-content:space-between;align-items:center"><span style="font-size:11.5px;color:var(--t3)">New here? Try <strong style="color:var(--t2)">Load Example</strong></span><div style="display:flex;gap:10px"><button class="btn-ghost" onclick="loadExample()">Load Example</button><button class="btn-ghost" onclick="resetInputs()">Reset</button><button class="btn-primary" onclick="goToResults()">Calculate ›</button></div></div>';
+  html+='</main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES1,"bn-list1");
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+}
+
+function renderPage2(){
+  var res=S.res,sym=getSym();
+  var html='<div class="page"><div class="p2-grid"><aside>';
+  html+='<div class="section-label">Understanding your results</div><div class="panel" style="margin-bottom:14px"><div id="bn-list2"></div></div><div style="display:flex;flex-direction:column;gap:10px"><button class="btn-ghost" onclick="S.page=1;render()">‹ Change my numbers</button><button class="print-btn" onclick="printSummary()">🖶 Print</button></div></aside><main>';
+  html+='<div class="result-banner good"><div><div style="font-family:Georgia,serif;font-size:22px;color:var(--green);line-height:1.3">Don\'t pay more than <strong>'+fmtM(res.maxPrice)+'</strong>.</div><div style="font-size:13px;color:var(--t2);margin-top:8px;line-height:1.6">This is your private walk-away price — never reveal it to the seller. Any price above this earns less than your '+S.coc+'% target return.</div></div><div class="result-box" style="background:var(--green)"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.75)">Maximum price</div><div style="font-family:monospace;font-size:26px;font-weight:800;color:white;margin-top:4px">'+fmtM(res.maxPrice)+'</div></div></div>';
+  html+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 18px;margin-bottom:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);flex-shrink:0">Also on this page:</span><div style="display:flex;gap:8px;flex-wrap:wrap"><span style="font-size:12px;color:var(--t2);background:white;border:1px solid var(--border);border-radius:5px;padding:3px 10px">🎯 Negotiation range</span><span style="font-size:12px;color:var(--t2);background:white;border:1px solid var(--border);border-radius:5px;padding:3px 10px">📊 Maximum by return</span><span style="font-size:12px;color:var(--t2);background:white;border:1px solid var(--border);border-radius:5px;padding:3px 10px">💡 Maximum by value</span></div></div>';
+  html+='<div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 16px 0;align-items:center"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-right:4px">Also on this page</span>';
+  ['📊 Annual value sensitivity','📈 Return sensitivity'].forEach(function(item){html+='<span style="font-size:12px;color:var(--t2);padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:20px">'+item+'</span>';}); html+='</div>';
+  html+='<div class="metrics"><div class="metric"><div class="metric-label">Your maximum price</div><div class="metric-val good">'+fmtM(res.maxPrice)+'</div><div class="metric-sub">Walk away above this at '+S.coc+'% target</div></div><div class="metric"><div class="metric-label">PV of annual value</div><div class="metric-val good">'+fmtM(res.pvBen)+'</div><div class="metric-sub">'+fmtM(+S.benefits)+'/yr over '+S.life+' years in today\'s money</div></div><div class="metric"><div class="metric-label">Nominal ceiling</div><div class="metric-val warn">'+fmtM(res.ceiling)+'</div><div class="metric-sub">Maximum at 0% return — absolute ceiling</div></div></div>';
+
+  // Negotiation range bar
+  var range=res.ceiling-res.maxPrice;var pct=range>0&&res.ceiling>0?range/res.ceiling*100:0;
+  html+='<div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:18px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:12px">Negotiation Range</div>';
+  html+='<div style="display:flex;height:28px;border-radius:5px;overflow:hidden;margin-bottom:8px"><div style="flex:1;background:var(--green);display:flex;align-items:center;padding:0 10px"><span style="font-size:11px;font-weight:700;color:white">Your target: '+fmtM(res.maxPrice)+'</span></div><div style="width:'+Math.max(5,Math.min(40,pct)).toFixed(0)+'%;background:#F59E0B;display:flex;align-items:center;justify-content:center;padding:0 6px;min-width:70px"><span style="font-size:10px;font-weight:700;color:#92400E;white-space:nowrap">+'+fmtM(range)+'</span></div></div>';
+  html+='<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3)"><span>Maximum at your target return</span><span>Ceiling at 0% return: '+fmtM(res.ceiling)+'</span></div></div>';
+
+  html+='<div class="chart-box"><div class="chart-title">Maximum price by target return</div><div class="chart-sub">Higher return requirement = lower maximum price</div><canvas id="coc-chart" width="700" height="200" style="width:100%;height:auto;display:block"></canvas></div>';
+
+  html+='<div class="collapsible"><div class="coll-head" onclick="S.show_ben_sens=!S.show_ben_sens;renderPage2()"><span class="coll-title">What if my value estimate is off?</span><span class="coll-arr" style="transform:'+(S.show_ben_sens?'rotate(90deg)':'rotate(0deg)')+'" >›</span></div>';
+  if(S.show_ben_sens){
+    html+='<div class="coll-body open" style="padding:4px 0"><div style="padding:10px 18px 6px;font-size:12px;color:var(--t2)">Use the -20% or -30% row as your conservative maximum — it\'s what you should pay if the asset delivers less value than you hope.</div><table><thead><tr><th class="left">Annual value</th><th>Maximum price</th><th>vs current estimate</th></tr></thead><tbody>';
+    res.benSens.forEach(function(row){var isCur=Math.abs(row.delta)<0.001;var diff=row.price-res.maxPrice;html+='<tr'+(isCur?' class="highlight"':'')+'><td class="left">'+(isCur?"★ ":"")+fmtM(row.benefits)+(row.delta!==0?" ("+(row.delta>0?"+":"")+fmt(row.delta,0)+"%)":"")+'</td><td>'+fmtM(row.price)+'</td><td style="color:'+(isCur?"var(--t3)":diff>0?"var(--green)":"var(--warn)")+'\">'+(isCur?"current":(diff>0?"+":"")+fmtM(diff))+'</td></tr>';});
+    html+='</tbody></table></div></div></div>';
+  }
+  html+='</div></main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES2,"bn-list2");
+  setTimeout(function(){drawChart("coc-chart",res.cocSens,+S.coc)},50);
+  initChartTooltip("coc-chart",res.cocSens,function(d){return d.coc+"% return → max price "+fmtM(d.price);});
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+}
+function printSummary(){var pd=S.show_ben_sens;S.show_ben_sens=true;renderPage2();setTimeout(function(){document.querySelectorAll('canvas').forEach(function(c){var img=document.createElement('img');img.src=c.toDataURL('image/png');img.style.cssText='width:100%;height:auto;display:block';c.parentNode.replaceChild(img,c);});window.print();S.show_ben_sens=pd;renderPage2();},300);}
+function initChartTooltip(canvasId,data,labelFn){
+  setTimeout(function(){
+    var canvas=document.getElementById(canvasId);if(!canvas)return;
+    var par=canvas.parentNode;par.style.position='relative';
+    var old=par.querySelector('.ctip');if(old)old.remove();
+    var tip=document.createElement('div');tip.className='ctip';
+    tip.style.cssText='position:absolute;pointer-events:none;background:rgba(15,29,46,.88);color:white;font-size:11px;font-weight:600;padding:5px 10px;border-radius:5px;white-space:nowrap;display:none;z-index:99;transform:translateX(-50%);top:6px';
+    par.appendChild(tip);
+    canvas.style.cursor='crosshair';
+    canvas.onmousemove=function(e){
+      var r=canvas.getBoundingClientRect();
+      var scaleX=canvas.width/r.width;
+      var mx=(e.clientX-r.left)*scaleX;
+      var W=canvas.width,padL=80,cw=W-96;
+      var n=data.length,gap=cw/n,bw=Math.floor(gap*0.6);
+      var hit=null,hitPct=0;
+      for(var i=0;i<n;i++){
+        var bx=padL+gap*i+(gap-bw)/2;
+        if(mx>=bx&&mx<=bx+bw){hit=data[i];hitPct=((bx+bw/2)/W*100);break;}
+      }
+      if(hit){tip.textContent=labelFn(hit);tip.style.left=hitPct.toFixed(1)+'%';tip.style.display='block';}
+      else tip.style.display='none';
+    };
+    canvas.onmouseleave=function(){tip.style.display='none';};
+  },90);
+}
+
+function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();var cl=document.getElementById("cur-label");if(cl)cl.textContent=getSym()+" "+S.currency;}
+render();
+</script></body></html>

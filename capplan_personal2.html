@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan Personal — Which Option Should I Buy?</title>
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#F0F4F0;color:#0F1D2E;font-size:14px;-webkit-font-smoothing:antialiased}
+input,select,button{font-family:inherit;font-size:14px}button{cursor:pointer;background:none;border:none}select{-webkit-appearance:none;appearance:none}
+:root{--green:#2E7D52;--green-warm:#3D8B5A;--green-soft:rgba(46,125,82,0.10);--green-mid:#EBF5EE;--green-dark:#1A5C35;
+--blue:#1B3F6E;--blue-soft:rgba(27,63,110,0.08);
+--amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7;
+--surface:#F7FAF7;--panel:#fff;--border:#D8E8DC;--t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;--warn:#C84B31;--warn-soft:rgba(200,75,49,.07)}
+#masthead{background:var(--green);height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}.logo-mark{width:30px;height:30px;background:rgba(255,255,255,0.2);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:Georgia,serif;font-size:20px;color:white}.logo-text span{color:rgba(255,255,255,0.6)}
+.logo-sub{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-left:4px;padding-left:12px;border-left:1px solid rgba(255,255,255,0.25)}
+.module-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.9)}
+#stepper{background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px}
+.step{display:flex;align-items:center;gap:8px;padding:13px 4px;border-bottom:2px solid transparent}
+.step.active{border-bottom-color:var(--green)}.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--border);color:var(--t3)}
+.step.active .step-num{background:var(--green);color:white}.step.done .step-num{background:var(--green-warm);color:white}
+.step-label{font-size:13px;font-weight:500;color:var(--t3)}.step.active .step-label{color:var(--green)}.step.done .step-label{color:var(--green-warm)}
+.step-sep{color:var(--border);margin:0 8px;font-size:16px}
+.page{max-width:1040px;margin:0 auto;padding:24px 22px}
+.page-grid{display:grid;grid-template-columns:300px 1fr;gap:22px}
+.p2-grid{display:grid;grid-template-columns:220px 1fr;gap:22px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);overflow:hidden;margin-bottom:18px}
+.panel-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr}
+.field{padding:13px 18px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.field.full{grid-column:1/-1;border-right:none}.field.last{border-bottom:none}
+.field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:6px}
+.field-note{font-size:10px;color:var(--t3);margin-top:4px;line-height:1.5}
+.ui{display:flex;align-items:center;gap:6px}
+.ui .pfx,.ui .sfx{font-family:monospace;font-size:12px;color:var(--t3);flex-shrink:0}
+.ui input{font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none}
+.ui input:focus{border-bottom-color:var(--green)}.ui input:disabled{color:var(--t3);opacity:.6}
+.ui select{font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none;cursor:pointer}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.pill{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;user-select:none}
+.pill.active{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+.pill-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--t3);flex-shrink:0}.pill.active .pill-dot{border-color:var(--green);background:var(--green)}
+.btn-primary{background:var(--green);color:white;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-primary:hover{background:var(--green-warm)}
+.btn-ghost{background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn{display:flex;align-items:center;gap:6px;background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn:hover{border-color:var(--green);color:var(--green)}
+.action-row{display:flex;gap:10px;margin-top:4px}
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:11px}
+.bn-item{border-bottom:1px solid var(--border)}.bn-item:last-child{border-bottom:none}
+.bn-head{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;cursor:pointer}.bn-head:hover{background:var(--surface)}
+.bn-qmark{width:21px;height:21px;border-radius:50%;background:var(--green-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--green);flex-shrink:0;margin-top:1px;margin-right:5px}
+.bn-q{font-size:13px;line-height:1.5;color:var(--green);flex:1}.bn-arr{color:var(--t3);font-size:14px;flex-shrink:0;margin-top:2px;transition:transform .2s}
+.bn-body{padding:10px 13px 12px 44px;font-size:12.5px;line-height:1.7;color:var(--t2);background:var(--surface);border-top:1px solid var(--border);display:none}.bn-body.open{display:block}
+.watch-btn{margin-top:10px;display:flex;width:fit-content;align-items:center;gap:5px;border:1px solid var(--green);border-radius:5px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--green);background:none;cursor:pointer}
+.helper-card{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.helper-head{padding:11px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--amber-mid)}.helper-head:hover{background:#fde68a}
+.helper-icon{font-size:18px;flex-shrink:0}.helper-title{font-size:13px;font-weight:700;color:var(--amber-dark);flex:1}.helper-toggle{font-size:11px;font-weight:600;color:var(--amber-dark);opacity:.7}
+.helper-body{padding:16px;border-top:1.5px solid var(--amber);display:flex;flex-direction:column;gap:12px}
+.helper-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dark)}
+.helper-result{background:var(--green-soft);border:1.5px solid var(--green);border-radius:8px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.helper-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.result-banner{border-radius:10px;padding:20px 24px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.result-banner.good{background:var(--green-soft);border:1.5px solid var(--green)}
+.result-banner.warn{background:var(--warn-soft);border:1.5px solid var(--warn)}
+.result-banner.neutral{background:var(--surface);border:1.5px solid var(--border)}
+.result-banner.info{background:var(--blue-soft);border:1.5px solid #93B4D8}
+.result-box{border-radius:10px;padding:14px 20px;text-align:center;flex-shrink:0}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.metric{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.metric-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:7px}
+.metric-val{font-family:monospace;font-size:18px;font-weight:700;color:var(--t1)}.metric-val.good{color:var(--green)}.metric-val.warn{color:var(--warn)}.metric-val.info{color:var(--blue)}
+.metric-sub{font-size:10px;color:var(--t3);margin-top:3px;line-height:1.4}
+.chart-box{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:18px}
+.chart-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:4px}.chart-sub{font-size:11px;color:var(--t3);margin-bottom:12px}
+.collapsible{background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:14px;overflow:hidden}
+.coll-head{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}.coll-head:hover{background:var(--surface)}
+.coll-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}.coll-arr{color:var(--t3);font-size:14px;transition:transform .2s}
+.coll-body{display:none;border-top:1px solid var(--border)}.coll-body.open{display:block}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{padding:8px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}th.left{text-align:left}
+td{padding:8px 14px;text-align:right;font-family:monospace;border-bottom:1px solid var(--border)}td.left{text-align:left;font-family:inherit;color:var(--t1)}td.sub{text-align:left;font-family:inherit;color:var(--t3);font-size:11px}
+tr.total-row td{font-weight:700;background:var(--surface)}tr:nth-child(even){background:var(--surface)}
+tr.highlight td{background:var(--green-soft)!important;font-weight:700;color:var(--green)}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,29,46,.82);z-index:9999;display:flex;align-items:center;justify-content:center}
+.modal-box{background:white;border-radius:10px;overflow:hidden;width:min(820px,95vw)}
+.modal-head{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.modal-close{font-size:22px;color:var(--t3);line-height:1;cursor:pointer}
+.video-wrap{position:relative;padding-bottom:56.25%;height:0}.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;background:white}#masthead{position:static!important;height:auto!important;padding:8px 0!important}#stepper,.btn-ghost,.print-btn,.coll-arr{display:none!important}.page-grid,.p2-grid{display:block!important}aside{display:none!important}.coll-body{display:block!important}.coll-head{break-after:avoid!important}.result-banner,.metric,.chart-box,.collapsible,.helper-card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid}table{font-size:9px;table-layout:fixed}th,td{padding:3px 5px}thead{display:table-header-group}tr{break-inside:avoid}@page{margin:0.5in;size:landscape}}
+.opt-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.opt-tab{background:var(--surface);border:1.5px solid var(--border);border-radius:8px 8px 0 0;padding:9px 16px;cursor:pointer;font-size:13px;font-weight:600;color:var(--t2);transition:all .15s}
+.opt-tab.active{background:var(--panel);border-color:var(--green);border-bottom-color:var(--panel);color:var(--green)}
+.opt-remove{margin-left:8px;color:var(--t3);font-weight:800}
+.opt-add{background:var(--green-soft);border:1.5px dashed var(--green);border-radius:8px;padding:9px 16px;cursor:pointer;font-size:13px;font-weight:600;color:var(--green)}
+.compare-card{border-radius:10px;padding:16px;border:2px solid var(--border);background:var(--surface)}
+.compare-card.winner{border-color:var(--green);background:var(--green-soft)}
+</style>
+</head>
+<body>
+<div id="masthead">
+  <div class="logo"><div class="logo-mark"><svg viewBox="0 0 18 18" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg></div><div class="logo-text">Cap<span>Plan</span></div><div class="logo-sub">Personal</div></div>
+  <div class="module-name">Which Option Should I Buy?</div>
+  <div style="position:relative"><button style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600" id="cur-btn" onclick="toggleCur()"><span id="cur-label">$ USD</span> ▾</button><div id="cur-dropdown" style="display:none;position:absolute;right:0;top:110%;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,29,46,.16);min-width:200px;z-index:300;overflow:hidden"></div></div>
+</div>
+<div id="stepper">
+  <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Your options</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step2"><div class="step-num" id="sn2">2</div><div class="step-label">Results</div></div>
+</div>
+<div id="main-content"></div>
+<script>
+var CURRENCIES=[{code:"USD",symbol:"$",label:"US Dollar"},{code:"EUR",symbol:"€",label:"Euro"},{code:"GBP",symbol:"£",label:"British Pound"},{code:"CAD",symbol:"CA$",label:"Canadian Dollar"},{code:"AUD",symbol:"AU$",label:"Australian Dollar"},{code:"NZD",symbol:"NZ$",label:"New Zealand Dollar"},{code:"JPY",symbol:"¥",label:"Japanese Yen"}];
+function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
+function toggleCur(){S.cur_open=!S.cur_open;var dd=document.getElementById("cur-dropdown");dd.style.display=S.cur_open?"block":"none";if(S.cur_open){dd.innerHTML="";CURRENCIES.forEach(function(c){var b=document.createElement("button");b.style.cssText="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:"+(c.code===S.currency?"var(--green-soft)":"transparent")+";border:none;border-bottom:1px solid var(--border);cursor:pointer";b.innerHTML='<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--green);width:36px">'+c.symbol+'</span><span>'+c.label+'</span>';b.onclick=function(){S.currency=c.code;S.cur_open=false;render()};dd.appendChild(b);});}}
+
+function emptyOption(label){return{label:label,price:"",life:"",salvage:"",benefits:""};}
+var S={page:1,currency:"USD",cur_open:false,res:null,missingFields:null,activeTab:0,
+  coc:"",options:[emptyOption("Option A"),emptyOption("Option B")]};
+
+function calcNPV(price,life,salvage,benefits,coc){
+  var r=coc/100;var pvBen=benefits*((1-Math.pow(1+r,-life))/r);var pvSalv=salvage/Math.pow(1+r,life);
+  return -price+pvBen+pvSalv;
+}
+function calcAll(){
+  var coc=+S.coc||0;
+  var results=S.options.map(function(o,i){
+    var npv=calcNPV(+o.price,+o.life||1,+o.salvage||0,+o.benefits||0,coc);
+    var tco=+o.price-(+o.salvage||0)-(+o.benefits||0)*(+o.life||0); // simple nominal total cost
+    return{idx:i,label:o.label,price:+o.price,life:+o.life,salvage:+o.salvage,benefits:+o.benefits,npv:npv,tco:tco};
+  });
+  var winnerIdx=0;for(var i=1;i<results.length;i++)if(results[i].npv>results[winnerIdx].npv)winnerIdx=i;
+  return{results:results,winnerIdx:winnerIdx};
+}
+function fmt(n,d){if(n==null||isNaN(n))return"--";d=d||0;return n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmtM(n){if(n==null||isNaN(n))return"--";var s=getSym();return n<0?"-"+s+fmt(Math.abs(n)):s+fmt(n)}
+function updateStepper(){for(var i=1;i<=2;i++){var step=document.getElementById("step"+i),sn=document.getElementById("sn"+i);step.className="step";if(i<S.page){step.classList.add("done");sn.textContent="✓"}else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}else sn.textContent=String(i);var n=i;(function(n,step){step.onclick=function(){if(n<S.page||(n===2&&S.res)){S.page=n;render()}}})(n,step);step.style.cursor=(i<S.page||(i===2&&S.res))?"pointer":"default";}}
+
+var NOTES=[
+  {q:"What does this model do?",a:"It compares two or more purchase options on a financial basis — not just sticker price, but the full picture: what you pay, what value each option provides, and what you can sell it for later, all converted into today's money."},
+  {q:"How do I estimate annual value for each option?",a:"Think about what is genuinely different between the options. If one car gets better fuel economy, the annual value is the fuel savings. If a premium appliance lasts longer or uses less energy, value that difference per year for each option."},
+  {q:"Why not just compare sticker prices?",a:"Sticker price ignores running costs, lifespan, and resale value — all of which differ between options and add up over time. A cheaper option upfront can cost more overall if it depreciates faster or costs more to run."},
+  {q:"What if the options have different lifespans?",a:"Enter each option's expected useful life separately. The model compares them fairly even with different time horizons by working in present value terms."},
+  {q:"Should I use a different discount rate for a riskier option?",a:"This model uses a single discount rate for all options, which works well when comparing variants of the same asset type — different car models, different appliance brands — where the uncertainty in projected benefits is broadly similar. If one option is genuinely riskier — a newer unproven brand, experimental technology, or less certain benefits — a higher discount rate for that option would be more rigorous. Run the model twice using different rates and compare. An option that wins even when discounted at a higher rate is unambiguously the better choice."}
+];
+var NOTES2=[
+  {q:"What does the winning option mean?",a:"The option with the highest net present value provides the most financial value for your money, accounting for price, ongoing value, and resale. It is the financially preferable choice based on your inputs."},
+  {q:"What is the total cost of ownership figure?",a:"A simple nominal total — what you pay minus what you get back in value and resale, without discounting. It is a rougher, more intuitive cross-check alongside the present value comparison."},
+  {q:"What if the gap between options is small?",a:"A small gap means the financial difference is not decisive — other factors (reliability, brand preference, features) may reasonably tip your decision. A large gap means the financial case is clear."}
+];
+function makeBNList(notes,id){var list=document.getElementById(id);if(!list)return;list.innerHTML="";notes.forEach(function(n,i){var item=document.createElement("div");item.className="bn-item";var head=document.createElement("div");head.className="bn-head";head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+id+i+'">›</div>';var body=document.createElement("div");body.className="bn-body";body.textContent=n.a;head.onclick=function(){var open=body.classList.contains("open");body.classList.toggle("open");document.getElementById("arr"+id+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";head.style.background=open?"":"var(--surface)";};item.appendChild(head);item.appendChild(body);list.appendChild(item);});}
+function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last?" last":"")+'"><div class="field-label">'+l+'</div>'+h+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';}
+function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--green)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
+
+function addOption(){if(S.options.length>=5)return;var letter=String.fromCharCode(65+S.options.length);S.options.push(emptyOption("Option "+letter));S.activeTab=S.options.length-1;render();}
+function removeOption(i){if(S.options.length<=2)return;S.options.splice(i,1);if(S.activeTab>=S.options.length)S.activeTab=S.options.length-1;render();}
+
+function goToResults(){
+  var missing=[];
+  if(!S.coc)missing.push("Target return");
+  S.options.forEach(function(o,i){
+    if(!o.price)missing.push(o.label+": purchase price");
+    if(!o.life)missing.push(o.label+": how long you'd keep it");
+    if(!o.benefits&&o.benefits!==0)missing.push(o.label+": annual value");
+  });
+  if(missing.length>0){S.missingFields=missing;render();return;}
+  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+}
+function resetInputs(){S.coc="";S.options=[emptyOption("Option A"),emptyOption("Option B")];S.activeTab=0;S.missingFields=null;render();}
+function loadExample(){
+  S.coc=6;S.activeTab=0;
+  S.options=[
+    {label:"Option A — Standard",price:24000,life:7,salvage:7000,benefits:4200},
+    {label:"Option B — Premium",price:31000,life:8,salvage:11000,benefits:5400}
+  ];
+  S.missingFields=null;render();
+}
+
+function renderPage1(){
+  var sym=getSym();
+  var html='<div class="page"><div class="page-grid"><aside><div class="section-label">About this tool</div>';
+  html+='<div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div>';
+  html+='</aside><main>';
+
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:16px 18px;margin-bottom:14px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:12px">Which option gives you the most financial value?</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Enter each option.</strong> For each option you are considering, enter the price, expected life, resale value, and annual value it provides.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Present value comparison.</strong> The model converts every option to today\'s money using your target return, so options with different lifespans are fairly compared.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Net value ranking.</strong> The option with the highest net present value delivers the best financial return — not necessarily the cheapest or most expensive.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Year-by-year detail.</strong> The Full Comparison shows how each option\'s value accumulates year by year, plus the present value of resale at the end.</div></div>';
+  html+='</div></div>';
+
+  
+  // Option tabs
+  html+='<div class="opt-tabs">';
+  S.options.forEach(function(o,i){
+    html+='<div class="opt-tab'+(S.activeTab===i?" active":"")+'" onclick="S.activeTab='+i+';render()">'+o.label+(S.options.length>2?'<span class="opt-remove" onclick="event.stopPropagation();removeOption('+i+')">×</span>':'')+'</div>';
+  });
+  if(S.options.length<5)html+='<div class="opt-add" onclick="addOption()">+ Add option</div>';
+  html+='</div>';
+
+  var opt=S.options[S.activeTab];
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">'+opt.label+'</div></div><div class="field-grid">';
+  html+=field("Option name",uIn("",opt.label,"inp-label","S.options['+S.activeTab+'].label=this.value||\'Option\';render()","",false),true);
+  html+=field("Purchase price",uIn(sym,opt.price,"inp-price","S.options['+S.activeTab+'].price=+this.value||0","",false));
+  html+=field("How long you would keep it",uIn("",opt.life,"inp-life","S.options['+S.activeTab+'].life=+this.value||0","years",false));
+  html+=field("Expected resale value",uIn(sym,opt.salvage,"inp-salv","S.options['+S.activeTab+'].salvage=+this.value||0","",false));
+  html+=field("Annual value this option provides",uIn(sym,opt.benefits,"inp-ben","S.options['+S.activeTab+'].benefits=+this.value||0","/ yr",false),true,true,"Money saved, fuel/energy efficiency, or value of use each year");
+  html+='</div></div>';
+
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Your Target Return</div></div><div class="field-grid">';
+  html+=field("Target return on your money",uIn("",S.coc,"inp-coc","S.coc=+this.value||0","%",false),true,true,"5-8% is typical — applies to all options for a fair comparison");
+  html+='</div></div>';
+
+  if(S.missingFields&&S.missingFields.length>0)html+='<div style="background:var(--warn-soft);border:1.5px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)"><strong>Please fill in:</strong> '+S.missingFields.join(", ")+'.</div>';
+  html+='<div class="action-row" style="justify-content:space-between;align-items:center"><span style="font-size:11.5px;color:var(--t3)">New here? Try <strong style="color:var(--t2)">Load Example</strong></span><div style="display:flex;gap:10px"><button class="btn-ghost" onclick="loadExample()">Load Example</button><button class="btn-ghost" onclick="resetInputs()">Reset</button><button class="btn-primary" onclick="goToResults()">Compare options ›</button></div></div>';
+  html+='</main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES,"bn-list1");
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+}
+
+function renderPage2(){
+  var res=S.res,sym=getSym();var winner=res.results[res.winnerIdx];
+  var html='<div class="page"><div class="p2-grid"><aside>';
+  html+='<div class="section-label">Understanding your results</div><div class="panel" style="margin-bottom:14px"><div id="bn-list2"></div></div><div style="display:flex;flex-direction:column;gap:10px"><button class="btn-ghost" onclick="S.page=1;render()">‹ Change my numbers</button><button class="print-btn" onclick="printSummary()">🖶 Print</button></div></aside><main>';
+
+  html+='<div class="result-banner good"><div><div style="font-family:Georgia,serif;font-size:22px;color:var(--green);line-height:1.3"><strong>'+winner.label+'</strong> gives you the most value.</div><div style="font-size:13px;color:var(--t2);margin-top:8px;line-height:1.6">It provides the highest net financial value of the options compared, at your '+S.coc+'% target return.</div></div><div class="result-box" style="background:var(--green)"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.75)">Net value</div><div style="font-family:monospace;font-size:26px;font-weight:800;color:white;margin-top:4px">'+fmtM(winner.npv)+'</div></div></div>';
+
+  // Comparison cards
+  html+='<div style="display:grid;grid-template-columns:repeat('+Math.min(res.results.length,3)+',1fr);gap:14px;margin-bottom:18px">';
+  res.results.forEach(function(r){
+    var isWin=r.idx===res.winnerIdx;
+    html+='<div class="compare-card'+(isWin?" winner":"")+'"><div style="font-size:12px;font-weight:700;color:'+(isWin?"var(--green)":"var(--t2)")+';margin-bottom:8px">'+r.label+(isWin?" ✓":"")+'</div>';
+    html+='<div style="font-family:monospace;font-size:22px;font-weight:800;color:'+(isWin?"var(--green)":"var(--t1)")+'">'+fmtM(r.npv)+'</div>';
+    html+='<div style="font-size:10px;color:var(--t3);margin-top:4px">Net value (today\'s money)</div>';
+    html+='<div style="margin-top:10px;font-size:11px;color:var(--t2);line-height:1.7">Price: '+fmtM(r.price)+'<br>Life: '+r.life+' yrs<br>Annual value: '+fmtM(r.benefits)+'/yr<br>Resale: '+fmtM(r.salvage)+'</div></div>';
+  });
+  html+='</div>';
+
+  // Comparison table — year-by-year per option
+  html+='<div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 16px 0;align-items:center"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-right:4px">Also on this page</span>';
+  ['📊 Year-by-year PV breakdown','🏆 Ranked comparison'].forEach(function(item){html+='<span style="font-size:12px;color:var(--t2);padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:20px">'+item+'</span>';}); html+='</div>';
+  html+='<div class="collapsible"><div class="coll-head" style="cursor:default"><span class="coll-title">Full Comparison</span></div><div class="coll-body open">';
+  res.results.forEach(function(r){
+    var isWin=r.idx===res.winnerIdx;var rc=+S.coc/100;var life=+r.life||1;
+    var pvpYr=rc>0?r.benefits*(1-Math.pow(1+rc,-1))/rc:r.benefits; // pv of ben for 1yr: simplify as pmt/(1+r) but level annuity shows cumulative - do year by year
+    html+='<div style="margin-bottom:16px"><div style="font-size:12px;font-weight:700;color:'+(isWin?"var(--green)":"var(--t2)")+';padding:8px 18px;background:'+(isWin?"var(--green-soft)":"var(--surface)")+';border-radius:4px">'+(isWin?"★ ":"")+r.label+(isWin?" — best option":"")+'</div>';
+    html+='<table><thead><tr><th class="left">Year</th><th>PV of annual value</th><th>Cumulative PV</th></tr></thead><tbody>';
+    var cumPV=0;
+    for(var yr=1;yr<=life;yr++){
+      var pvYr=r.benefits/Math.pow(1+rc,yr);
+      cumPV+=pvYr;
+      html+='<tr><td class="left">'+yr+'</td><td>'+fmtM(pvYr)+'</td><td>'+fmtM(cumPV)+'</td></tr>';
+    }
+    var pvSalv=r.salvage/Math.pow(1+rc,life);
+    html+='<tr style="border-top:2px solid var(--border)"><td class="left" style="color:var(--t3)">Resale (yr '+life+')</td><td style="color:var(--t3)">'+fmtM(pvSalv)+'</td><td></td></tr>';
+    html+='<tr class="total-row"><td class="left">Net value</td><td></td><td style="font-weight:700;color:'+(r.npv>=0?"var(--green)":"var(--warn)")+'">'+fmtM(r.npv)+'</td></tr>';
+    html+='</tbody></table></div>';
+  });
+  html+='</div></div>';
+
+  html+='</main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES2,"bn-list2");
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+}
+function printSummary(){renderPage2();setTimeout(function(){window.print()},300);}
+function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();var cl=document.getElementById("cur-label");if(cl)cl.textContent=getSym()+" "+S.currency;}
+render();
+</script></body></html>

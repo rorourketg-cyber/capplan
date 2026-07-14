@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan Business (US) — Asset Replacement Analysis</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#F7F8FA;color:#0F1D2E;font-size:14px}
+input,select,button{font-family:inherit;font-size:14px}
+button{cursor:pointer;background:none;border:none}
+select{-webkit-appearance:none;appearance:none}
+:root{--blue:#1B3F6E;--green:#2E7D52;--surface:#F7F8FA;--panel:#fff;--border:#E2E6EC;--t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;--warn:#C84B31;--blue-soft:rgba(27,63,110,0.08);--green-soft:rgba(46,125,82,0.09);--amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7}
+#masthead{background:var(--blue);height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:34px;height:34px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:Georgia,serif;font-size:22px;color:white}.logo-text span{color:#A8C5E8}
+.module-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)}
+#stepper{background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px}
+.step{display:flex;align-items:center;gap:8px;padding:13px 4px;border-bottom:2px solid transparent}
+.step.active{border-bottom-color:var(--blue)}.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--border);color:var(--t3)}
+.step.active .step-num{background:var(--blue);color:white}.step.done .step-num{background:var(--green);color:white}
+.step-label{font-size:13px;font-weight:500;color:var(--t3)}.step.active .step-label{color:var(--blue)}.step.done .step-label{color:var(--green)}
+.step-sep{color:var(--border);margin:0 8px;font-size:16px}
+.page{max-width:1100px;margin:0 auto;padding:24px 22px}
+.page-grid{display:grid;grid-template-columns:310px 1fr;gap:22px}
+.p2-grid{display:grid;grid-template-columns:280px 1fr;gap:22px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-bottom:18px}
+.panel-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr}
+.field{padding:13px 18px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.field.full{grid-column:1/-1;border-right:none}.field.last{border-bottom:none}
+.field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:6px}
+.field-note{font-size:10px;color:var(--t3);margin-top:4px}
+.ui{display:flex;align-items:center;gap:6px}
+.ui .pfx,.ui .sfx{font-family:monospace;font-size:12px;color:var(--t3);flex-shrink:0}
+.ui input{font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none}
+.ui input:focus{border-bottom-color:var(--blue)}
+.ui select{font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none;cursor:pointer}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.pill{display:flex;align-items:center;gap:6px;padding:6px 13px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;user-select:none}
+.pill.active{border-color:var(--blue);background:var(--blue-soft);color:var(--blue)}
+.pill-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--t3);flex-shrink:0}
+.pill.active .pill-dot{border-color:var(--blue);background:var(--blue)}
+.btn-primary{background:var(--blue);color:white;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-ghost{background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn{display:flex;align-items:center;gap:6px;background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn:hover{border-color:var(--blue);color:var(--blue)}
+.action-row{display:flex;gap:10px;margin-top:4px}
+.bn-item{border-bottom:1px solid var(--border)}.bn-item:last-child{border-bottom:none}
+.bn-head{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;cursor:pointer}
+.bn-head:hover{background:var(--surface)}
+.bn-qmark{width:21px;height:21px;border-radius:50%;background:var(--blue-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--blue);flex-shrink:0;margin-top:1px;margin-right:5px}
+.bn-q{font-size:13px;line-height:1.5;color:var(--blue);flex:1}
+.bn-arr{color:var(--t3);font-size:14px;flex-shrink:0;margin-top:2px;transition:transform .2s}
+.bn-body{padding:10px 13px 12px 44px;font-size:12.5px;line-height:1.7;color:var(--t2);background:var(--surface);border-top:1px solid var(--border);display:none}
+.bn-body.open{display:block}
+.watch-btn{margin-top:10px;display:flex;width:fit-content;align-items:center;gap:5px;border:1px solid var(--blue);border-radius:5px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--blue);background:none;cursor:pointer}
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:11px}
+.helper-card{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.helper-head{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--amber-mid)}
+.helper-head:hover{background:#fde68a}
+.helper-icon{font-size:18px;flex-shrink:0}
+.helper-title{font-size:13px;font-weight:700;color:var(--amber-dark);flex:1}
+.helper-toggle{font-size:11px;font-weight:600;color:var(--amber-dark);opacity:.7}
+.helper-body{padding:16px;border-top:1.5px solid var(--amber);display:flex;flex-direction:column;gap:12px}
+.result-banner{border-radius:10px;padding:20px 24px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.result-banner.accept{background:var(--green-soft);border:1.5px solid var(--green)}
+.result-banner.reject{background:rgba(200,75,49,.07);border:1.5px solid var(--warn)}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.metric{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.metric-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:7px}
+.metric-val{font-family:monospace;font-size:18px;font-weight:700;color:var(--t1)}
+.metric-val.ok{color:var(--green)}.metric-val.bad{color:var(--warn)}
+.metric-sub{font-size:10px;color:var(--t3);margin-top:3px}
+.chart-box{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:18px}
+.chart-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:6px}
+.chart-sub{font-size:11px;color:var(--t3);margin-bottom:12px}
+.collapsible{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:14px;overflow:hidden}
+.coll-head{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.coll-head:hover{background:var(--surface)}
+.coll-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.coll-arr{color:var(--t3);font-size:14px;transition:transform .2s}
+.coll-body{display:none;border-top:1px solid var(--border)}.coll-body.open{display:block}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{padding:8px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}
+th.left{text-align:left}
+td{padding:8px 14px;text-align:right;font-family:monospace;border-bottom:1px solid var(--border)}
+td.left{text-align:left;font-family:inherit;color:var(--t1)}
+td.sub{text-align:left;font-family:inherit;color:var(--t3);font-size:11px}
+td.neg{color:var(--warn)}
+tr.total-row td{font-weight:700;background:var(--surface)}
+tr:nth-child(even){background:var(--surface)}
+tr.highlight td{background:var(--blue-soft)!important;font-weight:700;color:var(--blue)}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,29,46,.82);z-index:9999;display:flex;align-items:center;justify-content:center}
+.modal-box{background:white;border-radius:10px;overflow:hidden;width:min(820px,95vw)}
+.modal-head{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.modal-close{font-size:22px;color:var(--t3);line-height:1;cursor:pointer}
+.video-wrap{position:relative;padding-bottom:56.25%;height:0}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{margin:0;padding:0;background:white}
+  #masthead{position:static!important;height:auto!important;padding:8px 0!important}
+  #stepper,.btn-ghost,.print-btn,.coll-arr{display:none!important}
+  .page-grid,.p2-grid{display:block!important}
+  aside{display:none!important}
+  .coll-body{display:block!important}
+  .coll-head{break-after:avoid!important}
+  .result-banner,.metric,.chart-box,.collapsible,.helper-card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid}
+  table{font-size:9px;table-layout:fixed}
+  th,td{padding:3px 5px}
+  thead{display:table-header-group}
+  tr{break-inside:avoid}
+  @page{margin:0.5in;size:landscape}
+}
+
+/* US-specific additions */
+.macrs-panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-bottom:18px}
+.macrs-class-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.macrs-class-btn{padding:12px 16px;border:none;background:var(--surface);border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:left;cursor:pointer;transition:all .15s}
+.macrs-class-btn:hover{background:var(--blue-soft)}
+.macrs-class-btn.active{background:var(--blue-soft);border-left:3px solid var(--blue)}
+.macrs-class-label{font-size:13px;font-weight:700;color:var(--t1)}
+.macrs-class-sub{font-size:10px;color:var(--t3);margin-top:2px}
+.bonus-toggle{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--green-soft);border-radius:8px;border:1.5px solid var(--green)}</style>
+</head>
+<body>
+<div id="masthead">
+  <div class="logo"><div class="logo-icon"><svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg></div><div class="logo-text">Cap<span>Plan</span></div></div>
+  <div class="module-name">Asset Replacement Analysis <span style="opacity:.6;font-weight:500">— US</span></div>
+  <div style="position:relative"><button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600">$ USD</button></div>
+</div>
+<div id="stepper">
+  <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Old &amp; New Asset</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step2"><div class="step-num" id="sn2">2</div><div class="step-label">Economic Benefits</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step3"><div class="step-num" id="sn3">3</div><div class="step-label">Results</div></div>
+</div>
+<div id="main-content"></div>
+<script>
+// ============================================================================
+// CapPlan MACRS Data Layer
+// Source: IRS Revenue Procedure 87-57, IRS Publication 946 (Appendix A, Table A-1)
+// Last verified: June 2026
+// These percentage tables are fixed by Rev. Proc. 87-57 and have not changed
+// since 1987. What changes periodically is tax policy layered on top (bonus
+// depreciation, Section 179 limits) — handled separately below.
+// ============================================================================
+
+// ── GDS MACRS PERCENTAGE TABLES (Half-Year Convention) ──────────────────────
+// Each array entry is [year, percentage] for years 1 through N+1
+// (the half-year convention creates one extra recovery year for all classes)
+// Source: IRS Publication 946, Appendix A, Table A-1
+
+var MACRS_TABLES = {
+  "3-year": {
+    label: "3-Year Property (200% DB)",
+    method: "200% Declining Balance",
+    examples: "Tractor units (over-the-road), qualified rent-to-own property",
+    rates: [33.33, 44.45, 14.81, 7.41]  // 4 rows: years 1-3 + half-year tail
+  },
+  "5-year": {
+    label: "5-Year Property (200% DB)",
+    method: "200% Declining Balance",
+    examples: "Automobiles, taxis, buses, trucks, computers, office machinery, appliances",
+    rates: [20.00, 32.00, 19.20, 11.52, 11.52, 5.76]  // 6 rows
+  },
+  "7-year": {
+    label: "7-Year Property (200% DB)",
+    method: "200% Declining Balance",
+    examples: "Office furniture & fixtures, agricultural machinery, railroad track",
+    rates: [14.29, 24.49, 17.49, 12.49, 8.93, 8.92, 8.93, 4.46]  // 8 rows
+  },
+  "10-year": {
+    label: "10-Year Property (200% DB)",
+    method: "200% Declining Balance",
+    examples: "Vessels, barges, tugs, single-purpose agricultural structures, fruit/nut trees",
+    rates: [10.00, 18.00, 14.40, 11.52, 9.22, 7.37, 6.55, 6.55, 6.56, 6.55, 3.28]  // 11 rows
+  },
+  "15-year": {
+    label: "15-Year Property (150% DB)",
+    method: "150% Declining Balance",
+    examples: "Land improvements (fences, roads, sidewalks, landscaping), qualified leasehold improvements, retail motor fuels outlets",
+    rates: [5.00, 9.50, 8.55, 7.70, 6.93, 6.23, 5.90, 5.90, 5.91, 5.90, 5.91, 5.90, 5.91, 5.90, 5.91, 2.95]  // 16 rows
+  },
+  "20-year": {
+    label: "20-Year Property (150% DB)",
+    method: "150% Declining Balance",
+    examples: "Farm buildings (not single-purpose), municipal sewers, initial land clearing/grading",
+    rates: [3.750, 7.219, 6.677, 6.177, 5.713, 5.285, 4.888, 4.522, 4.462, 4.461,
+            4.462, 4.461, 4.462, 4.461, 4.462, 4.461, 4.462, 4.461, 4.462, 4.461, 2.231]  // 21 rows
+  },
+  "27.5-year": {
+    label: "27.5-Year Residential Rental Property (SL)",
+    method: "Straight-Line / Mid-Month Convention",
+    examples: "Residential rental property (apartments, houses) where 80%+ of income is from dwelling units",
+    // Full-year rate = 3.636%. First/last year prorated by month placed in service.
+    // For simplicity in capital planning (not tax filing), use the full-year rate.
+    fullYearRate: 3.636,
+    convention: "mid-month",
+    rates: null  // computed dynamically based on month placed in service
+  },
+  "39-year": {
+    label: "39-Year Nonresidential Real Property (SL)",
+    method: "Straight-Line / Mid-Month Convention",
+    examples: "Office buildings, stores, warehouses, commercial buildings",
+    fullYearRate: 2.564,
+    convention: "mid-month",
+    rates: null  // computed dynamically based on month placed in service
+  }
+};
+
+// ── ASSET-TO-PROPERTY-CLASS LOOKUP ─────────────────────────────────────────
+// Based on IRS Publication 946, Table B-1 and Table B-2
+// Grouped by common small business asset categories for the dropdown
+// Users can always override; this is a starting-point suggestion only.
+// Last updated: June 2026
+
+var MACRS_ASSET_CLASSES = [
+  // ── Vehicles & Transportation ──────────────────────────────────────────────
+  { name: "— Select asset type for suggested property class —", class: null, note: null },
+  { group: "Vehicles & Transportation" },
+  { name: "Automobile / Passenger Car", class: "5-year",
+    note: "IRS Table B-1 class 00.22. Subject to listed property luxury auto limits." },
+  { name: "Light-Duty Truck / Van (≤ 6,000 lbs GVW)", class: "5-year",
+    note: "IRS Table B-1 class 00.22. Subject to listed property limits." },
+  { name: "Heavy Truck / Commercial Vehicle (> 6,000 lbs)", class: "5-year",
+    note: "IRS Table B-1 class 00.23. Not subject to luxury auto limits." },
+  { name: "Tractor Unit (over-the-road)", class: "3-year",
+    note: "IRS Table B-1 class 00.26." },
+  { name: "Trailer / Container", class: "5-year",
+    note: "IRS Table B-1 class 00.27." },
+  { name: "Aircraft (general aviation)", class: "5-year",
+    note: "IRS Table B-2. May be listed property if personal use > 0." },
+  { name: "Vessel / Barge / Tug", class: "10-year",
+    note: "IRS Table B-1 class 00.28." },
+  // ── Computers & Technology ─────────────────────────────────────────────────
+  { group: "Computers & Technology" },
+  { name: "Computer / Laptop / Tablet", class: "5-year",
+    note: "IRS Table B-1 class 00.12. Listed property — business use must be > 50%." },
+  { name: "Computer Peripheral / Printer", class: "5-year",
+    note: "IRS Table B-1 class 00.12." },
+  { name: "Point-of-Sale System / POS Hardware", class: "5-year",
+    note: "IRS Table B-1 class 00.12." },
+  { name: "Telephone / Communications Equipment", class: "5-year",
+    note: "IRS class 00.12. Cell phones no longer listed property after 2010." },
+  // ── Office Equipment & Furniture ───────────────────────────────────────────
+  { group: "Office Equipment & Furniture" },
+  { name: "Office Furniture & Fixtures", class: "7-year",
+    note: "IRS Table B-1 class 00.11." },
+  { name: "Office Equipment (copiers, fax machines)", class: "5-year",
+    note: "IRS Table B-1 class 00.12." },
+  { name: "Appliances / Carpeting / Furniture (rental)", class: "5-year",
+    note: "Used in residential rental property; IRS Table B-1." },
+  // ── Manufacturing & Industrial ─────────────────────────────────────────────
+  { group: "Manufacturing & Industrial" },
+  { name: "Manufacturing Machinery & Equipment", class: "7-year",
+    note: "IRS Table B-2 (varies by industry). 7-year is the default for unclassified property." },
+  { name: "Industrial Steam / Electric Generation Equipment", class: "15-year",
+    note: "IRS Table B-1 class 00.4." },
+  { name: "Distributive Trades / Services Equipment", class: "5-year",
+    note: "IRS Table B-2 class 57.0. Includes restaurant/food service equipment." },
+  // ── Restaurant & Food Service ──────────────────────────────────────────────
+  { group: "Restaurant & Food Service" },
+  { name: "Restaurant Equipment (ovens, fryers, refrigerators)", class: "5-year",
+    note: "IRS Table B-2 class 57.0 (distributive trades and services)." },
+  { name: "Restaurant Furniture / Fixtures", class: "7-year",
+    note: "IRS Table B-1 class 00.11. Chairs, tables, bar stools." },
+  // ── Agriculture ────────────────────────────────────────────────────────────
+  { group: "Agriculture" },
+  { name: "Agricultural Machinery & Equipment", class: "7-year",
+    note: "IRS Table B-2 class 01.1." },
+  { name: "Single-Purpose Agricultural / Horticultural Structure", class: "10-year",
+    note: "IRS Table B-1. Structure used only for a specific agricultural purpose." },
+  { name: "Farm Building (general-purpose)", class: "20-year",
+    note: "IRS Table B-2 class 01.3. Excludes single-purpose structures." },
+  { name: "Fruit / Nut-Bearing Trees & Vines", class: "10-year",
+    note: "IRS Table B-2 class 01.23–01.25. Placed in service after planting/grafting." },
+  // ── Real Property ──────────────────────────────────────────────────────────
+  { group: "Real Property" },
+  { name: "Residential Rental Property", class: "27.5-year",
+    note: "Apartments, houses, mobile homes where 80%+ of rent is from dwelling units. Straight-line, mid-month convention." },
+  { name: "Nonresidential Real Property", class: "39-year",
+    note: "Office buildings, retail stores, warehouses. Straight-line, mid-month convention." },
+  { name: "Qualified Improvement Property (QIP)", class: "15-year",
+    note: "Interior improvements to nonresidential buildings placed in service after building. Eligible for bonus depreciation." },
+  { name: "Land Improvements (fences, roads, parking lots, landscaping)", class: "15-year",
+    note: "IRS Table B-1 class 00.3. Excludes land itself (not depreciable)." },
+  // ── HVAC & Mechanical ──────────────────────────────────────────────────────
+  { group: "HVAC & Mechanical Systems" },
+  { name: "HVAC System (standalone / not structural)", class: "5-year",
+    note: "Freestanding units qualify as 5-year. HVAC installed as part of a building = 39-year. Qualified improvement property rules may apply." },
+  { name: "HVAC as Qualified Improvement Property", class: "15-year",
+    note: "HVAC, roofing, fire protection, alarm/security systems in nonresidential buildings. Eligible for bonus depreciation." },
+  // ── Other Common Assets ────────────────────────────────────────────────────
+  { group: "Other Common Assets" },
+  { name: "Rental Property / Any Property Not Listed Above", class: "7-year",
+    note: "IRS default: property with no designated class life defaults to 7-year under MACRS GDS." },
+];
+
+// ── CURRENT TAX POLICY (as of June 2026) ────────────────────────────────────
+// This section captures the policy layer — things that change with legislation.
+// Update this section when tax law changes; the MACRS tables above do not change.
+
+var MACRS_POLICY = {
+  // One Big Beautiful Bill Act (OBBBA), signed July 4, 2025
+  bonusDepreciation: {
+    rate: 1.00,  // 100% for qualified property acquired and placed in service after Jan 19, 2025
+    qualifiedDate: "January 20, 2025",
+    note: "100% bonus depreciation restored by OBBBA. Applies to most new and used tangible personal property. Does NOT apply to 27.5-year or 39-year real property (except qualified improvement property).",
+    canElectOut: true,  // taxpayer can elect out on a class-by-class basis
+    phasedown: [
+      { year: 2023, rate: 0.80 },
+      { year: 2024, rate: 0.60 },
+      // 2025 pre-OBBBA: 40% for property acquired before Jan 20, 2025
+      // 2025 post-OBBBA: 100% for property acquired after Jan 19, 2025
+    ]
+  },
+  section179: {
+    limit: 2500000,  // OBBBA doubled from $1,250,000 to $2,500,000
+    phaseoutThreshold: null,  // check current pub 946 for exact phaseout start
+    note: "Section 179 limit doubled to $2,500,000 by OBBBA. Cannot exceed taxable income from active business. Applies to tangible personal property and qualified real property improvements."
+  },
+  lastUpdated: "June 2026",
+  source: "IRS Publication 946 (2025), OBBBA (P.L. 119-21, July 4, 2025)"
+};
+
+// ── HELPER FUNCTIONS ────────────────────────────────────────────────────────
+
+// Get MACRS depreciation schedule for a given property class and cost
+// Returns array of {year, rate, amount} for each recovery year
+function getMACRSSchedule(propertyClass, cost, bonusElected, monthPlacedInService) {
+  var table = MACRS_TABLES[propertyClass];
+  if (!table) return [];
+
+  // Bonus depreciation (year 1 full expensing if elected)
+  if (bonusElected && table.convention !== "mid-month") {
+    return [{ year: 1, rate: 100.00, amount: cost }];
+  }
+
+  // Real property: straight-line with mid-month convention
+  if (table.convention === "mid-month") {
+    var schedule = [];
+    var fullRate = table.fullYearRate / 100;
+    var life = propertyClass === "27.5-year" ? 27.5 : 39;
+    var month = monthPlacedInService || 1;  // default to January
+    // First year: prorated by month (mid-month: months remaining + 0.5)
+    var firstYearMonths = (12 - month + 0.5) / 12;
+    var firstYearRate = firstYearMonths / life;
+    schedule.push({ year: 1, rate: +(firstYearRate * 100).toFixed(3), amount: cost * firstYearRate });
+    // Full years
+    var fullYears = Math.floor(life);
+    for (var y = 2; y <= fullYears; y++) {
+      schedule.push({ year: y, rate: table.fullYearRate, amount: cost * fullRate });
+    }
+    // Last partial year (remaining months)
+    var lastYearMonths = 1 - firstYearMonths;
+    if (lastYearMonths > 0.001) {
+      var lastRate = lastYearMonths / life;
+      schedule.push({ year: fullYears + 1, rate: +(lastRate * 100).toFixed(3), amount: cost * lastRate });
+    }
+    return schedule;
+  }
+
+  // Standard MACRS table lookup (personal property, half-year convention)
+  var rates = table.rates;
+  return rates.map(function(rate, i) {
+    return { year: i + 1, rate: rate, amount: +(cost * rate / 100).toFixed(2) };
+  });
+}
+
+// Get property class info for display
+function getMACRSClass(propertyClass) {
+  return MACRS_TABLES[propertyClass] || null;
+}
+
+// Get suggested property class from asset type name
+function suggestPropertyClass(assetTypeName) {
+  var match = MACRS_ASSET_CLASSES.find(function(a) {
+    return a.name === assetTypeName && a.class;
+  });
+  return match ? match.class : "7-year";  // default to 7-year if not found
+}
+
+// Get all property classes as options for a select dropdown
+function getMACRSClassOptions(includeRealProperty) {
+  var classes = ["3-year", "5-year", "7-year", "10-year", "15-year", "20-year"];
+  if (includeRealProperty) {
+    classes.push("27.5-year", "39-year");
+  }
+  return classes;
+}
+
+function fmt(n,d){if(n==null||isNaN(n))return"--";d=d||0;return n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmtM(n){if(n==null||isNaN(n))return"--";return n<0?"-$"+fmt(Math.abs(n)):"$"+fmt(n)}
+function fmtPct(n,d){if(n==null||isNaN(n))return"--";return fmt(n,d||1)+"%"}
+
+var S={
+  page:1,coc_open:false,coc_mode:"wacc",coc_kd:6,coc_ke:12,coc_wd:40,coc_rf:4.5,coc_beta:1.0,coc_mrp:5.5,
+  res:null,show_dcf:false,show_depr:false,missingFields:null,
+  bw_open:false,bw_current:"",bw_improvement:"",
+  // New asset
+  cost:"",propertyClass:"",assetTypeSel:"",bonusElected:false,section179:"",salvage:"",life:"",workingCapital:"",
+  // Old asset being replaced
+  oldSalePrice:"",oldRemainingBasis:"",
+  annuity:true,annuityAmount:"",yearlyBenefits:[],
+  taxRate:"",coc:""
+};
+
+function getDeprBase(){return Math.max(0,(+S.cost)-(+S.section179||0));}
+function calcDeprSchedule(){if(!S.propertyClass)return[];return getMACRSSchedule(S.propertyClass,getDeprBase(),S.bonusElected,1);}
+function buildBenefits(life){if(S.annuity){var arr=[];for(var i=0;i<life;i++)arr.push(+S.annuityAmount||0);return arr;}var arr=[];for(var i=0;i<life;i++)arr.push(+(S.yearlyBenefits[i]||0));return arr;}
+
+function calcAll(){
+  var cost=+S.cost,life=+S.life||1,salvage=+S.salvage||0,wc=+S.workingCapital||0;
+  var tax=+S.taxRate/100,r=+S.coc/100,s179=+S.section179||0;
+  var oldSale=+S.oldSalePrice||0,oldBasis=+S.oldRemainingBasis||0;
+
+  // Old asset disposal: gain/loss recognized, taxed (or deducted if loss)
+  var gainOnDisposal=oldSale-oldBasis;
+  var taxOnDisposal=gainOnDisposal*tax; // positive = tax owed, negative = tax benefit from loss
+  var netOldProceeds=oldSale-taxOnDisposal;
+
+  // New asset — full cost depreciable basis (no like-kind exchange treatment since TCJA)
+  var depr=calcDeprSchedule();
+  var benefits=buildBenefits(life);
+  var pvTS=depr.reduce(function(s,d){return s+d.amount*tax/Math.pow(1+r,d.year)},0);
+  var pvS179=s179*tax/(1+r);
+  var pvBen=benefits.reduce(function(s,b,i){return s+b*(1-tax)/Math.pow(1+r,i+1)},0);
+  var pvSalv=salvage/Math.pow(1+r,life);
+  var totalDepr=depr.reduce(function(s,d){return s+d.amount},0)+s179;
+  var remainingBasis=Math.max(0,cost-totalDepr);
+  var recaptureTax=salvage>remainingBasis?(salvage-remainingBasis)*tax:0;
+  var pvRecapture=-recaptureTax/Math.pow(1+r,life);
+  var pvWC=wc>0?wc/Math.pow(1+r,life):0;
+
+  // Net initial outlay = new cost - net proceeds from old asset + working capital
+  var netOutlay=cost-netOldProceeds+wc;
+  var npv=-netOutlay+pvTS+pvS179+pvBen+pvSalv+pvRecapture+pvWC;
+
+  var robustness=netOutlay>0?Math.min(100,Math.abs(npv)/netOutlay*100):0;
+  var robustnessLabel=robustness<5?"Very close call":robustness<15?"Marginal":robustness<30?"Moderate":robustness<50?"Clear":"Very clear";
+
+  var af=(1-Math.pow(1+r,-life))/r;
+  var wwit=af>0?(netOutlay-pvTS-pvS179-pvSalv-pvRecapture-pvWC)/((1-tax)*af):0;
+
+  var benSens=[-0.40,-0.30,-0.20,-0.10,0,0.10,0.20,0.30,0.40].map(function(delta){
+    var b2=benefits.map(function(b){return b*(1+delta)});
+    var pvB2=b2.reduce(function(s,b,i){return s+b*(1-tax)/Math.pow(1+r,i+1)},0);
+    var npv2=-netOutlay+pvTS+pvS179+pvB2+pvSalv+pvRecapture+pvWC;
+    return{delta:delta*100,npv:npv2};
+  });
+  var cocSens=[-3,-2,-1,0,1,2,3].map(function(delta){
+    var r2=(+S.coc+delta)/100;if(r2<=0)return{coc:+S.coc+delta,npv:0};
+    var pvTS2=depr.reduce(function(s,d){return s+d.amount*tax/Math.pow(1+r2,d.year)},0);
+    var pvS1792=s179*tax/(1+r2);
+    var pvBen2=benefits.reduce(function(s,b,i){return s+b*(1-tax)/Math.pow(1+r2,i+1)},0);
+    var pvSalv2=salvage/Math.pow(1+r2,life);
+    var pvRecap2=-recaptureTax/Math.pow(1+r2,life);
+    var pvWC2=wc>0?wc/Math.pow(1+r2,life):0;
+    var npv2=-netOutlay+pvTS2+pvS1792+pvBen2+pvSalv2+pvRecap2+pvWC2;
+    return{coc:+S.coc+delta,npv:npv2};
+  });
+
+  return{npv:npv,netOutlay:netOutlay,gainOnDisposal:gainOnDisposal,taxOnDisposal:taxOnDisposal,
+    netOldProceeds:netOldProceeds,pvTS:pvTS,pvS179:pvS179,pvBen:pvBen,pvSalv:pvSalv,
+    pvRecapture:pvRecapture,pvWC:pvWC,depr:depr,benefits:benefits,robustness:robustness,
+    robustnessLabel:robustnessLabel,wwit:wwit,benSens:benSens,cocSens:cocSens,totalDepr:totalDepr,
+    remainingBasis:remainingBasis,recaptureTax:recaptureTax};
+}
+
+function updateStepper(){for(var i=1;i<=3;i++){var step=document.getElementById("step"+i),sn=document.getElementById("sn"+i);step.className="step";if(i<S.page){step.classList.add("done");sn.textContent="✓"}else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}else sn.textContent=String(i);var n=i;(function(n,step){step.onclick=function(){if(n<S.page||(n>=2&&S.cost)){S.page=n;render()}}})(n,step);step.style.cursor=(i<S.page||(i>=2&&S.cost))?"pointer":"default";}}
+
+var NOTES1=[
+  {q:"How is asset replacement treated differently from a new purchase under US tax law?",a:"Since the Tax Cuts and Jobs Act eliminated like-kind exchange treatment for personal property (2018 onward), trading in or selling an old business asset when buying a new one is treated as two separate transactions: a taxable disposal of the old asset, and a full-cost purchase of the new asset. The new asset gets its own full MACRS depreciable basis — it is NOT reduced by the old asset's value, unlike many non-US tax systems.",v:""},
+  {q:"What happens when I sell the old asset?",a:"You recognize a gain or loss equal to the sale price minus the asset's remaining tax basis. If the old asset is fully depreciated (common with bonus depreciation or aggressive MACRS schedules), any sale proceeds are taxed — typically as ordinary income through Section 1245 depreciation recapture for personal property.",v:""},
+  {q:"What is the remaining basis of my old asset?",a:"This is the old asset's original cost less all depreciation already claimed against it. If you elected bonus depreciation or Section 179 on the original purchase, the remaining basis may already be zero, meaning the full sale price is recognized as a gain.",v:""},
+  {q:"What is the net initial outlay?",a:"The cost of the new asset, minus the after-tax proceeds from disposing of the old one, plus any additional working capital required. This is the real cash outflow at the start of the replacement decision.",v:""},
+  {q:"How do I select a MACRS property class for the new asset?",a:"Select your asset type from the dropdown to get a suggested property class, or choose directly from the six personal property classes. The half-year convention is built into the standard tables automatically.",v:""}
+];
+var NOTES2=[
+  {q:"What counts as the benefit of replacing?",a:"The incremental after-tax value created by the new asset compared to continuing with the old one — lower operating costs, higher output, improved reliability, or other measurable improvements.",v:""}
+];
+var NOTES3=[
+  {q:"What does the NPV tell me?",a:"A positive NPV means replacing the asset is expected to earn more than your required return on the net cash you put in. A negative NPV means the replacement falls short and should generally be deferred.",v:""},
+  {q:"Why does the old asset's tax basis matter so much?",a:"If the old asset is fully depreciated, every dollar of sale proceeds is taxed. This can meaningfully reduce the net cash you actually receive from disposing of it — sometimes dramatically, if bonus depreciation was used on the original purchase.",v:""},
+  {q:"What does decision robustness tell me?",a:"It measures how far the NPV is from break-even relative to the net cash outlay. A close call means small changes in assumptions could flip the decision.",v:""}
+];
+function makeBNList(notes,id){var list=document.getElementById(id);if(!list)return;list.innerHTML="";notes.forEach(function(n,i){var item=document.createElement("div");item.className="bn-item";var head=document.createElement("div");head.className="bn-head";head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+id+i+'">›</div>';var body=document.createElement("div");body.className="bn-body";body.textContent=n.a;head.onclick=function(){var open=body.classList.contains("open");body.classList.toggle("open");document.getElementById("arr"+id+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";head.style.background=open?"":"var(--surface)";};item.appendChild(head);item.appendChild(body);list.appendChild(item);});}
+
+function renderCoC(){
+  var box=document.getElementById("coc-box");if(!box)return;box.innerHTML="";
+  var tx=35,we=100-S.coc_wd;var wacc=+(S.coc_kd*(1-tx/100)*S.coc_wd/100+S.coc_ke*we/100).toFixed(2);var capm=+(S.coc_rf+S.coc_beta*S.coc_mrp).toFixed(2);var result=S.coc_mode==="wacc"?wacc:capm;
+  if(!S.coc_open){box.innerHTML='<button onclick="S.coc_open=true;renderCoC()" style="display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;background:none;border:none;cursor:pointer;text-align:left"><div style="width:34px;height:34px;background:var(--green-soft);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="9" r="3"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2"/></svg></div><div><div style="font-size:13px;font-weight:700;color:var(--blue)">Cost of Capital Calculator</div><div style="font-size:11px;color:var(--t3);margin-top:2px">WACC · CAPM</div></div><span style="margin-left:auto;color:var(--t3)">›</span></button>';return;}
+  var html='<div style="border:1px solid var(--blue);border-radius:8px;overflow:hidden"><div style="background:var(--blue);padding:11px 14px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:700;color:white">Cost of Capital Calculator</span><button onclick="S.coc_open=false;renderCoC()" style="color:rgba(255,255,255,.7);font-size:20px">×</button></div><div style="padding:12px 14px 0;display:flex;gap:8px">';
+  [{k:"wacc",n:"WACC",s:"Borrowing rate"},{k:"capm",n:"CAPM",s:"Market risk"}].forEach(function(t){html+='<button onclick="S.coc_mode=\''+t.k+'\';renderCoC()" style="flex:1;padding:8px 10px;border-radius:7px;border:1.5px solid '+(S.coc_mode===t.k?"var(--blue)":"var(--border)")+';background:'+(S.coc_mode===t.k?"var(--blue-soft)":"transparent")+';cursor:pointer;text-align:left"><div style="font-size:12px;font-weight:700;color:'+(S.coc_mode===t.k?"var(--blue)":"var(--t2)")+'">'+t.n+'</div><div style="font-size:10px;color:var(--t3)">'+t.s+'</div></button>';});
+  html+='</div><div style="padding:14px">';
+  if(S.coc_mode==="wacc"){html+=cR("Cost of Debt (pre-tax)","coc_kd",S.coc_kd,"%");html+=cR("Cost of Equity","coc_ke",S.coc_ke,"%");html+=cR("Debt Weighting","coc_wd",S.coc_wd,"%");html+='<div style="background:var(--surface);border-radius:5px;padding:8px 10px;font-size:11px">WACC = <strong style="color:var(--green)">'+wacc+'%</strong></div>';}
+  else{html+=cR("Risk-Free Rate","coc_rf",S.coc_rf,"%");html+=cR("Beta","coc_beta",S.coc_beta,"");html+=cR("Market Risk Premium","coc_mrp",S.coc_mrp,"%");html+='<div style="background:var(--surface);border-radius:5px;padding:8px 10px;font-size:11px">Ke = '+capm+'%</div>';}
+  html+='<div style="margin-top:12px;padding:10px 14px;background:var(--green-soft);border-radius:8px;border:1px solid var(--green);display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--green)">Calculated Rate</div><div style="font-family:monospace;font-size:22px;font-weight:700;color:var(--green)">'+result+'%</div></div><button onclick="S.coc='+result+';renderCoC();var el=document.getElementById(\'inp-coc\');if(el)el.value='+result+'" style="background:var(--green);color:white;border:none;border-radius:7px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer">Use this rate →</button></div></div></div>';
+  box.innerHTML=html;
+}
+function cR(l,k,v,s){return'<div style="margin-bottom:11px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:5px">'+l+'</div><div class="ui"><input type="text" value="'+v+'" onchange="S.'+k+'=+this.value||0;renderCoC()" onfocus="this.style.borderBottomColor=\'var(--blue)\'" onblur="this.style.borderBottomColor=\'var(--border)\'" style="font-family:monospace;font-size:15px;font-weight:600;border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;outline:none;padding:2px 0">'+(s?'<span style="font-size:12px;color:var(--t3)">'+s+'</span>':'')+'</div></div>'}
+function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last?" last":"")+'"><div class="field-label">'+l+'</div>'+h+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';}
+function uInput(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--blue)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
+function selectPropertyClass(cls){S.propertyClass=cls;render();}
+function selectAssetType(name){S.assetTypeSel=name;S.propertyClass=suggestPropertyClass(name);render();}
+
+function goToPage2(){
+  var missing=[];
+  if(!S.cost)missing.push("Cost of New Asset");if(!S.propertyClass)missing.push("MACRS Property Class");
+  if(!S.life)missing.push("Economic Life");if(!S.salvage&&S.salvage!==0)missing.push("Salvage Value of New Asset");
+  if(!S.oldSalePrice&&S.oldSalePrice!==0)missing.push("Sale Price of Old Asset");
+  if(!S.oldRemainingBasis&&S.oldRemainingBasis!==0)missing.push("Remaining Tax Basis of Old Asset");
+  if(missing.length>0){S.missingFields=missing;render();return;}
+  S.missingFields=null;S.page=2;render();
+}
+function goToResults(){
+  var missing=[];
+  if(S.annuity){if(!S.annuityAmount)missing.push("Annual Benefit Amount");}
+  else{for(var i=0;i<+S.life;i++)if(!S.yearlyBenefits[i]&&S.yearlyBenefits[i]!==0)missing.push("Year "+(i+1)+" Benefit");}
+  if(!S.taxRate)missing.push("Tax Rate");if(!S.coc)missing.push("Required Rate of Return");
+  if(missing.length>0){S.missingFields=missing;render();return;}
+  S.missingFields=null;try{S.res=calcAll();S.page=3;render();}catch(e){alert("Error: "+e.message)}
+}
+function resetInputs(){
+  S.cost="";S.propertyClass="";S.assetTypeSel="";S.bonusElected=false;S.section179="";S.salvage="";S.life="";S.workingCapital="";
+  S.oldSalePrice="";S.oldRemainingBasis="";
+  S.annuity=true;S.annuityAmount="";S.yearlyBenefits=[];S.taxRate="";S.coc="";S.missingFields=null;
+  S.bw_open=false;S.bw_current="";S.bw_improvement="";S.res=null;S.page=1;render();
+}
+function loadExample(){
+  S.cost=95000;S.assetTypeSel="Manufacturing Machinery & Equipment";S.propertyClass="7-year";
+  S.bonusElected=false;S.section179="";S.salvage=10000;S.life=10;S.workingCapital=4000;
+  S.oldSalePrice=12000;S.oldRemainingBasis=0;
+  S.annuity=true;S.annuityAmount=28000;S.yearlyBenefits=[];S.taxRate=35;S.coc=10;S.missingFields=null;render();
+}
+
+function drawChart(canvasId,data,xkey,ykey,xfmt){
+  var canvas=document.getElementById(canvasId);if(!canvas)return;
+  var ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;
+  var pad={top:16,bottom:48,left:80,right:16};var cw=W-pad.left-pad.right,ch=H-pad.top-pad.bottom;
+  ctx.clearRect(0,0,W,H);
+  var vals=data.map(function(d){return d[ykey]});var minV=Math.min.apply(null,vals),maxV=Math.max.apply(null,vals);
+  var rng=maxV-minV||Math.abs(maxV||1)*0.4;var lo=minV-rng*0.15,hi=maxV+rng*0.15;
+  var zeroY=(hi-lo)!==0?pad.top+ch*(hi/(hi-lo)):pad.top+ch*0.5;
+  ctx.strokeStyle="#E2E6EC";ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(pad.left,zeroY);ctx.lineTo(pad.left+cw,zeroY);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle="#E2E6EC";ctx.lineWidth=1;
+  for(var i=0;i<=4;i++){var y=pad.top+ch*(1-i/4);ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();var v=lo+(hi-lo)*(i/4);ctx.fillStyle="#8A96A6";ctx.font="10px system-ui";ctx.textAlign="right";ctx.fillText((v>=0?"$":"-$")+fmt(Math.abs(v)/1000,0)+"k",pad.left-3,y+3);}
+  var bw=Math.floor(cw/data.length*0.6),gap=cw/data.length,midIdx=Math.floor(data.length/2);
+  data.forEach(function(d,i){var x=pad.left+gap*i+(gap-bw)/2,bh=Math.abs(d[ykey])/(hi-lo)*ch,y=d[ykey]>=0?zeroY-bh:zeroY;ctx.fillStyle=d[ykey]>=0?(i===midIdx?"#2E7D52":"#6DBF8A"):"#E88A8A";ctx.fillRect(x,y,bw,bh);ctx.fillStyle=i===midIdx?"var(--blue)":"#8A96A6";ctx.font=i===midIdx?"bold 10px system-ui":"10px system-ui";ctx.textAlign="center";ctx.fillText(d[xkey]+(xfmt||""),x+bw/2,H-pad.bottom+13);});
+  ctx.strokeStyle="#4A5568";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(pad.left,pad.top+ch);ctx.lineTo(pad.left+cw,pad.top+ch);ctx.stroke();
+}
+
+function renderPage1(){
+  var html='<div class="page"><div class="page-grid"><aside><div class="section-label">Briefing Notes</div><div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div><div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div></aside><main>';
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:13px;color:var(--amber-dark);line-height:1.6"><strong>US Edition:</strong> Since TCJA eliminated like-kind exchange treatment for personal property, the new asset gets a full-cost MACRS basis, and the old asset\'s disposal is taxed separately as a gain or loss. 100% bonus depreciation is permanent under OBBBA.</div>';
+
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--warn)"></div><div class="panel-title">Old Asset Being Replaced</div></div><div class="field-grid">';
+  html+=field("Sale Price of Old Asset",uInput("$",S.oldSalePrice,"inp-old-sale","S.oldSalePrice=+this.value||0","",false),false,false,"What you can sell or trade it for today");
+  html+=field("Remaining Tax Basis of Old Asset",uInput("$",S.oldRemainingBasis,"inp-old-basis","S.oldRemainingBasis=+this.value||0","",false),false,true,"Original cost less all depreciation already claimed — often $0 if bonus depreciation was used");
+  html+='</div></div>';
+
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">New Asset Data</div></div><div class="field-grid">';
+  html+=field("Cost of New Asset",uInput("$",S.cost,"inp-cost","S.cost=+this.value||0;render()","",false),false,false,"Full purchase price — not reduced by old asset's value under current tax law");
+  html+=field("Economic Life",uInput("",S.life,"inp-life","S.life=+this.value||0","years",false));
+  html+=field("Salvage Value",uInput("$",S.salvage,"inp-salv","S.salvage=+this.value||0","",false));
+  html+=field("Working Capital Required",uInput("$",S.workingCapital,"inp-wc","S.workingCapital=+this.value||0","",false),false,true);
+  html+='</div></div>';
+
+  html+='<div class="macrs-panel"><div class="panel-head"><div class="panel-dot" style="background:var(--green)"></div><div class="panel-title">MACRS Depreciation (New Asset)</div></div>';
+  html+='<div style="padding:14px 18px"><div class="field-label" style="margin-bottom:8px">Asset Type</div><select class="asset-sel" style="width:100%;font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;padding:6px 0;outline:none;cursor:pointer" onchange="selectAssetType(this.value)" id="asset-type-sel">';
+  MACRS_ASSET_CLASSES.forEach(function(a){if(a.group){html+='</optgroup><optgroup label="'+a.group+'">';}else if(a.name&&a.class){html+='<option value="'+a.name+'"'+(S.assetTypeSel===a.name?" selected":"")+'>'+a.name+'</option>';}else if(a.name){html+='<option value="">'+a.name+'</option>';}});
+  html+='</optgroup></select></div>';
+  html+='<div style="padding:0 18px 18px"><div class="field-label" style="margin-bottom:8px">MACRS Property Class</div><div class="macrs-class-grid" style="border:1px solid var(--border);border-radius:8px;overflow:hidden">';
+  ["3-year","5-year","7-year","10-year","15-year","20-year"].forEach(function(c){var t=MACRS_TABLES[c];html+='<button class="macrs-class-btn'+(S.propertyClass===c?" active":"")+'" onclick="selectPropertyClass(\''+c+'\')"><div class="macrs-class-label">'+c.replace("-year"," Year")+'</div><div class="macrs-class-sub">'+t.method+'</div></button>';});
+  html+='</div></div>';
+  html+='<div style="padding:0 18px 18px"><div class="bonus-toggle"><div class="pills"><div class="pill'+(S.bonusElected?" active":"")+'" onclick="S.bonusElected=true;render()"><div class="pill-dot"></div>Elect bonus depreciation</div><div class="pill'+(!S.bonusElected?" active":"")+'" onclick="S.bonusElected=false;render()"><div class="pill-dot"></div>Standard MACRS</div></div></div></div>';
+  html+='<div style="padding:0 18px 18px">'+field("Section 179 Expensing (optional)",uInput("$",S.section179,"inp-179","S.section179=+this.value||0","",false))+'</div></div>';
+
+  if(S.missingFields&&S.missingFields.length>0)html+='<div style="background:rgba(200,75,49,.07);border:1.5px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)"><strong>Please complete:</strong> '+S.missingFields.join(", ")+'.</div>';
+  html+='<div class="action-row" style="justify-content:space-between;align-items:center"><span style="font-size:11.5px;color:var(--t3)">New here? Try <strong style="color:var(--t2)">Load Example</strong></span><div style="display:flex;gap:10px"><button class="btn-ghost" onclick="loadExample()">Load Example</button><button class="btn-ghost" onclick="resetInputs()">Reset</button><button class="btn-primary" onclick="goToPage2()">Next: Economic Benefits ›</button></div></div>';
+  html+='</main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES1,"bn-list1");renderCoC();
+  var as=document.getElementById("asset-type-sel");if(as)as.value=S.assetTypeSel||"";
+}
+
+function renderPage2(){
+  var html='<div class="page"><div class="page-grid"><aside><div class="section-label">Briefing Notes</div><div class="panel" style="margin-bottom:14px"><div id="bn-list2"></div></div></aside><main>';
+  html+='<div class="helper-card"><div class="helper-head" onclick="S.bw_open=!S.bw_open;render()"><span class="helper-icon">💡</span><span class="helper-title">Help me estimate annual benefits</span><span class="helper-toggle">'+(S.bw_open?"▲ hide":"▼ show")+'</span></div>';
+  if(S.bw_open){
+    html+='<div class="helper-body"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+    html+='<div><div class="helper-label">Current annual cost or revenue</div><div class="ui"><span class="pfx">$</span><input type="text" value="'+(S.bw_current||"")+'" placeholder="0" onblur="S.bw_current=+this.value||0;render()" onfocus="this.style.borderBottomColor=\'var(--blue)\'" style="font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none"></div></div>';
+    html+='<div><div class="helper-label">Expected improvement</div><div class="ui"><input type="text" value="'+(S.bw_improvement||"")+'" placeholder="0" onblur="S.bw_improvement=+this.value||0;render()" onfocus="this.style.borderBottomColor=\'var(--blue)\'" style="font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none"><span class="sfx">%</span></div></div></div>';
+    if(S.bw_current&&S.bw_improvement){var sug=Math.round(S.bw_current*S.bw_improvement/100);html+='<div class="helper-result"><div style="font-size:13px;color:var(--t2)">Suggested annual benefit: <strong style="color:var(--green)">'+fmtM(sug)+'</strong></div><button class="helper-use" onclick="S.annuityAmount='+sug+';S.bw_open=false;render()">Use this ›</button></div>';}
+    html+='</div></div>';
+  }
+  html+='</div>';
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Annual Benefits of Replacing</div></div><div class="field-grid">';
+  html+=field("Benefit Stream",'<div class="pills"><div class="pill'+(S.annuity?" active":"")+'" onclick="S.annuity=true;render()"><div class="pill-dot"></div>Annuity</div><div class="pill'+(!S.annuity?" active":"")+'" onclick="S.annuity=false;render()"><div class="pill-dot"></div>Variable by year</div></div>',true);
+  if(S.annuity)html+=field("Annual Benefit Amount",uInput("$",S.annuityAmount,"inp-ann","S.annuityAmount=+this.value||0","/ yr",false),true,true,"Incremental after-tax value of replacing vs. continuing with old asset");
+  html+='</div></div>';
+  if(!S.annuity){
+    var life=+S.life||1;while(S.yearlyBenefits.length<life)S.yearlyBenefits.push(0);
+    html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Benefits by Year</div></div><div style="padding:10px 18px;max-height:400px;overflow-y:auto">';
+    for(var i=0;i<life;i++)html+='<div style="display:grid;grid-template-columns:72px 1fr;gap:0 14px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px;font-weight:600;color:var(--t2)">Year '+(i+1)+'</span><div class="ui"><span class="pfx">$</span><input type="text" value="'+(S.yearlyBenefits[i]||"")+'" placeholder="0" data-idx="'+i+'" onblur="S.yearlyBenefits[+this.dataset.idx]=+this.value||0" onfocus="this.style.borderBottomColor=\'var(--blue)\'"></div></div>';
+    html+='</div></div>';
+  }
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Firm Data</div></div><div class="field-grid">';
+  html+=field("Tax Rate",uInput("",S.taxRate,"inp-tax","S.taxRate=+this.value||0","%",false));
+  html+=field("Required Rate of Return",uInput("",S.coc,"inp-coc","S.coc=+this.value||0","%",false),false,true);
+  html+='</div></div>';
+  if(S.missingFields&&S.missingFields.length>0)html+='<div style="background:rgba(200,75,49,.07);border:1.5px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)"><strong>Please complete:</strong> '+S.missingFields.join(", ")+'.</div>';
+  html+='<div class="action-row" style="justify-content:space-between"><button class="btn-ghost" onclick="S.page=1;render()">‹ Back</button><button class="btn-primary" onclick="goToResults()">Calculate ›</button></div>';
+  html+='</main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES2,"bn-list2");
+}
+
+function renderPage3(){
+  var res=S.res;var ok=res.npv>=0;
+  var html='<div class="page"><div class="p2-grid"><aside><div class="section-label">Understanding Results</div><div class="panel" style="margin-bottom:14px"><div id="bn-list3"></div></div><button class="btn-ghost" onclick="S.page=1;render()">‹ Edit Inputs</button></aside><main>';
+  var headline=ok?(res.robustness<15?"Accept this replacement — but the margin is thin.":"Accept this replacement."):(res.robustness<15?"Reject this replacement — but the margin is thin.":"Reject this replacement.");
+  html+='<div class="result-banner" style="border-radius:10px;padding:20px 24px;margin-bottom:18px;background:'+(ok?"var(--green-soft)":"rgba(200,75,49,.07)")+';border:1.5px solid '+(ok?"var(--green)":"var(--warn)")+';display:flex;align-items:center;justify-content:space-between;gap:20px"><div><div style="font-family:Georgia,serif;font-size:22px;color:'+(ok?"var(--green)":"var(--warn)")+';line-height:1.3">'+headline+'</div><div style="font-size:13px;color:var(--t2);margin-top:8px;line-height:1.6">NPV is <strong>'+fmtM(res.npv)+'</strong> — a '+res.robustnessLabel.toLowerCase()+' result.</div></div><div style="background:'+(ok?"var(--green)":"var(--warn)")+';border-radius:10px;padding:14px 20px;text-align:center;flex-shrink:0"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.75)">NPV</div><div style="font-family:monospace;font-size:26px;font-weight:800;color:white;margin-top:4px">'+fmtM(res.npv)+'</div></div></div>';
+
+  html+='<div class="metrics"><div class="metric"><div class="metric-label">Net Initial Outlay</div><div class="metric-val">'+fmtM(res.netOutlay)+'</div><div class="metric-sub">New cost less after-tax old asset proceeds</div></div><div class="metric"><div class="metric-label">Old Asset After-Tax Proceeds</div><div class="metric-val">'+fmtM(res.netOldProceeds)+'</div><div class="metric-sub">'+(res.gainOnDisposal>0?"Gain of "+fmtM(res.gainOnDisposal)+" taxed":res.gainOnDisposal<0?"Loss of "+fmtM(-res.gainOnDisposal)+" deductible":"No gain or loss")+'</div></div><div class="metric"><div class="metric-label">PV Tax Shields</div><div class="metric-val">'+fmtM(res.pvTS+res.pvS179)+'</div><div class="metric-sub">MACRS on new asset (full basis)</div></div></div>';
+
+  html+='<div class="collapsible"><div class="coll-head" onclick="S.show_wwit=!S.show_wwit;renderPage3()"><span class="coll-title">What Would It Take?</span><span class="coll-arr" style="transform:'+(S.show_wwit?'rotate(90deg)':'rotate(0deg)')+'">›</span></div>';
+  if(S.show_wwit){var curBen=+S.annuityAmount||0;var margin=curBen-res.wwit;html+='<div class="coll-body open" style="padding:16px 18px;font-size:13px;color:var(--t2);line-height:1.6">At a net outlay of '+fmtM(res.netOutlay)+' and a '+S.coc+'% required return, the replacement breaks even at <strong style="color:var(--green)">'+fmtM(res.wwit)+'/year</strong>. Your current estimate is '+fmtM(curBen)+'/yr — <strong style="color:'+(margin>=0?"var(--green)":"var(--warn)")+'">'+fmtM(Math.abs(margin))+' '+(margin>=0?"above":"below")+'</strong> the threshold.</div></div>';}
+  html+='</div>';
+
+  html+='<div class="chart-box"><div class="chart-title">NPV by Required Return</div><canvas id="coc-chart" width="700" height="200" style="width:100%;height:auto;display:block"></canvas></div>';
+
+  html+='<div class="collapsible"><div class="coll-head" onclick="S.show_dcf=!S.show_dcf;renderPage3()"><span class="coll-title">DCF Summary</span><span class="coll-arr" style="transform:'+(S.show_dcf?'rotate(90deg)':'rotate(0deg)')+'">›</span></div>';
+  if(S.show_dcf){
+    html+='<div class="coll-body open"><table><tbody>';
+    html+='<tr><td class="left">Cost of new asset</td><td class="sub">Year 0</td><td>'+fmtM(-(+S.cost))+'</td></tr>';
+    html+='<tr><td class="left">Sale price of old asset</td><td class="sub">Year 0</td><td>'+fmtM(+S.oldSalePrice)+'</td></tr>';
+    if(res.taxOnDisposal!==0)html+='<tr><td class="left">'+(res.taxOnDisposal>0?"Less: tax on disposal gain":"Plus: tax benefit on disposal loss")+'</td><td class="sub">Year 0</td><td>'+fmtM(-res.taxOnDisposal)+'</td></tr>';
+    if(+S.workingCapital>0)html+='<tr><td class="left">Working capital</td><td class="sub">Year 0</td><td>'+fmtM(-(+S.workingCapital))+'</td></tr>';
+    html+='<tr><td class="left">PV of MACRS tax shields</td><td class="sub">Per schedule</td><td>'+fmtM(res.pvTS)+'</td></tr>';
+    if(res.pvS179>0)html+='<tr><td class="left">PV of Section 179 tax shield</td><td class="sub">Year 1</td><td>'+fmtM(res.pvS179)+'</td></tr>';
+    html+='<tr><td class="left">PV of after-tax benefits</td><td class="sub">Years 1–'+S.life+'</td><td>'+fmtM(res.pvBen)+'</td></tr>';
+    html+='<tr><td class="left">PV of salvage value</td><td class="sub">Year '+S.life+'</td><td>'+fmtM(res.pvSalv)+'</td></tr>';
+    if(res.recaptureTax>0)html+='<tr><td class="left">Less: depreciation recapture tax</td><td class="sub">Year '+S.life+'</td><td>'+fmtM(res.pvRecapture)+'</td></tr>';
+    if(+S.workingCapital>0)html+='<tr><td class="left">PV of working capital recovery</td><td class="sub">Year '+S.life+'</td><td>'+fmtM(res.pvWC)+'</td></tr>';
+    html+='<tr class="total-row" style="border-top:2px solid var(--blue)"><td class="left" colspan="2">Net Present Value</td><td style="color:'+(ok?"var(--green)":"var(--warn)")+';font-size:15px">'+fmtM(res.npv)+'</td></tr>';
+    html+='</tbody></table></div>';
+  }
+  html+='</div>';
+
+  html+='<div class="collapsible"><div class="coll-head" onclick="S.show_depr=!S.show_depr;renderPage3()"><span class="coll-title">MACRS Depreciation Schedule (New Asset)</span><span class="coll-arr" style="transform:'+(S.show_depr?'rotate(90deg)':'rotate(0deg)')+'">›</span></div>';
+  if(S.show_depr){
+    html+='<div class="coll-body open"><table><thead><tr><th class="left">Year</th><th>Rate</th><th>Depreciation</th><th>Tax Shield</th><th>PV of Shield</th></tr></thead><tbody>';
+    var tax=+S.taxRate/100,r=+S.coc/100;
+    res.depr.forEach(function(d){var ts=d.amount*tax,pv=ts/Math.pow(1+r,d.year);html+='<tr><td class="left">'+d.year+'</td><td>'+fmtPct(d.rate,2)+'</td><td>'+fmtM(d.amount)+'</td><td>'+fmtM(ts)+'</td><td>'+fmtM(pv)+'</td></tr>';});
+    html+='</tbody></table></div>';
+  }
+  html+='</div></main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES3,"bn-list3");
+  setTimeout(function(){drawChart("coc-chart",res.cocSens,"coc","npv","%")},50);
+}
+
+function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2)renderPage2();else if(S.page===3&&S.res)renderPage3();}
+render();
+</script>
+</body>
+</html>

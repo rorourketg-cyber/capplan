@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan Personal — Find Your Model</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#F0F4F0;color:#0F1D2E;font-size:15px;line-height:1.6;min-height:100vh}
+:root{
+  --green:#2E7D52;--green-warm:#3D8B5A;--green-soft:rgba(46,125,82,0.10);--green-mid:#EBF5EE;
+  --blue:#1B3F6E;--blue-soft:rgba(27,63,110,0.07);
+  --amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7;
+  --surface:#F7FAF7;--panel:#ffffff;--border:#D8E8DC;
+  --t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;
+  --navy:#0F1D2E;
+}
+
+/* ── HEADER ─────────────────────────────────────────────────────────────── */
+#header{background:var(--green);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:28px;height:28px;background:rgba(255,255,255,0.2);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:Georgia,serif;font-size:18px;color:white}.logo-text span{color:rgba(255,255,255,0.6)}
+.logo-sub{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-left:4px;padding-left:12px;border-left:1px solid rgba(255,255,255,0.25)}
+.header-back{font-size:13px;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:6px;cursor:pointer}
+.header-back:hover{color:white}
+
+/* ── LAYOUT ─────────────────────────────────────────────────────────────── */
+#finder{max-width:980px;margin:0 auto;padding:48px 24px 64px}
+.finder-intro{text-align:center;margin-bottom:52px}
+.finder-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:12px}
+.finder-headline{font-family:Georgia,serif;font-size:clamp(26px,3.5vw,40px);color:var(--t1);margin-bottom:14px;line-height:1.2}
+.finder-sub{font-size:16px;color:var(--t2);max-width:560px;margin:0 auto}
+
+/* ── STEP INDICATOR ─────────────────────────────────────────────────────── */
+#step-track{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:44px}
+.st{display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;color:var(--t3);transition:all .2s}
+.st.done{color:var(--green)}
+.st.active{background:var(--green);color:white}
+.st-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:rgba(0,0,0,0.08);flex-shrink:0}
+.st.active .st-num{background:rgba(255,255,255,0.25)}
+.st.done .st-num{background:var(--green-soft);color:var(--green)}
+.st-sep{width:32px;height:1px;background:var(--border)}
+
+/* ── QUESTION CARD ──────────────────────────────────────────────────────── */
+.q-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:36px 40px;box-shadow:0 2px 12px rgba(15,29,46,0.07);margin-bottom:28px;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.q-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:10px}
+.q-text{font-family:Georgia,serif;font-size:22px;color:var(--t1);margin-bottom:28px;line-height:1.35}
+
+/* ── CHOICE GRID ────────────────────────────────────────────────────────── */
+.choices{display:grid;gap:12px}
+.choices.cols-2{grid-template-columns:1fr 1fr}
+.choices.cols-3{grid-template-columns:1fr 1fr 1fr}
+.choice{background:var(--surface);border:2px solid var(--border);border-radius:10px;padding:20px 22px;cursor:pointer;text-align:left;transition:all .18s;display:flex;align-items:flex-start;gap:14px}
+.choice:hover{border-color:var(--green);background:var(--green-mid);transform:translateY(-2px);box-shadow:0 4px 16px rgba(46,125,82,0.12)}
+.choice-icon{font-size:26px;flex-shrink:0;line-height:1;margin-top:2px}
+.choice-body{}
+.choice-title{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.choice-desc{font-size:13px;color:var(--t2);line-height:1.5}
+
+/* ── BREADCRUMB ─────────────────────────────────────────────────────────── */
+#breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t3);margin-bottom:24px;flex-wrap:wrap}
+.bc-item{cursor:pointer;color:var(--green);font-weight:500}.bc-item:hover{text-decoration:underline}
+.bc-sep{color:var(--border)}
+.bc-current{color:var(--t2);font-weight:500}
+
+/* ── RESULT CARD ────────────────────────────────────────────────────────── */
+.result-card{border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(46,125,82,0.15);animation:fadeUp .3s ease}
+.result-head{background:var(--green);padding:28px 36px;display:flex;align-items:center;gap:20px}
+.result-badge{background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:8px 14px;font-family:monospace;font-size:13px;font-weight:700;color:white;flex-shrink:0}
+.result-head-text{}
+.result-model-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:4px}
+.result-title{font-family:Georgia,serif;font-size:22px;color:white;line-height:1.2}
+.result-body{background:var(--panel);padding:28px 36px}
+.result-question{font-size:15px;color:var(--t2);line-height:1.6;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.result-what{margin-bottom:24px}
+.result-what-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+.result-features{display:flex;flex-direction:column;gap:8px}
+.result-feature{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--t2)}
+.result-feature-check{width:18px;height:18px;border-radius:50%;background:var(--green-soft);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;margin-top:1px}
+.result-actions{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+.result-btn-primary{background:var(--green);color:white;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
+.result-btn-primary:hover{background:var(--green-warm)}
+.result-btn-secondary{background:transparent;color:var(--green);border:2px solid var(--green);border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s}
+.result-btn-secondary:hover{background:var(--green-soft)}
+.free-badge{display:inline-flex;align-items:center;gap:5px;background:var(--amber-soft);border:1px solid var(--amber);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--amber-dark);margin-left:10px}
+
+/* ── ALSO CONSIDER ──────────────────────────────────────────────────────── */
+.also-consider{margin-top:20px}
+.also-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:12px}
+.also-chips{display:flex;gap:10px;flex-wrap:wrap}
+.also-chip{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer;font-size:13px;color:var(--t2);transition:all .15s;display:flex;align-items:center;gap:8px}
+.also-chip:hover{border-color:var(--green);color:var(--green);background:var(--green-mid)}
+.also-chip-num-unused{font-family:monospace;font-size:11px;font-weight:700;color:var(--t3)}
+
+/* ── START OVER ─────────────────────────────────────────────────────────── */
+#start-over{text-align:center;margin-top:32px}
+#start-over button{background:transparent;border:none;font-size:13px;color:var(--t3);cursor:pointer;padding:8px 16px;border-radius:6px}
+#start-over button:hover{color:var(--green);background:var(--green-soft)}
+
+@media(max-width:640px){
+  .choices.cols-2,.choices.cols-3{grid-template-columns:1fr}
+  .q-card{padding:24px}
+  .result-head,.result-body{padding:22px 24px}
+  #finder{padding:32px 16px 48px}
+}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="logo">
+    <div class="logo-mark"><svg viewBox="0 0 18 18" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg></div>
+    <div class="logo-text">Cap<span>Plan</span></div>
+    <div class="logo-sub">Personal</div>
+  </div>
+  <div class="header-back" onclick="window.location.href='capplan_landing.html'">← Back to capplan.online</div>
+</div>
+
+<div id="finder">
+  <div class="finder-intro">
+    <div class="finder-eyebrow">Solution Finder</div>
+    <h1 class="finder-headline">What decision are you<br>trying to make?</h1>
+    <p class="finder-sub">Answer two quick questions and we'll point you to exactly the right tool — no financial background needed.</p>
+  </div>
+
+  <div id="step-track"></div>
+  <div id="breadcrumb"></div>
+  <div id="finder-content"></div>
+  <div id="start-over" style="display:none">
+    <button onclick="restart()">↩ Start over</button>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+var MODELS = {
+  P1: {
+    id:'P1', title:'Should I Buy This?', free:true,
+    question:'Is buying this asset worth the money?',
+    desc:'You\'re thinking about buying something — a car, appliance, boat, solar panels, or other durable asset. This model works out whether the purchase makes financial sense given what you\'ll get from it and what it will be worth when you\'re done.',
+    features:[
+      'Calculates whether the purchase earns back its cost at your target return',
+      'Benefit estimation wizard — helps you put a dollar value on what the asset provides',
+      'Sensitivity: how the answer changes if benefits are higher or lower than expected',
+      '"What would it take?" — the minimum annual benefit needed to justify the purchase',
+      'Decision robustness indicator — how close is it either way?'
+    ],
+    also:['P2','P9','P13']
+  },
+  P2: {
+    id:'P2', title:'Which Option Should I Buy?', free:false,
+    question:'I\'m choosing between two or more options — which is the better financial choice?',
+    desc:'You\'ve narrowed it down to two or more candidates and want to compare them financially. Which car gives you more value for money? Does the premium model pay for itself over the base model?',
+    features:[
+      'Side-by-side comparison of up to five alternatives',
+      'Identifies which option has the highest net present value',
+      'Benefit wizard for each alternative',
+      'Total cost of ownership alongside NPV for an intuitive comparison',
+      'Sensitivity to benefit assumptions for each option'
+    ],
+    also:['P1','P3','P13']
+  },
+  P3: {
+    id:'P3', title:'Should I Replace What I Own?', free:false,
+    question:'My current asset is ageing — is it time to replace it?',
+    desc:'You own something and it\'s getting old, expensive to run, or simply behind the times. This model compares the cost of keeping what you have against the financial case for replacing it.',
+    features:[
+      'Compares keep vs replace on a present value basis',
+      'Accounts for current resale value of what you own',
+      'Market value estimator for common asset types',
+      'O&M cost escalation — maintenance tends to increase with age',
+      'Breakeven: how much would replacement need to save to justify the switch?'
+    ],
+    also:['P4','P5','P1']
+  },
+  P4: {
+    id:'P4', title:'Which Replacement Is Best?', free:false,
+    question:'I\'m replacing something — which replacement option makes the most sense?',
+    desc:'You\'ve decided to replace your current asset and want to compare the alternatives. Which new model is the better financial choice, accounting for what you\'ll get for your old one?',
+    features:[
+      'Combines replacement analysis with multi-option comparison',
+      'Accounts for trade-in or resale value of your current asset',
+      'Side-by-side present value comparison of up to five replacement options',
+      'Benefit wizard for each option',
+      'Sensitivity analysis across all alternatives'
+    ],
+    also:['P3','P5','P2']
+  },
+  P5: {
+    id:'P5', title:'When Should I Replace It?', free:false,
+    question:'My asset is still working — but when is the right time to replace it?',
+    desc:'You\'re not sure whether to replace now, next year, or in five years. This model finds the financially optimal replacement interval — the age at which the cost of keeping the asset per year is minimised.',
+    features:[
+      'Finds the year-by-year equivalent annual cost for every possible holding period',
+      'Identifies the financially optimal replacement age',
+      'Asset-class library: pre-loaded O&M cost defaults for vehicles, appliances, HVAC, and more',
+      'Shows where you are on the cost curve relative to the optimal point',
+      'Sensitivity to O&M escalation assumptions'
+    ],
+    also:['P3','P4','P1']
+  },
+  P9: {
+    id:'P9', title:'Should I Lease or Buy?', free:false,
+    question:'I can lease or buy — which costs less?',
+    desc:'Leasing and buying both get you the use of the asset, but the costs work very differently. This model works out which option is cheaper in present value terms, and — if leasing costs more but you need to lease anyway — exactly how much extra you\'re paying.',
+    features:[
+      'Compares total cost of leasing vs buying in today\'s dollars',
+      'Works for any asset: car, equipment, appliance',
+      'Cost of the leasing constraint — how much extra leasing costs if buying is cheaper',
+      'Monthly equivalent: "leasing costs you an extra $X per month"',
+      'Break-even lease payment — the payment at which leasing becomes the better deal',
+      'Implied interest rate in the lease'
+    ],
+    also:['P11','P1','P13']
+  },
+  P11: {
+    id:'P11', title:'What Is This Lease Really Costing Me?', free:false,
+    question:'I have a lease offer — what interest rate is the lessor really charging?',
+    desc:'Lease payments can look attractive without revealing the financing cost embedded in them. This model works out the effective interest rate in any lease offer, so you can compare it to what you\'d pay if you borrowed to buy instead.',
+    features:[
+      'Calculates the implied interest rate in any lease structure',
+      'Compares implied rate to your available borrowing rate',
+      'Clear decision: borrow and buy, or accept the lease',
+      'Sensitivity: how the implied rate changes at different payment levels',
+      'Useful for negotiating — shows exactly what lower payments would cost the lessor'
+    ],
+    also:['P9','P1','P13']
+  },
+  P12: {
+    id:'P12', title:'What\'s the Least I Should Accept?', free:false,
+    question:'I\'m selling something — what\'s the minimum price I should accept?',
+    desc:'When selling an asset you\'ve owned and used, the minimum acceptable price depends on what you originally paid, how much use you\'ve had from it, and your target return on the investment. This model calculates that floor price.',
+    features:[
+      'Calculates the minimum selling price to earn your target return',
+      'Accounts for the value you\'ve already received from the asset',
+      'Benefit wizard — helps estimate the annual value of use',
+      'Price floor vs age: how the minimum changes depending on when you sell',
+      'Sensitivity to required return assumption'
+    ],
+    also:['P13','P3','P1']
+  },
+  P13: {
+    id:'P13', title:'What\'s the Most I Should Pay?', free:false,
+    question:'I\'m buying something — what\'s the maximum I should pay for it?',
+    desc:'Rather than evaluating a given price, this model works backwards from your required return to calculate the highest price that still makes the purchase worthwhile. That number is your private walk-away point in any negotiation.',
+    features:[
+      'Calculates the maximum price that earns your target return',
+      'Benefit wizard — helps build realistic annual benefit estimates',
+      'Negotiation range: maximum at your target return vs ceiling at 0% return',
+      'Sensitivity to benefit levels — what if the asset performs better or worse?',
+      'Sensitivity to required return — how the maximum changes with your target'
+    ],
+    also:['P12','P1','P9']
+  }
+};
+
+// ── QUESTION TREE ─────────────────────────────────────────────────────────────
+// Each node: { id, step, label, question, choices: [{icon,title,desc,next}] }
+// next: model ID (string starting with P) or node ID
+
+var TREE = {
+  root: {
+    id:'root', step:1, label:'What\'s on your mind?',
+    question:'What kind of decision are you facing?',
+    choices:[
+      {icon:'🛒', title:'Buying or acquiring something',
+       desc:'A car, appliance, boat, equipment, or other asset you\'re considering purchasing',
+       next:'buying'},
+      {icon:'🔧', title:'Something I already own',
+       desc:'An asset I have now — deciding whether to replace it, or figuring out when to',
+       next:'owning'},
+      {icon:'📋', title:'I am considering a lease',
+       desc:'Comparing lease vs buying, or understanding what a lease offer is really costing',
+       next:'leasing'},
+      {icon:'💰', title:'Negotiating a price',
+       desc:'Working out what to accept when selling, or the maximum I should pay when buying',
+       next:'negotiating'}
+    ]
+  },
+
+  buying: {
+    id:'buying', step:2, label:'Buying something',
+    question:'Are you comparing options, or evaluating one specific thing?',
+    choices:[
+      {icon:'🎯', title:'Evaluating one specific asset',
+       desc:'I have one thing in mind and want to know if buying it makes financial sense',
+       next:'P1'},
+      {icon:'⚖️', title:'Comparing two or more options',
+       desc:'I\'m deciding between alternatives — which one is the better financial choice?',
+       next:'P2'},
+      {icon:'🤝', title:'Negotiating the purchase price',
+       desc:'I want to know the maximum I should pay before entering negotiations',
+       next:'P13'}
+    ]
+  },
+
+  owning: {
+    id:'owning', step:2, label:'Something I already own',
+    question:'What are you trying to decide about the asset you own?',
+    choices:[
+      {icon:'🔄', title:'Whether to replace it now',
+       desc:'It\'s getting old or costly — should I replace it, or keep it going?',
+       next:'replacing'},
+      {icon:'📅', title:'When to replace it',
+       desc:'I know I\'ll replace it eventually — but what\'s the financially optimal time?',
+       next:'P5'},
+      {icon:'💵', title:'What to sell it for',
+       desc:'I\'m planning to sell and want to know the minimum price I should accept',
+       next:'P12'}
+    ]
+  },
+
+  replacing: {
+    id:'replacing', step:3, label:'Replacing what I own',
+    question:'Do you have a specific replacement in mind, or are you comparing options?',
+    choices:[
+      {icon:'🔁', title:'One specific replacement',
+       desc:'I know what I\'d replace it with — I just need to know if the switch makes sense',
+       next:'P3'},
+      {icon:'📊', title:'Comparing replacement options',
+       desc:'I have several candidates for the replacement and want to pick the best one',
+       next:'P4'}
+    ]
+  },
+
+  leasing: {
+    id:'leasing', step:2, label:'A lease',
+    question:'What do you want to know about the lease?',
+    choices:[
+      {icon:'⚖️', title:'Lease vs buying — which costs less?',
+       desc:'I can do either — I want to know which option is cheaper overall',
+       next:'P9'},
+      {icon:'🔍', title:'What this lease is really costing me',
+       desc:'I have a lease offer and want to know the effective interest rate embedded in it',
+       next:'P11'}
+    ]
+  },
+
+  negotiating: {
+    id:'negotiating', step:2, label:'Negotiating a price',
+    question:'Are you on the buying side or the selling side?',
+    choices:[
+      {icon:'💵', title:'I\'m selling — what\'s my minimum?',
+       desc:'What\'s the floor price I should accept to earn a fair return on my investment?',
+       next:'P12'},
+      {icon:'🏷️', title:'I\'m buying — what\'s my maximum?',
+       desc:'What\'s the highest price I should pay before walking away?',
+       next:'P13'}
+    ]
+  }
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var PATH = []; // array of {nodeId, choiceIdx}
+var CURRENT = 'root';
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render(){
+  renderSteps();
+  renderBreadcrumb();
+  var isResult = CURRENT.startsWith('P');
+  document.getElementById('start-over').style.display = PATH.length>0?'block':'none';
+  if(isResult) renderResult(MODELS[CURRENT]);
+  else renderQuestion(TREE[CURRENT]);
+}
+
+function renderSteps(){
+  var track = document.getElementById('step-track');
+  // Determine max steps reached
+  var steps=[
+    {label:'What\'s on your mind?'},
+    {label:'Narrow it down'},
+    {label:'Your model'}
+  ];
+  var currentStep = PATH.length === 0 ? 1 :
+    CURRENT.startsWith('P') ? 3 :
+    TREE[CURRENT].step >= 3 ? 3 : 2;
+  // For replacing node (step 3), bump
+  if(CURRENT==='replacing') currentStep=3;
+
+  track.innerHTML = steps.map(function(s,i){
+    var n=i+1;
+    var cls = n < currentStep ? 'done' : n===currentStep ? 'active' : '';
+    var icon = n < currentStep ? '✓' : String(n);
+    return (i>0?'<div class="st-sep"></div>':'')+
+      '<div class="st '+cls+'"><div class="st-num">'+icon+'</div>'+s.label+'</div>';
+  }).join('');
+}
+
+function renderBreadcrumb(){
+  var bc = document.getElementById('breadcrumb');
+  if(PATH.length===0){bc.innerHTML='';return;}
+  var parts = ['<span class="bc-item" onclick="restart()">Home</span>'];
+  PATH.forEach(function(step,i){
+    var node = TREE[step.nodeId];
+    var choice = node.choices[step.choiceIdx];
+    parts.push('<span class="bc-sep">›</span>');
+    if(i < PATH.length-1){
+      parts.push('<span class="bc-item" onclick="goBack('+i+')">'+ choice.title +'</span>');
+    } else {
+      parts.push('<span class="bc-current">'+ choice.title +'</span>');
+    }
+  });
+  bc.innerHTML = parts.join('');
+}
+
+function renderQuestion(node){
+  var cols = node.choices.length === 2 ? 'cols-2' :
+             node.choices.length === 3 ? 'cols-3' : 'cols-2';
+  var html = '<div class="q-card">';
+  html += '<div class="q-label">'+node.label+'</div>';
+  html += '<div class="q-text">'+node.question+'</div>';
+  html += '<div class="choices '+cols+'">';
+  node.choices.forEach(function(c,i){
+    html += '<button class="choice" onclick="choose(\''+node.id+'\','+i+',\''+c.next+'\')">';
+    html += '<div class="choice-icon">'+c.icon+'</div>';
+    html += '<div class="choice-body">';
+    html += '<div class="choice-title">'+c.title+'</div>';
+    html += '<div class="choice-desc">'+c.desc+'</div>';
+    html += '</div></button>';
+  });
+  html += '</div></div>';
+  document.getElementById('finder-content').innerHTML = html;
+}
+
+function renderResult(model){
+  var html = '<div class="result-card">';
+  // Head
+  html += '<div class="result-head">';
+  html += '<div class="result-badge">Recommended</div>';
+  html += '<div class="result-head-text">';
+  html += '<div class="result-model-label">Your model</div>';
+  html += '<div class="result-title">'+model.title;
+  if(model.free) html += '<span class="free-badge">✦ Free</span>';
+  html += '</div>';
+  html += '</div></div>';
+  // Body
+  html += '<div class="result-body">';
+  html += '<div class="result-question">'+model.question+'</div>';
+  html += '<div class="result-what">';
+  html += '<div class="result-what-label">What this model does</div>';
+  html += '<div class="result-features">';
+  model.features.forEach(function(f){
+    html += '<div class="result-feature"><div class="result-feature-check">✓</div><span>'+f+'</span></div>';
+  });
+  html += '</div></div>';
+  // Actions
+  html += '<div class="result-actions">';
+  html += '<button class="result-btn-primary" onclick="openModel(\''+model.id+'\')">Open '+model.title+' →</button>';
+  html += '<button class="result-btn-secondary" onclick="restart()">Start over</button>';
+  html += '</div>';
+  // Also consider
+  if(model.also && model.also.length>0){
+    html += '<div class="also-consider">';
+    html += '<div class="also-label">Also worth considering</div>';
+    html += '<div class="also-chips">';
+    model.also.forEach(function(mid){
+      var m = MODELS[mid];
+      html += '<div class="also-chip" onclick="showModel(\''+mid+'\')">'+m.title+'</div>';
+    });
+    html += '</div></div>';
+  }
+  html += '</div></div>';
+  document.getElementById('finder-content').innerHTML = html;
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function choose(nodeId, choiceIdx, next){
+  PATH.push({nodeId:nodeId, choiceIdx:choiceIdx});
+  CURRENT = next;
+  render();
+  // Smooth scroll to top of finder
+  document.getElementById('finder').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function goBack(pathIdx){
+  PATH = PATH.slice(0, pathIdx);
+  CURRENT = pathIdx===0 ? 'root' : (function(){
+    var prev = PATH[pathIdx-1];
+    return TREE[prev.nodeId].choices[prev.choiceIdx].next;
+  })();
+  render();
+}
+
+function restart(){
+  PATH = [];
+  CURRENT = 'root';
+  render();
+}
+
+function showModel(modelId){
+  // Direct jump to a result without adding to path
+  CURRENT = modelId;
+  renderResult(MODELS[modelId]);
+  document.getElementById('finder').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function openModel(modelId){
+  var urls = {
+    P1:'capplan_personal1.html', P2:'capplan_personal2.html',
+    P3:'capplan_personal3.html', P4:'capplan_personal4.html',
+    P5:'capplan_personal5.html', P9:'capplan_personal9.html',
+    P11:'capplan_personal11.html', P12:'capplan_personal12.html',
+    P13:'capplan_personal13.html'
+  };
+  var url = urls[modelId];
+  if(url) window.location.href = url;
+  else alert('Model '+modelId+' — coming soon');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>

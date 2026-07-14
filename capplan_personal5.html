@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan Personal — When Should I Replace It?</title>
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#F0F4F0;color:#0F1D2E;font-size:14px;-webkit-font-smoothing:antialiased}
+input,select,button{font-family:inherit;font-size:14px}button{cursor:pointer;background:none;border:none}select{-webkit-appearance:none;appearance:none}
+:root{--green:#2E7D52;--green-warm:#3D8B5A;--green-soft:rgba(46,125,82,0.10);--green-mid:#EBF5EE;--green-dark:#1A5C35;
+--blue:#1B3F6E;--blue-soft:rgba(27,63,110,0.08);
+--amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7;
+--surface:#F7FAF7;--panel:#fff;--border:#D8E8DC;--t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;--warn:#C84B31;--warn-soft:rgba(200,75,49,.07)}
+#masthead{background:var(--green);height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}.logo-mark{width:30px;height:30px;background:rgba(255,255,255,0.2);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:Georgia,serif;font-size:20px;color:white}.logo-text span{color:rgba(255,255,255,0.6)}
+.logo-sub{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-left:4px;padding-left:12px;border-left:1px solid rgba(255,255,255,0.25)}
+.module-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.9)}
+#stepper{background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px}
+.step{display:flex;align-items:center;gap:8px;padding:13px 4px;border-bottom:2px solid transparent}
+.step.active{border-bottom-color:var(--green)}.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--border);color:var(--t3)}
+.step.active .step-num{background:var(--green);color:white}.step.done .step-num{background:var(--green-warm);color:white}
+.step-label{font-size:13px;font-weight:500;color:var(--t3)}.step.active .step-label{color:var(--green)}.step.done .step-label{color:var(--green-warm)}
+.step-sep{color:var(--border);margin:0 8px;font-size:16px}
+.page{max-width:1040px;margin:0 auto;padding:24px 22px}
+.page-grid{display:grid;grid-template-columns:300px 1fr;gap:22px}
+.p2-grid{display:grid;grid-template-columns:270px 1fr;gap:22px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);overflow:hidden;margin-bottom:18px}
+.panel-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr}
+.field{padding:13px 18px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.field.full{grid-column:1/-1;border-right:none}.field.last{border-bottom:none}
+.field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:6px}
+.field-note{font-size:10px;color:var(--t3);margin-top:4px;line-height:1.5}
+.ui{display:flex;align-items:center;gap:6px}
+.ui .pfx,.ui .sfx{font-family:monospace;font-size:12px;color:var(--t3);flex-shrink:0}
+.ui input{font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none}
+.ui input:focus{border-bottom-color:var(--green)}.ui input:disabled{color:var(--t3);opacity:.6}
+.ui select{font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none;cursor:pointer}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.pill{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;user-select:none}
+.pill.active{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+.pill-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--t3);flex-shrink:0}.pill.active .pill-dot{border-color:var(--green);background:var(--green)}
+.btn-primary{background:var(--green);color:white;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-primary:hover{background:var(--green-warm)}
+.btn-ghost{background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn{display:flex;align-items:center;gap:6px;background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn:hover{border-color:var(--green);color:var(--green)}
+.action-row{display:flex;gap:10px;margin-top:4px}
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:11px}
+.bn-item{border-bottom:1px solid var(--border)}.bn-item:last-child{border-bottom:none}
+.bn-head{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;cursor:pointer}.bn-head:hover{background:var(--surface)}
+.bn-qmark{width:21px;height:21px;border-radius:50%;background:var(--green-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--green);flex-shrink:0;margin-top:1px;margin-right:5px}
+.bn-q{font-size:13px;line-height:1.5;color:var(--green);flex:1}.bn-arr{color:var(--t3);font-size:14px;flex-shrink:0;margin-top:2px;transition:transform .2s}
+.bn-body{padding:10px 13px 12px 44px;font-size:12.5px;line-height:1.7;color:var(--t2);background:var(--surface);border-top:1px solid var(--border);display:none}.bn-body.open{display:block}
+.watch-btn{margin-top:10px;display:flex;width:fit-content;align-items:center;gap:5px;border:1px solid var(--green);border-radius:5px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--green);background:none;cursor:pointer}
+.helper-card{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.helper-head{padding:11px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--amber-mid)}.helper-head:hover{background:#fde68a}
+.helper-icon{font-size:18px;flex-shrink:0}.helper-title{font-size:13px;font-weight:700;color:var(--amber-dark);flex:1}.helper-toggle{font-size:11px;font-weight:600;color:var(--amber-dark);opacity:.7}
+.helper-body{padding:16px;border-top:1.5px solid var(--amber);display:flex;flex-direction:column;gap:12px}
+.helper-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dark)}
+.helper-result{background:var(--green-soft);border:1.5px solid var(--green);border-radius:8px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.helper-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.result-banner{border-radius:10px;padding:20px 24px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.result-banner.good{background:var(--green-soft);border:1.5px solid var(--green)}
+.result-banner.warn{background:var(--warn-soft);border:1.5px solid var(--warn)}
+.result-banner.neutral{background:var(--surface);border:1.5px solid var(--border)}
+.result-banner.info{background:var(--blue-soft);border:1.5px solid #93B4D8}
+.result-box{border-radius:10px;padding:14px 20px;text-align:center;flex-shrink:0}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.metric{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.metric-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:7px}
+.metric-val{font-family:monospace;font-size:18px;font-weight:700;color:var(--t1)}.metric-val.good{color:var(--green)}.metric-val.warn{color:var(--warn)}.metric-val.info{color:var(--blue)}
+.metric-sub{font-size:10px;color:var(--t3);margin-top:3px;line-height:1.4}
+.chart-box{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:18px}
+.chart-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:4px}.chart-sub{font-size:11px;color:var(--t3);margin-bottom:12px}
+.collapsible{background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:14px;overflow:hidden}
+.coll-head{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}.coll-head:hover{background:var(--surface)}
+.coll-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}.coll-arr{color:var(--t3);font-size:14px;transition:transform .2s}
+.coll-body{display:none;border-top:1px solid var(--border)}.coll-body.open{display:block}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{padding:8px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}th.left{text-align:left}
+td{padding:8px 14px;text-align:right;font-family:monospace;border-bottom:1px solid var(--border)}td.left{text-align:left;font-family:inherit;color:var(--t1)}td.sub{text-align:left;font-family:inherit;color:var(--t3);font-size:11px}
+tr.total-row td{font-weight:700;background:var(--surface)}tr:nth-child(even){background:var(--surface)}
+tr.highlight td{background:var(--green-soft)!important;font-weight:700;color:var(--green)}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,29,46,.82);z-index:9999;display:flex;align-items:center;justify-content:center}
+.modal-box{background:white;border-radius:10px;overflow:hidden;width:min(820px,95vw)}
+.modal-head{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.modal-close{font-size:22px;color:var(--t3);line-height:1;cursor:pointer}
+.video-wrap{position:relative;padding-bottom:56.25%;height:0}.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;background:white}#masthead{position:static!important;height:auto!important;padding:8px 0!important}#stepper,.btn-ghost,.print-btn,.coll-arr{display:none!important}.page-grid,.p2-grid{display:block!important}aside{display:none!important}.coll-body{display:block!important}.coll-head{break-after:avoid!important}.result-banner,.metric,.chart-box,.collapsible,.helper-card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid}table{font-size:9px;table-layout:fixed}th,td{padding:3px 5px}thead{display:table-header-group}tr{break-inside:avoid}@page{margin:0.5in;size:landscape}}
+.asset-sel{width:100%;font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;padding:4px 0;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none}
+.curve-bar{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.curve-bar-track{flex:1;height:8px;border-radius:4px;background:var(--border);overflow:hidden}
+.curve-bar-fill{height:100%;border-radius:4px;background:var(--green);transition:width .3s}
+.curve-bar-fill.optimal{background:var(--green)}
+.curve-bar-fill.past{background:#F59E0B}
+.curve-bar-fill.warning{background:var(--warn)}
+.year-label{font-size:11px;font-family:monospace;width:44px;flex-shrink:0;color:var(--t2)}
+.eac-label{font-size:11px;font-family:monospace;width:80px;flex-shrink:0;text-align:right;color:var(--t2)}
+.optimal-badge{font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:var(--green-soft);color:var(--green);margin-left:4px}
+</style>
+</head>
+<body>
+<div id="masthead">
+  <div class="logo"><div class="logo-mark"><svg viewBox="0 0 18 18" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg></div><div class="logo-text">Cap<span>Plan</span></div><div class="logo-sub">Personal</div></div>
+  <div class="module-name">When Should I Replace It?</div>
+  <div style="position:relative"><button style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600" id="cur-btn" onclick="toggleCur()"><span id="cur-label">$ USD</span> ▾</button><div id="cur-dropdown" style="display:none;position:absolute;right:0;top:110%;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,29,46,.16);min-width:200px;z-index:300;overflow:hidden"></div></div>
+</div>
+<div id="stepper">
+  <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Your asset</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step2"><div class="step-num" id="sn2">2</div><div class="step-label">Results</div></div>
+</div>
+<div id="main-content"></div>
+<script>
+var CURRENCIES=[{code:"USD",symbol:"$",label:"US Dollar"},{code:"EUR",symbol:"€",label:"Euro"},{code:"GBP",symbol:"£",label:"British Pound"},{code:"CAD",symbol:"CA$",label:"Canadian Dollar"},{code:"AUD",symbol:"AU$",label:"Australian Dollar"},{code:"NZD",symbol:"NZ$",label:"New Zealand Dollar"},{code:"JPY",symbol:"¥",label:"Japanese Yen"}];
+function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
+function toggleCur(){S.cur_open=!S.cur_open;var dd=document.getElementById("cur-dropdown");dd.style.display=S.cur_open?"block":"none";if(S.cur_open){dd.innerHTML="";CURRENCIES.forEach(function(c){var b=document.createElement("button");b.style.cssText="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:"+(c.code===S.currency?"var(--green-soft)":"transparent")+";border:none;border-bottom:1px solid var(--border);cursor:pointer";b.innerHTML='<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--green);width:36px">'+c.symbol+'</span><span>'+c.label+'</span>';b.onclick=function(){S.currency=c.code;S.cur_open=false;render()};dd.appendChild(b);});}}
+
+// ── ASSET CLASS LIBRARY ───────────────────────────────────────────────────────
+var ASSET_LIBRARY={
+  "":          {label:"-- Select an asset type --",group:""},
+  // VEHICLES
+  "eco-car":   {label:"Economy car",           group:"Vehicles",      life:8,  om1p:4.46,esc:20,svRate:55,note:"Year-1 maintenance ~$1,250 on a $28k car; costs rise ~20%/yr. Typical resale: 55% decline over life."},
+  "mid-car":   {label:"Mid-size car",          group:"Vehicles",      life:8,  om1p:2.0,esc:18,svRate:60,note:"Similar pattern to economy car. AAA data used for cost benchmarks."},
+  "lux-car":   {label:"Luxury car",            group:"Vehicles",      life:8,  om1p:2.8,esc:20,svRate:65,note:"Higher parts and labour; steeper depreciation."},
+  "suv":       {label:"Light truck / SUV",     group:"Vehicles",      life:9,  om1p:2.2,esc:18,svRate:58,note:"Slightly longer useful life than passenger cars."},
+  "motorcycle":{label:"Motorcycle",            group:"Vehicles",      life:7,  om1p:1.8,esc:15,svRate:50,note:"Lower absolute costs; shorter typical life."},
+  // RECREATIONAL
+  "outboard":  {label:"Outboard motorboat",    group:"Recreational",  life:12, om1p:3.5,esc:12,svRate:60,note:"Engine service, hull maintenance. Costs rise moderately."},
+  "inboard":   {label:"Inboard motorboat",     group:"Recreational",  life:15, om1p:4.0,esc:12,svRate:65,note:"Higher maintenance cost; longer life than outboard."},
+  "rv":        {label:"RV / Motorhome",        group:"Recreational",  life:12, om1p:3.0,esc:15,svRate:65,note:"Significant annual upkeep; roof, seals, engine, appliances."},
+  // HOME & APPLIANCES
+  "solar":     {label:"Solar panel system",    group:"Home & Appliances",life:25,om1p:0.5,esc:5, svRate:20,note:"Very low maintenance. Inverter replacement expected around year 12-15."},
+  "hvac":      {label:"Central air (HVAC)",    group:"Home & Appliances",life:15,om1p:1.5,esc:20,svRate:10,note:"ASHRAE: avg life 15-20yr. Repair costs accelerate sharply after year 10."},
+  "furnace":   {label:"Gas furnace",           group:"Home & Appliances",life:18,om1p:1.2,esc:18,svRate:5, note:"Annual servicing plus parts escalation. 18-year average life."},
+  "heatpump":  {label:"Heat pump",             group:"Home & Appliances",life:15,om1p:1.5,esc:20,svRate:10,note:"Similar cost pattern to central air conditioning."},
+  "fridge":    {label:"Refrigerator",          group:"Home & Appliances",life:12,om1p:1.0,esc:15,svRate:5, note:"Consumer Reports: repair costs rise after year 7. Compressor is main risk."},
+  "washer":    {label:"Washer",                group:"Home & Appliances",life:11,om1p:1.2,esc:18,svRate:5, note:"Drum bearings and motor failures mid-life are typical."},
+  "dryer":     {label:"Dryer",                 group:"Home & Appliances",life:13,om1p:0.8,esc:15,svRate:5, note:"Heating element and drum bearings are common mid-life failures."},
+  "dishwasher":{label:"Dishwasher",            group:"Home & Appliances",life:10,om1p:1.0,esc:18,svRate:5, note:"Pump and control board failures are typical from year 6 onward."},
+  "wh-tank":   {label:"Water heater (tank)",   group:"Home & Appliances",life:10,om1p:0.8,esc:20,svRate:5, note:"Sudden failure common. Anode rod replacement extends life."},
+  "wh-tankless":{label:"Water heater (tankless)",group:"Home & Appliances",life:20,om1p:1.0,esc:15,svRate:5,note:"Descaling and sensor replacement. Longer life than tank type."},
+  // TOOLS
+  "mower":     {label:"Riding mower",          group:"Tools & Equipment",life:10,om1p:3.0,esc:15,svRate:30,note:"Blades, belts, deck, engine service each season."},
+  "generator": {label:"Generator",             group:"Tools & Equipment",life:12,om1p:2.5,esc:12,svRate:20,note:"Annual service, fuel system, battery. Moderate cost escalation."},
+  "powertools":{label:"Power tools (set)",     group:"Tools & Equipment",life:10,om1p:1.5,esc:10,svRate:15,note:"Relatively flat cost curve. Blades and bits are consumables."}
+};
+
+var S={page:1,currency:"USD",cur_open:false,res:null,missingFields:null,
+  assetClass:"",assetCategory:"",price:"",life:"",currentAge:"",salvageRate:"",om1:"",omType:"pct",omInc:"",coc:""};
+
+// ── CALC ──────────────────────────────────────────────────────────────────────
+function buildOM(life,om1,omType,omInc){
+  var om=[+om1];
+  for(var i=1;i<life;i++){
+    if(omType==="pct") om.push(om[i-1]*(1+(+omInc||0)/100));
+    else om.push(om[i-1]+(+omInc||0));
+  }
+  return om;
+}
+function calcEAC(price,life,salvageRate,om1,omType,omInc,coc){
+  var r=coc/100;var results=[];
+  // salvageRate = % of value LOST by end of life; remaining at end of life = (1 - salvageRate/100)
+  var sv0=price*(1-(salvageRate||50)/100);var svDecline=Math.pow(sv0/price,1/life);
+  // Salvage at year n: price * (svDecline)^n
+  function salvageAtYear(n){return price*Math.pow(sv0/price,n/life);}
+  var om=buildOM(life,om1,omType,omInc);
+  for(var n=1;n<=life;n++){
+    var pvOM=0;for(var i=0;i<n;i++)pvOM+=om[i]/Math.pow(1+r,i+1);
+    var sv=salvageAtYear(n);
+    var pvSalv=sv/Math.pow(1+r,n);
+    var pv=price-pvSalv+pvOM;
+    var af=r>0?(1-Math.pow(1+r,-n))/r:n;
+    var eac=af>0?pv/af:0;
+    results.push({year:n,eac:eac,pv:pv,pvOM:pvOM,pvSalv:pvSalv,salv:sv,om:om[n-1]||0});
+  }
+  return results;
+}
+function calcAll(){
+  var price=+S.price,life=+S.life||1,age=+S.currentAge||0;
+  var svRate=+S.salvageRate||50,om1=+S.om1||0,coc=+S.coc||0;
+  var results=calcEAC(price,life,svRate,om1,S.omType,S.omInc,coc);
+  var optIdx=0;for(var i=1;i<results.length;i++)if(results[i].eac<results[optIdx].eac)optIdx=i;
+  var optYear=results[optIdx].year;
+  var optEAC=results[optIdx].eac;
+  var currentEAC=age>0&&age<=results.length?results[age-1].eac:null;
+  var status=age===0?"not yet owned":age<optYear?"before optimal — keep for now":age===optYear?"at optimal — good time to replace":"past optimal";
+  return{results:results,optYear:optYear,optEAC:optEAC,currentEAC:currentEAC,status:status,age:age};
+}
+
+function fmt(n,d){if(n==null||isNaN(n))return"--";d=d||0;return n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmtM(n){if(n==null||isNaN(n))return"--";var s=getSym();return n<0?"-"+s+fmt(Math.abs(n)):s+fmt(n)}
+function updateStepper(){for(var i=1;i<=2;i++){var step=document.getElementById("step"+i),sn=document.getElementById("sn"+i);step.className="step";if(i<S.page){step.classList.add("done");sn.textContent="✓"}else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}else sn.textContent=String(i);var n=i;(function(n,step){step.onclick=function(){if(n<S.page||(n===2&&S.res)){S.page=n;render()}}})(n,step);step.style.cursor=(i<S.page||(i===2&&S.res))?"pointer":"default";}}
+
+var NOTES=[
+  {q:"What does this model calculate?",a:"It finds the financially optimal time to replace your asset — the age at which the total annual cost of owning it is at its lowest. Keeping an asset beyond this point costs more per year than starting fresh with a new one would."},
+  {q:"What is equivalent annual cost?",a:"Equivalent annual cost (EAC) is the total cost of owning the asset for a given number of years, converted into a level annual payment. It combines the capital cost of the asset (purchase price less resale value) and the running costs (maintenance and repairs), adjusted for the time value of money. The year where EAC is lowest is the optimal replacement point."},
+  {q:"How do the asset class defaults work?",a:"Selecting an asset class pre-fills typical maintenance cost and escalation rate figures drawn from published industry data — AAA vehicle cost studies, ASHRAE equipment life tables, Consumer Reports reliability data. These are starting points you should review and adjust for your specific asset's condition and usage."},
+  {q:"What is the O&M escalation rate?",a:"Most assets cost more to maintain as they age. Percentage escalation means costs grow by that percentage each year. Flat (amount) escalation means costs increase by a fixed dollar amount each year. For most mechanical assets, percentage escalation is more realistic because repair costs accelerate as parts wear."},
+  {q:"What target return should I use?",a:"The return you could earn on the money tied up in the asset if you invested it elsewhere. Five to eight percent is a typical range for most households."}
+];
+var NOTES2=[
+  {q:"How do I read this chart?",a:"The bars show the equivalent annual cost for every possible holding period from year 1 to the asset's full life. The line connects these points to show the shape of the cost pattern — it falls as capital cost is spread over more years, then rises as maintenance costs take over. The trough of the line is the optimal replacement year, marked with a star. Bars to the left are before optimal; bars to the right are past it."},
+  {q:"What if I am past the optimal year?",a:"Being past the optimal year does not necessarily mean you should replace immediately. The relevant question is whether next year's EAC is higher or lower than this year's — if it is still lower, keep going. The cost curve table shows this year by year."},
+  {q:"How accurate are the default O&M figures?",a:"The defaults are based on industry averages and give a reasonable starting point. Your actual costs depend on how you use the asset, how well it has been maintained, and local labour and parts costs. If you have records of what you have spent on this asset, use your own numbers — they will give a more accurate result."}
+];
+function makeBNList(notes,id){var list=document.getElementById(id);if(!list)return;list.innerHTML="";notes.forEach(function(n,i){var item=document.createElement("div");item.className="bn-item";var head=document.createElement("div");head.className="bn-head";head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+id+i+'">›</div>';var body=document.createElement("div");body.className="bn-body";body.textContent=n.a;head.onclick=function(){var open=body.classList.contains("open");body.classList.toggle("open");document.getElementById("arr"+id+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";head.style.background=open?"":"var(--surface)";};item.appendChild(head);item.appendChild(body);list.appendChild(item);});}
+function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last?" last":"")+'"><div class="field-label">'+l+'</div>'+h+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';}
+function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--green)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
+
+function applyAssetClass(id){
+  if(!id)return;var a=ASSET_LIBRARY[id];if(!a||!a.life)return;
+  S.life=a.life;S.salvageRate=100-a.svRate;S.omType="pct";S.omInc=a.esc;
+  // om1 as percentage of price — will need price to compute absolute
+  if(S.price)S.om1=Math.round(+S.price*a.om1p/100);
+  render();
+}
+
+function goToResults(){
+  var missing=[];
+  if(!S.price)missing.push("Purchase price");if(!S.life)missing.push("Maximum useful life");
+  if(!S.om1)missing.push("Year 1 maintenance cost");if(!S.coc)missing.push("Target return");
+  if(missing.length>0){S.missingFields=missing;render();return;}
+  S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+}
+function resetInputs(){S.price="";S.life="";S.currentAge="";S.salvageRate="";S.om1="";S.omType="pct";S.omInc="";S.coc="";S.assetClass="";S.assetCategory="";S.missingFields=null;render();}
+function loadExample(){S.assetClass="eco-car";S.price=28000;S.life=8;S.currentAge=3;S.salvageRate=55;S.om1=1250;S.omType="pct";S.omInc=20;S.coc=6;S.missingFields=null;render();}
+
+function renderPage1(){
+  var sym=getSym();
+  var ac=S.assetClass?ASSET_LIBRARY[S.assetClass]:null;
+  // Build grouped select options
+  var groups={};Object.keys(ASSET_LIBRARY).forEach(function(k){var a=ASSET_LIBRARY[k];if(!a.group)return;if(!groups[a.group])groups[a.group]=[];groups[a.group].push({k:k,label:a.label});});
+  var selectHtml='<select class="asset-sel" onchange="S.assetClass=this.value;applyAssetClass(this.value)" id="asset-sel"><option value="">-- Select an asset type --</option>';
+  Object.keys(groups).forEach(function(g){selectHtml+='<optgroup label="'+g+'">';groups[g].forEach(function(o){selectHtml+='<option value="'+o.k+'"'+(S.assetClass===o.k?" selected":"")+'>'+o.label+'</option>';});selectHtml+='</optgroup>';});
+  selectHtml+='</select>';
+
+  var html='<div class="page"><div class="page-grid"><aside><div class="section-label">About this tool</div><div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div></aside><main>';
+
+  // Asset class selector
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:18px 20px;margin-bottom:18px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:14px">Every asset has a sweet spot — the age at which the total annual cost of owning it is at its lowest. Here is how we find it:</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:12px">';
+
+  html+='<div style="display:flex;gap:12px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:var(--amber);color:white;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:13px;color:var(--t2);line-height:1.6"><strong style="color:var(--amber-dark)">Too early, and capital cost dominates.</strong> If you replace the asset after just one year, its full purchase price (less what it is still worth) has to be recovered in that single year — an expensive way to own anything.</div></div>';
+
+  html+='<div style="display:flex;gap:12px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:var(--amber);color:white;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:13px;color:var(--t2);line-height:1.6"><strong style="color:var(--amber-dark)">Too late, and repair costs dominate.</strong> Keep it too long and rising maintenance and repair bills start to outweigh the savings from spreading the purchase price further.</div></div>';
+
+  html+='<div style="display:flex;gap:12px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:var(--amber);color:white;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:13px;color:var(--t2);line-height:1.6"><strong style="color:var(--amber-dark)">This model finds the balance.</strong> It calculates the <strong>equivalent annual cost</strong> — the total cost per year — for every possible holding period, and shows you exactly where that sweet spot falls for your asset.</div></div>';
+
+  html+='<div style="display:flex;gap:12px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:var(--amber);color:white;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div><div style="font-size:13px;color:var(--t2);line-height:1.6"><strong style="color:var(--amber-dark)">If you already own the asset,</strong> it tells you where you currently sit on the curve and whether it still makes sense to keep it.</div></div>';
+
+  html+='</div>';
+  html+='<div style="font-size:12px;color:var(--amber-dark);font-weight:600;margin-top:14px;padding-top:14px;border-top:1px solid rgba(245,158,11,0.3)">Select an asset type below to load typical maintenance cost defaults, or enter your own figures.</div>';
+  html+='</div>';
+  // ── VISUAL CATEGORY TILES ─────────────────────────────────────────────
+  var CATEGORIES=[
+    {id:'Vehicles',icon:'🚗',label:'Vehicles',desc:'Cars, trucks, motorcycles'},
+    {id:'Recreational',icon:'⛵',label:'Recreational',desc:'Boats, RVs'},
+    {id:'Home & Appliances',icon:'🏠',label:'Home & Appliances',desc:'HVAC, solar, appliances'},
+    {id:'Tools & Equipment',icon:'🔧',label:'Tools & Equipment',desc:'Mowers, generators, tools'}
+  ];
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset type — loads typical defaults</div></div>';
+  html+='<div style="padding:16px 18px">';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">';
+  CATEGORIES.forEach(function(cat){
+    var isActive=S.assetCategory===cat.id;
+    html+='<button onclick="S.assetCategory=S.assetCategory===\''+cat.id+'\'?\'\':'+"'"+cat.id+"'"+'  ;render()" style="display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:12px 14px;border-radius:10px;border:2px solid '+(isActive?'var(--green)':'var(--border)')+';background:'+(isActive?'var(--green-soft)':'white')+';cursor:pointer;text-align:left;transition:border-color .15s">';
+    html+='<div style="font-size:22px;line-height:1">'+cat.icon+'</div>';
+    html+='<div style="font-size:12px;font-weight:700;color:'+(isActive?'var(--green)':'var(--t1)')+'">'+cat.label+'</div>';
+    html+='<div style="font-size:10px;color:var(--t3)">'+cat.desc+'</div>';
+    html+='</button>';
+  });
+  html+='</div>';
+  if(S.assetCategory){
+    var catAssets=Object.keys(ASSET_LIBRARY).filter(function(k){return ASSET_LIBRARY[k].group===S.assetCategory;});
+    html+='<div style="display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px;background:var(--surface);border-radius:8px;margin-bottom:8px">';
+    catAssets.forEach(function(k){
+      var isSelected=S.assetClass===k;
+      html+='<button onclick="S.assetClass=\''+k+'\';applyAssetClass(\''+k+'\')" style="padding:6px 12px;border-radius:20px;border:1.5px solid '+(isSelected?'var(--green)':'var(--border)')+';background:'+(isSelected?'var(--green-soft)':'white')+';font-size:12px;font-weight:'+(isSelected?'700':'500')+';color:'+(isSelected?'var(--green)':'var(--t2)')+';cursor:pointer">'+ASSET_LIBRARY[k].label+'</button>';
+    });
+    html+='</div>';
+  }
+  if(ac&&ac.note)html+='<div style="font-size:11px;color:var(--t3);margin-top:6px;line-height:1.6">📊 '+ac.note+'</div>';
+  html+='</div></div>';
+
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">About the Asset</div></div><div class="field-grid">';
+  html+=field("Purchase price",uIn(sym,S.price,"inp-price","S.price=+this.value||0;if(S.assetClass){var a=ASSET_LIBRARY[S.assetClass];if(a&&a.om1p)S.om1=Math.round(+S.price*a.om1p/100);}render()","",false),false,false,"The original price paid — or today's price if you are evaluating a future purchase");
+  html+=field("Maximum useful life",uIn("",S.life,"inp-life","S.life=+this.value||0","years",false),false,false,"The longest you would realistically keep this asset");
+  html+=field("Current age",uIn("",S.currentAge,"inp-age","S.currentAge=+this.value||0","years",false),false,true,"How old is it now? Enter 0 if you are evaluating a new purchase");
+  html+='</div></div>';
+
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Maintenance Costs</div></div><div class="field-grid">';
+  html+=field("Year 1 maintenance cost",uIn(sym,S.om1,"inp-om1","S.om1=+this.value||0","",false),false,false,"Annual maintenance, servicing, and repairs in year 1");
+  html+=field("Cost increase each year",'<div class="ui"><select id="omt-sel" onchange="S.omType=this.value;render()"><option value="pct"'+(S.omType==="pct"?" selected":"")+'>% increase per year</option><option value="amt"'+(S.omType==="amt"?" selected":"")+'>Fixed amount per year</option></select></div>');
+  html+=field("Annual increase",uIn("",S.omInc,"inp-ominc","S.omInc=+this.value||0",S.omType==="pct"?"%":sym,false),false,true,"Maintenance costs typically rise as assets age — "+( S.omType==="pct"?"15-20% is common for vehicles and HVAC":"enter the additional amount added each year"));
+  html+='</div></div>';
+
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Value & Return</div></div><div class="field-grid">';
+  html+=field("Resale value decline",uIn("",S.salvageRate,"inp-sv","S.salvageRate=+this.value||0","%",false),false,false,"How much of the purchase price is lost by end of life — e.g. 55 means 55% lost, 45% recovered");
+  html+=field("Target return on your money",uIn("",S.coc,"inp-coc","S.coc=+this.value||0","%",false),false,true,"5-8% is typical");
+  html+='</div></div>';
+
+  if(S.missingFields&&S.missingFields.length>0)html+='<div style="background:var(--warn-soft);border:1.5px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)"><strong>Please fill in:</strong> '+S.missingFields.join(", ")+'.</div>';
+  html+='<div class="action-row" style="justify-content:space-between;align-items:center"><span style="font-size:11.5px;color:var(--t3)">New here? Try <strong style="color:var(--t2)">Load Example</strong></span><div style="display:flex;gap:10px"><button class="btn-ghost" onclick="loadExample()">Load Example</button><button class="btn-ghost" onclick="resetInputs()">Reset</button><button class="btn-primary" onclick="goToResults()">See my results ›</button></div></div>';
+  html+='</main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES,"bn-list1");
+  var as=document.getElementById("asset-sel");if(as)as.value=S.assetClass||"";
+  var ots=document.getElementById("omt-sel");if(ots)ots.value=S.omType;
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+}
+
+function renderPage2(){
+  var res=S.res,sym=getSym();var age=+S.currentAge;
+  var isPast=age>0&&age>res.optYear;var isAt=age>0&&age===res.optYear;var isBefore=age>0&&age<res.optYear;
+  var bannerClass=isPast?"warn":isAt?"good":"neutral";
+  var html='<div class="page"><div class="p2-grid"><aside><div class="section-label">Understanding your results</div><div class="panel" style="margin-bottom:14px"><div id="bn-list2"></div></div><div style="display:flex;flex-direction:column;gap:10px"><button class="btn-ghost" onclick="S.page=1;render()">‹ Change my numbers</button><button class="print-btn" onclick="printSummary()">🖶 Print</button></div></aside><main>';
+
+  // Banner
+  html+='<div class="result-banner '+bannerClass+'">';
+  html+='<div><div style="font-family:Georgia,serif;font-size:22px;color:'+(isPast?"var(--warn)":isAt?"var(--green)":"var(--blue)")+';line-height:1.3">';
+  if(age===0)html+='The optimal replacement year is <strong>year '+res.optYear+'</strong>.';
+  else if(isPast)html+='You are past the optimal replacement year.';
+  else if(isAt)html+='Now is the optimal time to replace.';
+  else html+='Keep it for '+( res.optYear-age)+' more year'+(res.optYear-age>1?"s":"")+'.';
+  html+='</div><div style="font-size:13px;color:var(--t2);margin-top:8px;line-height:1.6">';
+  if(age===0)html+='At year '+res.optYear+', the equivalent annual cost is minimised at <strong>'+fmtM(res.optEAC)+'/year</strong>.';
+  else if(isPast)html+='The optimal was year '+res.optYear+' ('+fmtM(res.optEAC)+'/yr). Current age '+age+' costs <strong>'+fmtM(res.currentEAC)+'/yr</strong> — '+fmtM(res.currentEAC-res.optEAC)+' more per year than the optimal point.';
+  else if(isAt)html+='The equivalent annual cost of <strong>'+fmtM(res.optEAC)+'/year</strong> is at its lowest now. Replacing soon minimises your total annual cost.';
+  else html+='Annual costs continue to fall until year '+res.optYear+' (<strong>'+fmtM(res.optEAC)+'/yr</strong>). Your current cost is '+fmtM(res.currentEAC)+'/yr.';
+  html+='</div></div>';
+  html+='<div class="result-box" style="background:'+(isPast?"var(--warn)":isAt?"var(--green)":"var(--blue)")+'"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.75)">Optimal year</div><div style="font-family:monospace;font-size:36px;font-weight:800;color:white;margin-top:4px">'+res.optYear+'</div><div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">'+fmtM(res.optEAC)+'/yr</div></div></div>';
+
+  // Metrics
+  html+='<div class="metrics">';
+  html+='<div class="metric"><div class="metric-label">Optimal year</div><div class="metric-val good">Year '+res.optYear+'</div><div class="metric-sub">Lowest equivalent annual cost</div></div>';
+  html+='<div class="metric"><div class="metric-label">Minimum annual cost</div><div class="metric-val good">'+fmtM(res.optEAC)+'</div><div class="metric-sub">Capital + maintenance per year at optimal</div></div>';
+  if(age>0)html+='<div class="metric"><div class="metric-label">Your current annual cost</div><div class="metric-val '+(isPast?"warn":"")+'">'+fmtM(res.currentEAC)+'</div><div class="metric-sub">At current age of '+age+' year'+(age>1?"s":"")+'</div></div>';
+  else html+='<div class="metric"><div class="metric-label">Cost at year 1</div><div class="metric-val">'+fmtM(res.results[0].eac)+'</div><div class="metric-sub">Equivalent annual cost if replaced after 1 year</div></div>';
+  html+='</div>';
+
+  // Cost curve visual
+  html+='<div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:18px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:10px">Equivalent Annual Cost by Replacement Year</div>';
+  html+='<canvas id="eac-chart" width="700" height="260" style="width:100%;height:auto;display:block;border-radius:6px"></canvas>';
+  html+='<div style="display:flex;gap:16px;margin-top:10px;font-size:11px;color:var(--t3);flex-wrap:wrap">';
+  html+='<span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--green);display:inline-block"></span>Optimal year</span>';
+  html+='<span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#F59E0B;display:inline-block"></span>Slightly past</span>';
+  html+='<span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#E88A8A;display:inline-block"></span>Well past</span>';
+  html+='<span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:3px;background:#1B3F6E;display:inline-block;border-radius:2px"></span>Cost curve</span>';
+  html+='<span style="display:flex;align-items:center;gap:5px">◀ Your current age</span>';
+  html+='</div>';
+
+  // Detailed table
+  html+='<div class="collapsible"><div class="coll-head" onclick="S.show_table=!S.show_table;renderPage2()"><span class="coll-title">Year-by-year cost detail</span><span class="coll-arr" style="transform:'+(S.show_table?'rotate(90deg)':'rotate(0deg)')+'" >›</span></div>';
+  if(S.show_table){
+    html+='<div class="coll-body open" style="padding:4px 0"><table><thead><tr><th class="left">Year</th><th>Maintenance</th><th>Resale value</th><th>Equiv. annual cost</th></tr></thead><tbody>';
+    res.results.forEach(function(r){
+      var isOpt=r.year===res.optYear;var isCur=r.year===age;
+      html+='<tr'+(isOpt||isCur?' class="highlight"':'')+'><td class="left">'+(isOpt?"★ ":"")+(isCur?"◀ ":"")+'Year '+r.year+'</td><td>'+fmtM(r.om)+'</td><td>'+fmtM(r.salv)+'</td><td style="font-weight:'+(isOpt?"700":"400")+';color:'+(isOpt?"var(--green)":"inherit")+'">'+fmtM(r.eac)+'/yr</td></tr>';
+    });
+    html+='</tbody></table></div></div>';
+  }
+  html+='</div></main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  setTimeout(function(){drawEACChart('eac-chart',res.results,res.optYear,(S.currentAge?+S.currentAge:0));},50);
+  makeBNList(NOTES2,"bn-list2");
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+}
+function printSummary(){var pd=S.show_table;S.show_table=true;renderPage2();setTimeout(function(){window.print();S.show_table=pd;renderPage2();},300);}
+
+function drawEACChart(canvasId, results, optYear, currentAge) {
+  var canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var pad = {top:24, bottom:44, left:72, right:20};
+  var cw = W - pad.left - pad.right, ch = H - pad.top - pad.bottom;
+  ctx.clearRect(0, 0, W, H);
+
+  var eacs = results.map(function(r){return r.eac;});
+  var minV = Math.min.apply(null, eacs), maxV = Math.max.apply(null, eacs);
+  var rng = maxV - minV || maxV * 0.2;
+  var lo = minV - rng * 0.1, hi = maxV + rng * 0.18;
+
+  // Grid lines
+  for (var i = 0; i <= 4; i++) {
+    var y = pad.top + ch * (1 - i/4);
+    var v = lo + (hi - lo) * (i/4);
+    ctx.strokeStyle = '#E8EEF4'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cw, y); ctx.stroke();
+    ctx.fillStyle = '#8A96A6'; ctx.font = '10px system-ui'; ctx.textAlign = 'right';
+    ctx.fillText('$' + (Math.abs(v) >= 1000 ? (v/1000).toFixed(0)+'k' : v.toFixed(0)), pad.left - 4, y + 3);
+  }
+
+  var n = results.length;
+  var gap = cw / n;
+  var bw = Math.floor(gap * 0.55);
+
+  // Bars
+  results.forEach(function(r, i) {
+    var isOpt = r.year === optYear;
+    var isCur = r.year === currentAge;
+    var color = isOpt ? '#2E7D52' : r.year > optYear ? (r.eac > eacs[optYear-1]*1.15 ? '#E88A8A' : '#F59E0B') : '#93C8A8';
+    var bh = Math.max(2, (r.eac - lo) / (hi - lo) * ch);
+    var bx = pad.left + gap * i + (gap - bw) / 2;
+    var by = pad.top + ch - bh;
+    ctx.fillStyle = color;
+    ctx.fillRect(bx, by, bw, bh);
+    // Year label
+    ctx.fillStyle = isOpt ? '#2E7D52' : isCur ? '#1B3F6E' : '#8A96A6';
+    ctx.font = (isOpt || isCur ? 'bold ' : '') + '10px system-ui';
+    ctx.textAlign = 'center';
+    var label = 'Yr' + r.year + (isOpt ? ' ★' : '') + (isCur ? ' ◀' : '');
+    ctx.fillText(label, bx + bw/2, H - pad.bottom + 13);
+  });
+
+  // Line overlay
+  ctx.beginPath();
+  ctx.strokeStyle = '#1B3F6E';
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  results.forEach(function(r, i) {
+    var x = pad.left + gap * i + gap / 2;
+    var y = pad.top + ch - (r.eac - lo) / (hi - lo) * ch;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Dots on line + store positions for tooltip
+  var dotPositions = [];
+  results.forEach(function(r, i) {
+    var x = pad.left + gap * i + gap / 2;
+    var y = pad.top + ch - (r.eac - lo) / (hi - lo) * ch;
+    var isOpt = r.year === optYear;
+    ctx.beginPath();
+    ctx.arc(x, y, isOpt ? 5 : 3, 0, Math.PI * 2);
+    ctx.fillStyle = isOpt ? '#2E7D52' : '#1B3F6E';
+    ctx.fill();
+    ctx.strokeStyle = 'white'; ctx.lineWidth = 1.5;
+    ctx.stroke();
+    dotPositions.push({x:x, y:y, year:r.year, eac:r.eac, isOpt:isOpt});
+  });
+
+  // Tooltip on mousemove near dots
+  var par = canvas.parentNode;
+  var oldTip = par.querySelector('.eac-tip');
+  if (oldTip) oldTip.remove();
+  var tip = document.createElement('div');
+  tip.className = 'eac-tip';
+  tip.style.cssText = 'position:absolute;pointer-events:none;background:rgba(15,29,46,.88);color:white;font-size:11px;font-weight:600;padding:5px 10px;border-radius:5px;white-space:nowrap;display:none;z-index:99;transform:translateX(-50%)';
+  par.style.position = 'relative';
+  par.appendChild(tip);
+  canvas.style.cursor = 'crosshair';
+  canvas.onmousemove = function(e) {
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = canvas.width / rect.width;
+    var scaleY = canvas.height / rect.height;
+    var mx = (e.clientX - rect.left) * scaleX;
+    var my = (e.clientY - rect.top) * scaleY;
+    var hit = null;
+    dotPositions.forEach(function(d) {
+      var dist = Math.sqrt((mx-d.x)*(mx-d.x) + (my-d.y)*(my-d.y));
+      if (dist < 18) hit = d;
+    });
+    if (hit) {
+      tip.textContent = 'Year ' + hit.year + (hit.isOpt ? ' ★ Optimal' : '') + ': $' + Math.round(hit.eac).toLocaleString() + '/yr';
+      tip.style.left = (hit.x / canvas.width * 100).toFixed(1) + '%';
+      tip.style.top = Math.max(4, (hit.y / canvas.height * 100 - 8)).toFixed(1) + '%';
+      tip.style.display = 'block';
+    } else {
+      tip.style.display = 'none';
+    }
+  };
+  canvas.onmouseleave = function() { tip.style.display = 'none'; };
+}
+
+function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();var cl=document.getElementById("cur-label");if(cl)cl.textContent=getSym()+" "+S.currency;}
+render();
+</script></body></html>
