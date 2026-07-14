@@ -110,8 +110,7 @@ var CURRENCIES=[{code:"USD",symbol:"$",label:"US Dollar"},{code:"EUR",symbol:"�
 function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
 
 var S={
-  page:1,currency:"USD",cur_open:false,mode:"business",
-  coc_open:false,coc_mode:"wacc",coc_kd:6,coc_ke:12,coc_wd:40,coc_rf:4.5,coc_beta:1.0,coc_mrp:5.5,
+  page:1,currency:"USD",cur_open:false,  coc_open:false,coc_mode:"wacc",coc_kd:6,coc_ke:12,coc_wd:40,coc_rf:4.5,coc_beta:1.0,coc_mrp:5.5,
   res:null,show_dcf:false,show_coc_sens:false,show_ben_sens:false,missingFields:null,
   bw_open:false,bw_type:"cost_saving",bw_current:"",bw_improvement:"",
   benefits:"",life:"",svPct:"",method:"Double-declining",hyr:true,ddbRate:"",
@@ -129,19 +128,18 @@ function calcDeprFactors(life,method,hyr,ddbRate){
   var d=[];
   if(method==="Double-declining"){var rate=ddbRate/100;d.push(rate*(hyr?0.5:1));for(var y=2;y<=life;y++)d.push((1-d.reduce(function(s,v){return s+v},0))*rate);}
   else if(method==="Straight-line"){var y1=1/life*(hyr?0.5:1);d.push(y1);for(var y=2;y<=life;y++)d.push(hyr?(1-y1)/(life-1):1/life);}
-  else{var y1=hyr?1/(life+1):2/(life+1);d.push(y1);if(hyr)for(var y=2;y<=life;y++)d.push(2*(life-y+1)/((life+1)*(life-1)));else for(var y=2;y<=life;y++)d.push((life-y+1)*2/(life*(life+1)));}
   return d;
 }
 
-function calcMaxPrice(benefits,life,svPct,method,hyr,ddbRate,taxRate,coc,isConsumer){
-  var tx=isConsumer?0:taxRate/100, r=coc/100;
+function calcMaxPrice(benefits,life,svPct,method,hyr,ddbRate,taxRate,coc){
+  var tx=taxRate/100, r=coc/100;
   var pvBen=benefits*(1-tx)*((1-Math.pow(1+r,-life))/r);
   var pvTSfactor=0;
-  if(!isConsumer){
+  {
     var df=calcDeprFactors(life,method,hyr,ddbRate);
     pvTSfactor=df.reduce(function(s,d,i){return s+d*tx/Math.pow(1+r,i+1)},0);
   }
-  var pvSalvFactor=(svPct/100)*(1-(isConsumer?0:tx))/Math.pow(1+r,life);
+  var pvSalvFactor=(svPct/100)*(1-tx)/Math.pow(1+r,life);
   var denom=1-pvTSfactor-pvSalvFactor;
   var maxPrice=denom>0?pvBen/denom:0;
 
@@ -150,7 +148,7 @@ function calcMaxPrice(benefits,life,svPct,method,hyr,ddbRate,taxRate,coc,isConsu
     var r2=(coc+delta)/100;if(r2<=0)return{coc:coc+delta,price:0};
     var pvB2=benefits*(1-tx)*((1-Math.pow(1+r2,-life))/r2);
     var pvTS2=0;
-    if(!isConsumer){var df2=calcDeprFactors(life,method,hyr,ddbRate);pvTS2=df2.reduce(function(s,d,i){return s+d*tx/Math.pow(1+r2,i+1)},0);}
+    var df2=calcDeprFactors(life,method,hyr,ddbRate);pvTS2=df2.reduce(function(s,d,i){return s+d*tx/Math.pow(1+r2,i+1)},0);
     var pvS2=(svPct/100)*(1-tx)/Math.pow(1+r2,life);
     var d2=1-pvTS2-pvS2;
     return{coc:coc+delta,price:d2>0?pvB2/d2:0};
@@ -173,7 +171,7 @@ function calcMaxPrice(benefits,life,svPct,method,hyr,ddbRate,taxRate,coc,isConsu
 }
 
 function calcAll(){
-  return calcMaxPrice(+S.benefits||0,+S.life||1,+S.svPct||0,S.method,S.hyr,+S.ddbRate,+S.taxRate||0,+S.coc||0,S.mode==="consumer");
+  return calcMaxPrice(+S.benefits||0,+S.life||1,+S.svPct||0,S.method,S.hyr,+S.ddbRate,+S.taxRate||0,+S.coc||0);
 }
 
 function fmt(n,d){if(n==null||isNaN(n))return"--";d=d||0;return n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
@@ -207,7 +205,6 @@ function renderCoC(){
   [{k:"wacc",n:"WACC",s:"Borrowing rate"},{k:"capm",n:"CAPM",s:"Market risk"}].forEach(function(t){html+='<button onclick="S.coc_mode=\''+t.k+'\';renderCoC()" style="flex:1;padding:8px 10px;border-radius:7px;border:1.5px solid '+(S.coc_mode===t.k?"var(--blue)":"var(--border)")+';background:'+(S.coc_mode===t.k?"var(--blue-soft)":"transparent")+';cursor:pointer;text-align:left"><div style="font-size:12px;font-weight:700;color:'+(S.coc_mode===t.k?"var(--blue)":"var(--t2)")+'">'+t.n+'</div><div style="font-size:10px;color:var(--t3)">'+t.s+'</div></button>';});
   html+='</div><div style="padding:14px">';
   if(S.coc_mode==="wacc"){html+=cR("Cost of Debt (pre-tax)","coc_kd",S.coc_kd,"%");html+=cR("Cost of Equity","coc_ke",S.coc_ke,"%");html+=cR("Debt Weighting","coc_wd",S.coc_wd,"%");html+='<div style="background:var(--surface);border-radius:5px;padding:8px 10px;font-size:11px">WACC = <strong style="color:var(--green)">'+wacc+'%</strong></div>';}
-  else{html+=cR("Risk-Free Rate","coc_rf",S.coc_rf,"%");html+=cR("Beta","coc_beta",S.coc_beta,"");html+=cR("Market Risk Premium","coc_mrp",S.coc_mrp,"%");html+='<div style="background:var(--surface);border-radius:5px;padding:8px 10px;font-size:11px">Ke = '+capm+'%</div>';}
   html+='<div style="margin-top:12px;padding:10px 14px;background:var(--green-soft);border-radius:8px;border:1px solid var(--green);display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--green)">Calculated Rate</div><div style="font-family:monospace;font-size:22px;font-weight:700;color:var(--green)">'+result+'%</div></div><button onclick="S.coc='+result+';renderCoC();var el=document.getElementById(\'inp-coc\');if(el)el.value='+result+'" style="background:var(--green);color:white;border:none;border-radius:7px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer">Use this rate →</button></div></div></div>';
   box.innerHTML=html;
 }
@@ -217,19 +214,16 @@ function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last
 function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--blue)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
 
 function goToResults(){
-  var missing=[];var isC=S.mode==="consumer";
-  if(!S.benefits&&S.benefits!==0)missing.push("Annual Benefits");if(!S.life)missing.push("Economic Life");
+  var missing=[];  if(!S.benefits&&S.benefits!==0)missing.push("Annual Benefits");if(!S.life)missing.push("Economic Life");
   if(!S.svPct&&S.svPct!==0)missing.push("Salvage Value %");
-  if(!isC&&S.method==="Double-declining"&&!S.ddbRate)missing.push("Depreciation Rate");
-  if(!isC&&!S.taxRate)missing.push("Tax Rate");if(!S.coc)missing.push("Required Return");
+  if(S.method==="Double-declining"&&!S.ddbRate)missing.push("Depreciation Rate");
+  if(!S.taxRate)missing.push("Tax Rate");if(!S.coc)missing.push("Required Return");
   if(missing.length>0){S.missingFields=missing;render();return;}
   S.missingFields=null;try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
 }
 function resetInputs(){S.benefits="";S.life="";S.svPct="";S.method="Double-declining";S.hyr=true;S.ddbRate="";S.taxRate="";S.coc="";S.missingFields=null;S.bw_open=false;S.bw_current="";S.bw_improvement="";render();}
 function loadExample(){
-  var isC=S.mode==="consumer";
-  if(!isC){S.benefits=20000;S.life=10;S.svPct=10;S.method="Double-declining";S.hyr=true;S.ddbRate=20;S.taxRate=30;S.coc=12;}
-  else{S.benefits=6000;S.life=5;S.svPct=20;S.method="Straight-line";S.hyr=false;S.ddbRate=0;S.taxRate=0;S.coc=6;}
+    S.benefits=20000;S.life=10;S.svPct=10;S.method="Double-declining";S.hyr=true;S.ddbRate=20;S.taxRate=30;S.coc=12;
   S.missingFields=null;render();
 }
 
@@ -247,13 +241,12 @@ function drawChart(canvasId,data,current){
 }
 
 function renderPage1(){
-  var sym=getSym(),isDDB=S.method==="Double-declining",isC=S.mode==="consumer";
+  var sym=getSym(),isDDB=S.method==="Double-declining";
   var html='<div class="page"><div class="page-grid"><aside>';
   html+='<div class="section-label">Briefing Notes</div><div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div>';
   html+='<div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div>';
   html+='</aside><main>';
-  html+='<div class="mode-toggle"><button class="mode-btn'+(S.mode==="business"?" active":"")+'" onclick="S.mode=\'business\';resetInputs()">🏢 Business</button><button class="mode-btn'+(S.mode==="consumer"?" active":"")+'" onclick="S.mode=\'consumer\';resetInputs()">🏠 Personal / Consumer</button></div>';
-
+  
   // Benefit wizard
   html+='<div class="helper-card"><div class="helper-head" onclick="S.bw_open=!S.bw_open;render()"><span class="helper-icon">💡</span><span class="helper-title">Help me estimate annual benefits</span><span class="helper-toggle">'+(S.bw_open?'▲ hide':'▼ show')+'</span></div>';
   if(S.bw_open){
@@ -280,7 +273,7 @@ function renderPage1(){
   html+=field("Salvage Value (% of purchase price)",uIn("",S.svPct,"inp-sv","S.svPct=+this.value||0","%",false),false,true,"Enter as a percentage — e.g. 10 means 10% of whatever you pay");
   html+='</div></div>';
 
-  if(!isC){
+  {
     html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--green)"></div><div class="panel-title">Depreciation</div></div><div class="field-grid">';
     html+=field("Method",'<div class="ui"><select onchange="S.method=this.value;render()">'+["Double-declining","Straight-line","Sum-of-years-digits"].map(function(m){return'<option'+(m===S.method?" selected":"")+'>'+m+'</option>'}).join("")+'</select></div>');
     html+=field(isDDB?"Rate":"Rate — N/A",uIn("",isDDB?S.ddbRate:"N/A","inp-rate","if(S.method===\'Double-declining\')S.ddbRate=+this.value||0","%",!isDDB)+(!isDDB?'<div class="field-note">Defined by method formula</div>':""));
@@ -288,8 +281,8 @@ function renderPage1(){
     html+='</div></div>';
   }
 
-  html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--t3)"></div><div class="panel-title">'+(isC?"Financial Data":"Firm Data")+'</div></div><div class="field-grid">';
-  if(!isC)html+=field("Tax Rate",uIn("",S.taxRate,"inp-tax","S.taxRate=+this.value||0","%",false));
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--t3)"></div><div class="panel-title">'+("Firm Data")+'</div></div><div class="field-grid">';
+  html+=field("Tax Rate",uIn("",S.taxRate,"inp-tax","S.taxRate=+this.value||0","%",false));
   html+=field("Required Rate of Return",uIn("",S.coc,"inp-coc","S.coc=+this.value||0","%",false),false,true);
   html+='</div></div>';
 
@@ -297,13 +290,13 @@ function renderPage1(){
   html+='<div class="action-row" style="justify-content:space-between;align-items:center"><span style="font-size:11.5px;color:var(--t3)">New here? Try <strong style="color:var(--t2)">Load Example</strong></span><div style="display:flex;gap:10px"><button class="btn-ghost" onclick="loadExample()">Load Example</button><button class="btn-ghost" onclick="resetInputs()">Reset</button><button class="btn-primary" onclick="goToResults()">Calculate ›</button></div></div>';
   html+='</main></div></div>';
   document.getElementById("main-content").innerHTML=html;
-  makeBNList(S.mode==="consumer"?NOTES_CON:NOTES_BUS,"bn-list1");
+  makeBNList(NOTES_BUS,"bn-list1");
   renderCoC();
   document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
 }
 
 function renderPage2(){
-  var res=S.res,sym=getSym(),isC=S.mode==="consumer";
+  var res=S.res,sym=getSym();
   var html='<div class="page"><div class="p2-grid"><aside>';
   html+='<div class="section-label">Understanding Results</div><div class="panel" style="margin-bottom:14px"><div id="bn-list2"></div></div>';
   html+='<div style="display:flex;flex-direction:column;gap:10px"><button class="btn-ghost" onclick="S.page=1;render()">‹ Edit Inputs</button><button class="print-btn" onclick="printSummary()">🖶 Print Summary</button></div>';
@@ -356,16 +349,16 @@ function renderPage2(){
     html+='<div class="coll-body open"><div style="padding:12px 18px;font-size:12px;color:var(--t2)">At the maximum price of '+fmtM(res.maxPrice)+', NPV = 0. Every dollar less generates positive NPV.</div>';
     html+='<table><tbody>';
     html+='<tr class="total-row"><td class="left" colspan="2">Inflows at Maximum Price (P)</td><td>'+fmtM(res.pvBen+res.pvTSfactor*res.maxPrice+res.pvSalvFactor*res.maxPrice)+'</td></tr>';
-    html+='<tr><td class="left">PV of benefits ('+(isC?"":"AT ")+'annuity)</td><td class="sub">Years 1–'+S.life+'</td><td>'+fmtM(res.pvBen)+'</td></tr>';
-    if(!isC)html+='<tr><td class="left">PV of depreciation tax shields</td><td class="sub">Years 1–'+S.life+'</td><td>'+fmtM(res.pvTSfactor*res.maxPrice)+'</td></tr>';
-    html+='<tr><td class="left">PV of '+(isC?"":"AT ")+'salvage value ('+S.svPct+'% of P)</td><td class="sub">Year '+S.life+'</td><td>'+fmtM(res.pvSalvFactor*res.maxPrice)+'</td></tr>';
+    html+='<tr><td class="left">PV of benefits ('+("AT ")+'annuity)</td><td class="sub">Years 1–'+S.life+'</td><td>'+fmtM(res.pvBen)+'</td></tr>';
+    html+='<tr><td class="left">PV of depreciation tax shields</td><td class="sub">Years 1–'+S.life+'</td><td>'+fmtM(res.pvTSfactor*res.maxPrice)+'</td></tr>';
+    html+='<tr><td class="left">PV of '+("AT ")+'salvage value ('+S.svPct+'% of P)</td><td class="sub">Year '+S.life+'</td><td>'+fmtM(res.pvSalvFactor*res.maxPrice)+'</td></tr>';
     html+='<tr class="total-row" style="border-top:2px solid var(--blue)"><td class="left" colspan="2">Maximum Purchase Price (= Total PV Inflows)</td><td style="color:var(--green);font-size:15px;font-weight:800">'+fmtM(res.maxPrice)+'</td></tr>';
     html+='</tbody></table></div>';
   }
   html+='</div>';
   html+='</main></div></div>';
   document.getElementById("main-content").innerHTML=html;
-  makeBNList(S.mode==="consumer"?NOTES_CON:NOTES_BUS,"bn-list2");
+  makeBNList(NOTES_BUS,"bn-list2");
   setTimeout(function(){drawChart("price-chart",res.cocSens,+S.coc)},50);
   document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
 }

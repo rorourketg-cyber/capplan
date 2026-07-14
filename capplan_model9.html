@@ -160,11 +160,10 @@ function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency})
 
 var S={
   page:1,currency:"USD",cur_open:false,
-  mode:"business", // "business" or "consumer"
   coc_open:false,coc_mode:"wacc",coc_kd:6,coc_ke:12,coc_wd:40,
   coc_rf:4.5,coc_beta:1.0,coc_mrp:5.5,
   res:null,show_purchase_dcf:false,show_lease_dcf:false,show_pmt_sens:false,
-  missingFields:null,consumer_choosing_lease:false,
+  missingFields:null,
   // inputs — blank by default
   price:"",itcPct:"",life:"",salvage:"",
   method:"Double-declining",hyr:true,ddbRate:"",
@@ -205,12 +204,7 @@ function calcDepr(price,itcPct,life,method,hyr,ddbRate){
   return d;
 }
 
-function calcPVPurchase(price,itcPct,life,method,hyr,ddbRate,salvage,taxRate,atBorrow,roi,isConsumer){
-  if(isConsumer){
-    // Consumer: no tax benefits, single discount rate
-    var r=atBorrow/100;
-    return price - salvage/Math.pow(1+r,life);
-  }
+function calcPVPurchase(price,itcPct,life,method,hyr,ddbRate,salvage,taxRate,atBorrow,roi){
   var tx=taxRate/100,r=atBorrow/100,r2=roi/100;
   var itc=price*itcPct/100;
   var depr=calcDepr(price,itcPct,life,method,hyr,ddbRate);
@@ -221,10 +215,8 @@ function calcPVPurchase(price,itcPct,life,method,hyr,ddbRate,salvage,taxRate,atB
   return price-pvITC-pvTS-pvSalv+pvLoss;
 }
 
-function calcPVLease(term,deposit,depositAmt,leasePmt,freq,taxRate,atBorrowPct,isConsumer){
-  // leasePmt = payment per period (e.g. per month if freq=12)
-  // atBorrowPct = after-tax annual borrowing rate as percentage
-  var tx=isConsumer?0:taxRate/100;
+function calcPVLease(term,deposit,depositAmt,leasePmt,freq,taxRate,atBorrowPct){
+  var tx=taxRate/100;
   var rAnn=atBorrowPct/100;  // annual AT rate
   var rp=Math.pow(1+rAnn,1/freq)-1;  // effective periodic rate
   var totalN=term*freq;
@@ -260,9 +252,9 @@ function calcImpliedRate(price,depositAmt,leasePmt,freq,term,hasDep,salvage){
   return(Math.pow(1+mid,freq)-1)*100;
 }
 
-function calcBreakEvenPmt(pvPurchase,freq,term,deposit,depositAmt,taxRate,atBorrowPct,isConsumer){
+function calcBreakEvenPmt(pvPurchase,freq,term,deposit,depositAmt,taxRate,atBorrowPct){
   // Returns break-even payment PER PERIOD
-  var tx=isConsumer?0:taxRate/100;
+  var tx=false?0:taxRate/100;
   var rAnn=atBorrowPct/100;
   var rp=Math.pow(1+rAnn,1/freq)-1;
   var totalN=term*freq;
@@ -281,14 +273,13 @@ function calcAll(){
   var roi=+S.roi,term=+S.term||life;
   var depAmt=S.deposit?(+S.depositAmt||0):0;
   var pmt=+S.leasePmt;
-  var isConsumer=S.mode==="consumer";
-  var atBorrow=isConsumer?borrow:borrow*(1-tx);
+    var atBorrow=borrow*(1-tx);
   // Note: atBorrow is percentage for consumer (raw rate), business uses after-tax
 
-  var atBorrowPct=isConsumer?borrow:borrow*(1-tx);
+  var atBorrowPct=borrow*(1-tx);
   var pvPurch=calcPVPurchase(price,itcPct,life,S.method,S.hyr,ddbRate,salvage,+S.taxRate,
-                              atBorrowPct,roi,isConsumer);
-  var pvLease=calcPVLease(term,S.deposit,depAmt,pmt,+S.freq,+S.taxRate,atBorrowPct,isConsumer);
+                              atBorrowPct,roi);
+  var pvLease=calcPVLease(term,S.deposit,depAmt,pmt,+S.freq,+S.taxRate,atBorrowPct);
   var diff=pvPurch-pvLease;
   var winner=diff<0?"purchase":"lease";
 
@@ -296,31 +287,30 @@ function calcAll(){
   var impliedRate=calcImpliedRate(price,depAmt,pmt,+S.freq,term,S.deposit&&depAmt>0,salvage);
 
   // Break-even lease payment
-  var bePmt=calcBreakEvenPmt(pvPurch,+S.freq,term,S.deposit,depAmt,+S.taxRate,atBorrowPct,isConsumer);
+  var bePmt=calcBreakEvenPmt(pvPurch,+S.freq,term,S.deposit,depAmt,+S.taxRate,atBorrowPct);
 
   // Cost of constraint (if leasing despite purchase being cheaper)
   var costOfConstraint=winner==="purchase"?Math.abs(diff):0;
-  var monthlyEquiv=isConsumer&&costOfConstraint>0?
-    costOfConstraint*(+S.borrowRate/100/12)/(1-Math.pow(1+(+S.borrowRate/100/12),-term*12)):0;
+  var monthlyEquiv=0;
 
   // Payment sensitivity
   var pmtSens=[-0.40,-0.30,-0.20,-0.10,0,0.10,0.20,0.30,0.40].map(function(delta){
     var p2=pmt*(1+delta);
-    var pvL2=calcPVLease(term,S.deposit,depAmt,p2,+S.freq,+S.taxRate,atBorrowPct,isConsumer);
+    var pvL2=calcPVLease(term,S.deposit,depAmt,p2,+S.freq,+S.taxRate,atBorrowPct);
     return{pmt:p2,pvLease:pvL2,diff:pvPurch-pvL2,winner:pvPurch<pvL2?"purchase":"lease"};
   });
 
   // CoC sensitivity (borrowing rate)
   var borrowSens=[-4,-3,-2,-1,0,1,2,3,4].map(function(delta){
     var b2=borrow+delta;if(b2<=0)return{label:b2+"%",diff:0};
-    var atb2=(isConsumer?b2:b2*(1-+S.taxRate/100));
-    var pvP2=calcPVPurchase(price,itcPct,life,S.method,S.hyr,ddbRate,salvage,+S.taxRate,atb2,roi,isConsumer);
-    var pvL2=calcPVLease(term,S.deposit,depAmt,pmt,+S.freq,+S.taxRate,atb2,isConsumer);
+    var atb2=(b2*(1-+S.taxRate/100));
+    var pvP2=calcPVPurchase(price,itcPct,life,S.method,S.hyr,ddbRate,salvage,+S.taxRate,atb2,roi);
+    var pvL2=calcPVLease(term,S.deposit,depAmt,pmt,+S.freq,+S.taxRate,atb2);
     return{label:b2+"%",pvP:pvP2,pvL:pvL2,diff:pvP2-pvL2};
   });
 
   // Depr schedule for DCF
-  var depr=isConsumer?[]:calcDepr(price,itcPct,life,S.method,S.hyr,ddbRate);
+  var depr=calcDepr(price,itcPct,life,S.method,S.hyr,ddbRate);
 
   return{pvPurch:pvPurch,pvLease:pvLease,diff:diff,winner:winner,
     impliedRate:impliedRate,bePmt:bePmt,costOfConstraint:costOfConstraint,
@@ -445,18 +435,17 @@ function uInput(prefix,value,id,onblur,suffix,disabled){
 // ── VALIDATION ────────────────────────────────────────────────────────────────
 function goToResults(){
   var missing=[];
-  var isC=S.mode==="consumer";
-  if(!S.price)missing.push("Purchase Price");
-  if(!isC&&(S.itcPct===""||S.itcPct==null))missing.push("ITC");
+    if(!S.price)missing.push("Purchase Price");
+  if(!false&&(S.itcPct===""||S.itcPct==null))missing.push("ITC");
   if(!S.life)missing.push("Economic Life");
   if(!S.salvage&&S.salvage!==0)missing.push("Salvage Value");
-  if(!isC&&S.method==="Double-declining"&&!S.ddbRate)missing.push("Depreciation Rate");
+  if(!S.taxRate)missing.push("Depreciation Rate");
   if(!S.term)missing.push("Lease Term");
   if(S.deposit&&(!S.depositAmt&&S.depositAmt!==0))missing.push("Deposit Amount");
   if(!S.leasePmt)missing.push("Lease Payment");
-  if(!isC&&!S.taxRate)missing.push("Tax Rate");
+  if(!S.taxRate)missing.push("Tax Rate");
   if(!S.borrowRate)missing.push("Borrowing Rate");
-  if(!isC&&!S.roi)missing.push("Required Return on Investment");
+  if(!S.taxRate)missing.push("Required Return on Investment");
   if(missing.length>0){S.missingFields=missing;render();return;}
   S.missingFields=null;
   try{S.res=calcAll();S.page=2;render();}
@@ -470,17 +459,10 @@ function resetInputs(){
   S.consumer_choosing_lease=false;render();
 }
 function loadExample(){
-  if(S.mode==="business"){
-    S.price=260000;S.itcPct=10;S.life=8;S.salvage=20000;
-    S.method="Double-declining";S.hyr=true;S.ddbRate=20;
-    S.term=8;S.deposit=true;S.depositAmt=55000;S.freq=1;S.leasePmt=55000;
-    S.taxRate=38;S.borrowRate=13;S.roi=14;
-  }else{
-    S.price=35000;S.itcPct=0;S.life=4;S.salvage=12000;
-    S.method="Straight-line";S.hyr=false;S.ddbRate=0;
-    S.term=4;S.deposit=true;S.depositAmt=3000;S.freq=12;S.leasePmt=650;
-    S.taxRate=0;S.borrowRate=6;S.roi=6;
-  }
+  S.price=260000;S.itcPct=10;S.life=8;S.salvage=20000;
+  S.method="Double-declining";S.hyr=true;S.ddbRate=20;
+  S.term=8;S.deposit=true;S.depositAmt=55000;S.freq=1;S.leasePmt=55000;
+  S.taxRate=38;S.borrowRate=13;S.roi=14;
   S.missingFields=null;render();
 }
 
@@ -524,31 +506,23 @@ function drawChart(canvasId,data){
 
 // ── PAGE 1 ────────────────────────────────────────────────────────────────────
 function renderPage1(){
-  var sym=getSym(),isDDB=S.method==="Double-declining",isC=S.mode==="consumer";
+  var sym=getSym(),isDDB=S.method==="Double-declining";
   var html='<div class="page"><div class="page-grid"><aside>';
   html+='<div class="section-label">Briefing Notes</div>';
   html+='<div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div>';
-  if(!isC){html+='<div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div>';}
+{html+='<div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div>';}
   html+='</aside><main>';
 
   // Mode toggle
-  html+='<div class="mode-toggle">';
-  html+='<button class="mode-btn'+(S.mode==="business"?" active":"")+'" onclick="S.mode=\'business\';resetInputs()">🏢 Business</button>';
-  html+='<button class="mode-btn'+(S.mode==="consumer"?" active":"")+'" onclick="S.mode=\'consumer\';resetInputs()">🏠 Personal / Consumer</button>';
-  html+='</div>';
-
-  if(isC){
-    html+='<div style="background:var(--blue-soft);border:1px solid rgba(27,63,110,0.2);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--t2);line-height:1.6">';
-    html+='Consumer mode: tax deductions are not available for personal asset leases. The comparison is based on the simple present value of all cash payments at your borrowing rate.</div>';
-  }
+      
 
   // Asset Data
   html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Data</div></div><div class="field-grid">';
-  html+=field("Purchase Price (cash price)",uInput(sym,S.price,"inp-price","S.price=+this.value||0","",false));
-  if(!isC)html+=field("Investment Tax Credit",uInput("",S.itcPct,"inp-itc","S.itcPct=+this.value||0","%",false));
-  html+=field("Economic Life",uInput("",S.life,"inp-life","S.life=+this.value||0","years",false));
-  html+=field("Salvage Value at End of Life",uInput(sym,S.salvage,"inp-salv","S.salvage=+this.value||0","",false),false,isC);
-  if(!isC){
+  html+=field("Purchase Price (cash price)",uInput(sym,S.price,"inp-price","S.price=+this.value||0",""));
+  html+=field("Investment Tax Credit",uInput("",S.itcPct,"inp-itc","S.itcPct=+this.value||0","%"));
+  html+=field("Economic Life",uInput("",S.life,"inp-life","S.life=+this.value||0","years"));
+  html+=field("Salvage Value at End of Life",uInput(sym,S.salvage,"inp-salv","S.salvage=+this.value||0",""),false,false);
+{
     html+='</div></div>';
     html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--green)"></div><div class="panel-title">Depreciation</div></div><div class="field-grid">';
     html+=field("Method",'<div class="ui"><select onchange="S.method=this.value;render()">'+["Double-declining","Straight-line","Sum-of-years-digits"].map(function(m){return'<option'+(m===S.method?" selected":"")+'>'+m+'</option>'}).join("")+'</select></div>');
@@ -559,28 +533,22 @@ function renderPage1(){
 
   // Lease Data
   html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:#9F7AEA"></div><div class="panel-title">Lease Data</div></div><div class="field-grid">';
-  html+=field("Lease Term",uInput("",S.term,"inp-term","S.term=+this.value||0","years",false),false,false,"Should equal economic life for a valid comparison");
+  html+=field("Lease Term",uInput("",S.term,"inp-term","S.term=+this.value||0","years"),false,false,"Should equal economic life for a valid comparison");
   html+=field("Payment Frequency",'<div class="ui"><select id="freq-sel" onchange="S.freq=+this.value;render()">'+[{v:1,l:"Annual"},{v:2,l:"Semi-annual"},{v:4,l:"Quarterly"},{v:12,l:"Monthly"}].map(function(o){return'<option value="'+o.v+'"'+(+S.freq===o.v?" selected":"")+'>'+o.l+'</option>'}).join("")+'</select></div>');
   var pmtLbl={1:"per year",2:"per semi-annual period",4:"per quarter",12:"per month"}[+S.freq]||"per period";
-  html+=field("Lease Payment",uInput(sym,S.leasePmt,"inp-pmt","S.leasePmt=+this.value||0",pmtLbl,false));
+  html+=field("Lease Payment",uInput(sym,S.leasePmt,"inp-pmt","S.leasePmt=+this.value||0",pmtLbl));
   html+=field("Initial Deposit",'<div class="pills"><div class="pill'+(S.deposit?" active":"")+'" onclick="S.deposit=true;render()"><div class="pill-dot"></div>Yes</div><div class="pill'+(!S.deposit?" active":"")+'" onclick="S.deposit=false;render()"><div class="pill-dot"></div>No</div></div>');
-  html+=field("Deposit Amount",S.deposit?uInput(sym,S.depositAmt,"inp-dep","S.depositAmt=+this.value||0","",false):uInput("","N/A","","","",true),false,true);
+  html+=field("Deposit Amount",S.deposit?uInput(sym,S.depositAmt,"inp-dep","S.depositAmt=+this.value||0",""):uInput("","N/A","","","",true),false,true);
   html+='</div></div>';
 
   // Rates
-  html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--t3)"></div><div class="panel-title">'+(isC?"Financial Data":"Firm Data")+'</div></div><div class="field-grid">';
-  if(!isC)html+=field("Tax Rate",uInput("",S.taxRate,"inp-tax","S.taxRate=+this.value||0","%",false));
-  html+=field("Borrowing Rate",uInput("",S.borrowRate,"inp-borrow","S.borrowRate=+this.value||0","%",false),false,false,isC?"The rate at which you could borrow to purchase the asset":"Pre-tax borrowing rate");
-  if(!isC)html+=field("Required Return on Investment",uInput("",S.roi,"inp-roi","S.roi=+this.value||0","%",false),false,true,"Used to discount salvage value");
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--t3)"></div><div class="panel-title">'+("Firm Data")+'</div></div><div class="field-grid">';
+  html+=field("Tax Rate",uInput("",S.taxRate,"inp-tax","S.taxRate=+this.value||0","%"));
+  html+=field("Borrowing Rate",uInput("",S.borrowRate,"inp-borrow","S.borrowRate=+this.value||0","%"),false,false,"Pre-tax borrowing rate");
+  html+=field("Required Return on Investment",uInput("",S.roi,"inp-roi","S.roi=+this.value||0","%"),false,true,"Used to discount salvage value");
   html+='</div></div>';
 
   // Capital constraint toggle (consumer only)
-  if(isC){
-    html+='<div class="helper-card"><div class="helper-body" style="flex-direction:row;align-items:center;justify-content:space-between">';
-    html+='<div style="font-size:13px;color:var(--amber-dark);line-height:1.6">If you plan to lease regardless of the financial comparison (capital constraint), the results page will quantify the extra cost of that decision.</div>';
-    html+='<div class="pills" style="flex-shrink:0"><div class="pill'+(S.consumer_choosing_lease?" active":"")+'" onclick="S.consumer_choosing_lease=true;render()"><div class="pill-dot"></div>I will lease regardless</div><div class="pill'+(!S.consumer_choosing_lease?" active":"")+'" onclick="S.consumer_choosing_lease=false;render()"><div class="pill-dot"></div>I will choose the cheaper option</div></div>';
-    html+='</div></div>';
-  }
 
   if(S.missingFields&&S.missingFields.length>0){
     html+='<div style="background:rgba(200,75,49,.07);border:1.5px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)"><strong>Please complete:</strong> '+S.missingFields.join(", ")+'.</div>';
@@ -592,16 +560,16 @@ function renderPage1(){
   document.getElementById("main-content").innerHTML=html;
   var freqSel=document.getElementById("freq-sel");
   if(freqSel)freqSel.value=String(S.freq);
-  makeBNList(S.mode==="consumer"?NOTES_CONSUMER:NOTES_BUSINESS,"bn-list1");
-  if(!isC)renderCoC();
+  makeBNList(NOTES_BUSINESS,"bn-list1");
+  renderCoC();
   document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
 }
 
 // ── PAGE 2: Results ────────────────────────────────────────────────────────────
 function renderPage2(){
-  var res=S.res,sym=getSym(),isC=S.mode==="consumer";
+  var res=S.res,sym=getSym();
   var purchaseWins=res.winner==="purchase";
-  var isConstrained=isC&&S.consumer_choosing_lease&&purchaseWins;
+  var isConstrained=false;
 
   var html='<div class="page"><div class="p2-grid"><aside>';
   html+='<div class="section-label">Understanding Results</div>';
@@ -638,30 +606,29 @@ function renderPage2(){
   html+='<span style="font-size:12px;color:var(--t2);background:white;border:1px solid var(--border);border-radius:5px;padding:3px 10px">💰 Implied lease interest rate</span>';
   html+='<span style="font-size:12px;color:var(--t2);background:white;border:1px solid var(--border);border-radius:5px;padding:3px 10px">⚖️ Break-even lease payment</span>';
   html+='<span style="font-size:12px;color:var(--t2);background:white;border:1px solid var(--border);border-radius:5px;padding:3px 10px">📊 Sensitivity to lease payment</span>';
-  if(isC)html+='<span style="font-size:12px;color:var(--t2);background:white;border:1px solid var(--border);border-radius:5px;padding:3px 10px">📋 Cost of leasing constraint</span>';
   html+='</div></div>';
 
   // Comparison cards
   html+='<div class="comparison-grid">';
   var pWin=purchaseWins;
-  html+='<div class="option-card '+(pWin?"winner":(isC?"consumer-loser":"loser"))+'">';
+  html+='<div class="option-card '+(pWin?"winner":("loser"))+'">';
   html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:'+(pWin?"var(--green)":"var(--t3)")+';margin-bottom:10px">Purchase Option '+(pWin?"✓ Lower Cost":"")+'</div>';
   html+='<div style="font-family:monospace;font-size:26px;font-weight:800;color:'+(pWin?"var(--green)":"var(--t1)")+'">'+fmtM(res.pvPurch)+'</div>';
   html+='<div style="font-size:11px;color:var(--t3);margin-top:4px">PV of all outflows</div>';
-  html+='<div style="font-size:12px;color:var(--t2);margin-top:10px;line-height:1.5">Asset cost less tax shields'+(isC?" and":",")+' salvage value'+(isC?".":', and ITC.')+' </div>';
+  html+='<div style="font-size:12px;color:var(--t2);margin-top:10px;line-height:1.5">Asset cost less tax shields'+(",")+' salvage value'+(false?".":', and ITC.')+' </div>';
   html+='</div>';
   html+='<div class="option-card '+(!pWin?"winner":"loser")+(isConstrained?" consumer-loser":"")+'">';
   html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:'+(!pWin?"var(--blue)":"var(--t3)")+';margin-bottom:10px">Lease Option '+(!pWin?"✓ Lower Cost":"")+(isConstrained?" ⚠ Higher Cost — Chosen":"")+'</div>';
   html+='<div style="font-family:monospace;font-size:26px;font-weight:800;color:'+(!pWin?"var(--blue)":isConstrained?"var(--warn)":"var(--t1)")+'">'+fmtM(res.pvLease)+'</div>';
   html+='<div style="font-size:11px;color:var(--t3);margin-top:4px">PV of all outflows</div>';
-  html+='<div style="font-size:12px;color:var(--t2);margin-top:10px;line-height:1.5">Deposit and lease payments less'+(isC?" any":" tax shields on") +' payments.</div>';
+  html+='<div style="font-size:12px;color:var(--t2);margin-top:10px;line-height:1.5">Deposit and lease payments less'+(" tax shields on") +' payments.</div>';
   html+='</div></div>';
 
   // Metrics
   html+='<div class="metrics">';
   html+='<div class="metric"><div class="metric-label">Implied Lease Interest Rate</div><div class="metric-val '+(res.impliedRate>+S.borrowRate?"warn":"ok")+'">'+fmt(res.impliedRate,2)+'%</div><div class="metric-sub">'+(res.impliedRate>+S.borrowRate?"Higher than your borrowing rate of "+S.borrowRate+"%":"Lower than your borrowing rate of "+S.borrowRate+"%")+'</div></div>';
-  html+='<div class="metric"><div class="metric-label">Break-Even Lease Payment</div><div class="metric-val">'+fmtM(res.bePmt)+'</div><div class="metric-sub">Leasing is cheaper below this figure'+(isC?"":('. Current payment of '+fmtM(+S.leasePmt)+' is '+(+S.leasePmt>res.bePmt?'above — purchase is cheaper.':'below — lease is cheaper.')+''))+'</div></div>';
-  if(isC&&purchaseWins){
+  html+='<div class="metric"><div class="metric-label">Break-Even Lease Payment</div><div class="metric-val">'+fmtM(res.bePmt)+'</div><div class="metric-sub">Leasing is cheaper below this figure'+(('. Current payment of '+fmtM(+S.leasePmt)+' is '+(+S.leasePmt>res.bePmt?'above — purchase is cheaper.':'below — lease is cheaper.')+''))+'</div></div>';
+  if(false&&purchaseWins){
     html+='<div class="metric"><div class="metric-label">Monthly Cost of Leasing</div><div class="metric-val warn">'+fmtM(res.monthlyEquiv)+'</div><div class="metric-sub">Extra per month by leasing over '+S.term+' years</div></div>';
   }else{
     html+='<div class="metric"><div class="metric-label">PV Advantage</div><div class="metric-val ok">'+fmtM(Math.abs(res.diff))+'</div><div class="metric-sub">'+(purchaseWins?"Purchase":"Lease")+' saves this amount in PV terms</div></div>';
@@ -694,7 +661,7 @@ function renderPage2(){
   html+='</div>';
 
   // DCF summaries
-  if(!isC){
+{
     html+='<div class="collapsible"><div class="coll-head" onclick="S.show_purchase_dcf=!S.show_purchase_dcf;renderPage2()"><span class="coll-title">Purchase Option — DCF Detail</span><span class="coll-arr" style="transform:'+(S.show_purchase_dcf?'rotate(90deg)':'rotate(0deg)')+'" >›</span></div>';
     if(S.show_purchase_dcf){
       var atb=+S.borrowRate*(1-+S.taxRate/100)/100,r2=+S.roi/100;
@@ -739,7 +706,7 @@ function renderPage2(){
   html+='</main></div></div>';
 
   document.getElementById("main-content").innerHTML=html;
-  makeBNList(S.mode==="consumer"?NOTES_CONSUMER:NOTES_BUSINESS,"bn-list2");
+  makeBNList(NOTES_BUSINESS,"bn-list2");
   setTimeout(function(){drawChart("sens-chart",res.borrowSens)},50);
   document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
 }

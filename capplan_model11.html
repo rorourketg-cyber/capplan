@@ -131,8 +131,7 @@ var CURRENCIES=[{code:"USD",symbol:"$",label:"US Dollar"},{code:"EUR",symbol:"�
 function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
 
 var S={
-  page:1,currency:"USD",cur_open:false,mode:"business",
-  coc_open:false,coc_mode:"wacc",coc_kd:6,coc_ke:12,coc_wd:40,coc_rf:4.5,coc_beta:1.0,coc_mrp:5.5,
+  page:1,currency:"USD",cur_open:false,  coc_open:false,coc_mode:"wacc",coc_kd:6,coc_ke:12,coc_wd:40,coc_rf:4.5,coc_beta:1.0,coc_mrp:5.5,
   res:null,show_dcf:false,show_pmt_sens:false,missingFields:null,
   price:"",itcPct:"",life:"",salvage:"",method:"Double-declining",hyr:true,ddbRate:"",
   term:"",deposit:true,depositAmt:"",freq:1,leasePmt:"",
@@ -149,12 +148,10 @@ function calcDepr(base,life,method,hyr,ddbRate){
   var d=[];
   if(method==="Double-declining"){var rate=ddbRate/100;d.push(base*rate*(hyr?0.5:1));for(var y=2;y<=life;y++)d.push((base-d.reduce(function(s,v){return s+v},0))*rate);}
   else if(method==="Straight-line"){var y1=base/life*(hyr?0.5:1);d.push(y1);for(var y=2;y<=life;y++)d.push(hyr?(base-y1)/(life-1):base/life);}
-  else{var y1=hyr?base/(life+1):2*base/(life+1);d.push(y1);if(hyr)for(var y=2;y<=life;y++)d.push(2*base*(life-y+1)/((life+1)*(life-1)));else for(var y=2;y<=life;y++)d.push(base*(life-y+1)*2/(life*(life+1)));}
   return d;
 }
 
-function pvPurchase(price,itcPct,life,method,hyr,ddbRate,salvage,taxRate,r,isConsumer){
-  if(isConsumer){return price-salvage/Math.pow(1+r,life);}
+function pvPurchase(price,itcPct,life,method,hyr,ddbRate,salvage,taxRate,r){
   var tx=taxRate/100;var itc=price*itcPct/100;var base=price-itc;
   var depr=calcDepr(base,life,method,hyr,ddbRate);
   var pvITC=-itc/(1+r);
@@ -164,8 +161,8 @@ function pvPurchase(price,itcPct,life,method,hyr,ddbRate,salvage,taxRate,r,isCon
   return price+pvITC+pvTS+pvSalv+pvLoss;
 }
 
-function pvLease(term,deposit,depAmt,pmt,freq,taxRate,r,isConsumer){
-  var tx=isConsumer?0:taxRate/100;
+function pvLease(term,deposit,depAmt,pmt,freq,taxRate,r){
+  var tx=taxRate/100;
   var rp=Math.pow(1+r,1/freq)-1;
   var totalN=term*freq;var hasDep=deposit&&depAmt>0;
   var n=hasDep?(totalN-1):totalN;
@@ -177,13 +174,18 @@ function pvLease(term,deposit,depAmt,pmt,freq,taxRate,r,isConsumer){
   return pvDep+pvDepTS+pvPmts+pvPmtTS;
 }
 
-function solveImpliedRate(price,itcPct,life,method,hyr,ddbRate,salvage,term,deposit,depAmt,pmt,freq,taxRate,isConsumer){
-  var lo=0.001,hi=10.0,mid;
-  for(var i=0;i<100;i++){
+function solveImpliedRate(price,salvage,term,deposit,depAmt,pmt,freq){
+  // Pre-tax implied rate: rate at which PV of lease cash flows = price - PV(salvage)
+  var lo=0.000001,hi=5.0,mid;
+  for(var i=0;i<120;i++){
     mid=(lo+hi)/2;
-    var pvP=pvPurchase(price,itcPct,life,method,hyr,ddbRate,salvage,taxRate,mid,isConsumer);
-    var pvL=pvLease(term,deposit,depAmt,pmt,freq,taxRate,mid,isConsumer);
-    if(pvP<pvL)lo=mid;else hi=mid;
+    var rp=Math.pow(1+mid,1/freq)-1;
+    var n=term*freq;
+    var af=rp>0?(1-Math.pow(1+rp,-n))/rp:n;
+    var hasDep=deposit&&depAmt>0;
+    var pvL=hasDep?depAmt+pmt*af-depAmt/Math.pow(1+mid,term):pmt*af;
+    var pvP=price-salvage/Math.pow(1+mid,term);
+    if(pvL>pvP)lo=mid;else hi=mid;
   }
   return mid*100;
 }
@@ -193,21 +195,20 @@ function calcAll(){
   var ddbRate=+S.ddbRate,term=+S.term||life,pmt=+S.leasePmt,freq=+S.freq;
   var depAmt=S.deposit?(+S.depositAmt||0):0;
   var taxRate=+S.taxRate||0,borrow=+S.borrowRate||0;
-  var isC=S.mode==="consumer";
-
-  var implied=solveImpliedRate(price,itcPct,life,S.method,S.hyr,ddbRate,salvage,term,S.deposit,depAmt,pmt,freq,taxRate,isC);
+  
+  var implied=solveImpliedRate(price,salvage,term,S.deposit,depAmt,pmt,freq);
   var r=implied/100;
-  var pvP=pvPurchase(price,itcPct,life,S.method,S.hyr,ddbRate,salvage,taxRate,r,isC);
-  var pvL=pvLease(term,S.deposit,depAmt,pmt,freq,taxRate,r,isC);
+  var pvP=pvPurchase(price,itcPct,life,S.method,S.hyr,ddbRate,salvage,taxRate,r,false);
+  var pvL=pvLease(term,S.deposit,depAmt,pmt,freq,taxRate,r,false);
 
   // Sensitivity: implied rate vs lease payment
   var pmtSens=[-0.40,-0.30,-0.20,-0.10,0,0.10,0.20,0.30,0.40].map(function(delta){
     var p2=pmt*(1+delta);
-    var ir=solveImpliedRate(price,itcPct,life,S.method,S.hyr,ddbRate,salvage,term,S.deposit,depAmt,p2,freq,taxRate,isC);
+    var ir=solveImpliedRate(price,itcPct,life,S.method,S.hyr,ddbRate,salvage,term,S.deposit,depAmt,p2,freq,taxRate,false);
     return{pmt:p2,rate:ir};
   });
 
-  var depr=isC?[]:calcDepr(price-price*itcPct/100,life,S.method,S.hyr,ddbRate);
+  var depr=false?[]:calcDepr(price-price*itcPct/100,life,S.method,S.hyr,ddbRate);
   return{implied:implied,pvPurchase:pvP,pvLease:pvL,borrow:borrow,
     decision:implied>borrow?"borrow":"lease",pmtSens:pmtSens,depr:depr,
     itc:price*itcPct/100};
@@ -245,7 +246,6 @@ function renderCoC(){
   [{k:"wacc",n:"WACC",s:"Borrowing rate"},{k:"capm",n:"CAPM",s:"Market risk"}].forEach(function(t){html+='<button onclick="S.coc_mode=\''+t.k+'\';renderCoC()" style="flex:1;padding:8px 10px;border-radius:7px;border:1.5px solid '+(S.coc_mode===t.k?"var(--blue)":"var(--border)")+';background:'+(S.coc_mode===t.k?"var(--blue-soft)":"transparent")+';cursor:pointer;text-align:left"><div style="font-size:12px;font-weight:700;color:'+(S.coc_mode===t.k?"var(--blue)":"var(--t2)")+'">'+t.n+'</div><div style="font-size:10px;color:var(--t3)">'+t.s+'</div></button>';});
   html+='</div><div style="padding:14px">';
   if(S.coc_mode==="wacc"){html+=cR("Cost of Debt (pre-tax)","coc_kd",S.coc_kd,"%");html+=cR("Cost of Equity","coc_ke",S.coc_ke,"%");html+=cR("Debt Weighting","coc_wd",S.coc_wd,"%");html+='<div style="background:var(--surface);border-radius:5px;padding:8px 10px;font-size:11px">WACC = <strong style="color:var(--green)">'+wacc+'%</strong></div>';}
-  else{html+=cR("Risk-Free Rate","coc_rf",S.coc_rf,"%");html+=cR("Beta","coc_beta",S.coc_beta,"");html+=cR("Market Risk Premium","coc_mrp",S.coc_mrp,"%");html+='<div style="background:var(--surface);border-radius:5px;padding:8px 10px;font-size:11px">Ke = '+capm+'%</div>';}
   html+='<div style="margin-top:12px;padding:10px 14px;background:var(--green-soft);border-radius:8px;border:1px solid var(--green);display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--green)">Calculated Rate</div><div style="font-family:monospace;font-size:22px;font-weight:700;color:var(--green)">'+result+'%</div></div><button onclick="S.borrowRate='+result+';renderCoC();var el=document.getElementById(\'inp-borrow\');if(el)el.value='+result+'" style="background:var(--green);color:white;border:none;border-radius:7px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer">Use as borrowing rate →</button></div></div></div>';
   box.innerHTML=html;
 }
@@ -255,16 +255,15 @@ function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last
 function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--blue)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
 
 function goToResults(){
-  var missing=[];var isC=S.mode==="consumer";
-  if(!S.price)missing.push("Asset Price");
-  if(!isC&&(S.itcPct===""||S.itcPct==null))missing.push("ITC");
+  var missing=[];  if(!S.price)missing.push("Asset Price");
+  if((S.itcPct===""||S.itcPct==null))missing.push("ITC");
   if(!S.life)missing.push("Economic Life");
-  if(!isC&&(!S.salvage&&S.salvage!==0))missing.push("Salvage Value");
-  if(!isC&&S.method==="Double-declining"&&!S.ddbRate)missing.push("Depreciation Rate");
+  if((!S.salvage&&S.salvage!==0))missing.push("Salvage Value");
+  if(S.method==="Double-declining"&&!S.ddbRate)missing.push("Depreciation Rate");
   if(!S.term)missing.push("Lease Term");
   if(S.deposit&&(!S.depositAmt&&S.depositAmt!==0))missing.push("Deposit Amount");
   if(!S.leasePmt)missing.push("Lease Payment");
-  if(!isC&&!S.taxRate)missing.push("Tax Rate");
+  if(!S.taxRate)missing.push("Tax Rate");
   if(!S.borrowRate)missing.push("Borrowing Rate");
   if(missing.length>0){S.missingFields=missing;render();return;}
   S.missingFields=null;
@@ -276,9 +275,7 @@ function resetInputs(){
   S.missingFields=null;render();
 }
 function loadExample(){
-  var isC=S.mode==="consumer";
-  if(!isC){S.price=100000;S.itcPct=15;S.life=6;S.salvage=5000;S.method="Double-declining";S.hyr=true;S.ddbRate=20;S.term=6;S.deposit=true;S.depositAmt=35000;S.freq=1;S.leasePmt=35000;S.taxRate=40;S.borrowRate=25;}
-  else{S.price=35000;S.itcPct=0;S.life=4;S.salvage=12000;S.method="Straight-line";S.hyr=false;S.ddbRate=0;S.term=4;S.deposit=true;S.depositAmt=3000;S.freq=12;S.leasePmt=650;S.taxRate=0;S.borrowRate=8;}
+    S.price=100000;S.itcPct=15;S.life=6;S.salvage=5000;S.method="Double-declining";S.hyr=true;S.ddbRate=20;S.term=6;S.deposit=true;S.depositAmt=35000;S.freq=1;S.leasePmt=35000;S.taxRate=40;S.borrowRate=25;
   S.missingFields=null;render();
 }
 
@@ -299,23 +296,20 @@ function drawChart(canvasId,data,currentPmt){
 }
 
 function renderPage1(){
-  var sym=getSym(),isDDB=S.method==="Double-declining",isC=S.mode==="consumer";
+  var sym=getSym(),isDDB=S.method==="Double-declining";
   var html='<div class="page"><div class="page-grid"><aside>';
   html+='<div class="section-label">Briefing Notes</div><div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div>';
   html+='<div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div>';
   html+='</aside><main>';
-  html+='<div class="mode-toggle"><button class="mode-btn'+(S.mode==="business"?" active":"")+'" onclick="S.mode=\'business\';resetInputs()">🏢 Business</button><button class="mode-btn'+(S.mode==="consumer"?" active":"")+'" onclick="S.mode=\'consumer\';resetInputs()">🏠 Personal / Consumer</button></div>';
-  if(isC)html+='<div style="background:var(--blue-soft);border:1px solid rgba(27,63,110,0.2);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--t2);line-height:1.6">Consumer mode — no tax deductions or depreciation. Comparison based on total cash payments at your borrowing rate.</div>';
-
+    
   html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Data</div></div><div class="field-grid">';
   html+=field("Purchase Price (cash price)",uIn(sym,S.price,"inp-price","S.price=+this.value||0","",false));
-  if(!isC){html+=field("Investment Tax Credit",uIn("",S.itcPct,"inp-itc","S.itcPct=+this.value||0","%",false));}
+  {html+=field("Investment Tax Credit",uIn("",S.itcPct,"inp-itc","S.itcPct=+this.value||0","%",false));}
   html+=field("Economic Life",uIn("",S.life,"inp-life","S.life=+this.value||0","years",false));
-  if(!isC){html+=field("Salvage Value",uIn(sym,S.salvage,"inp-salv","S.salvage=+this.value||0","",false),false,true);}
-  else{html+=field("Expected Resale / Salvage Value",uIn(sym,S.salvage,"inp-salv","S.salvage=+this.value||0","",false),false,true);}
+  {html+=field("Salvage Value",uIn(sym,S.salvage,"inp-salv","S.salvage=+this.value||0","",false),false,true);}
   html+='</div></div>';
 
-  if(!isC){
+  {
     html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--green)"></div><div class="panel-title">Depreciation</div></div><div class="field-grid">';
     html+=field("Method",'<div class="ui"><select onchange="S.method=this.value;render()">'+["Double-declining","Straight-line","Sum-of-years-digits"].map(function(m){return'<option'+(m===S.method?" selected":"")+'>'+m+'</option>'}).join("")+'</select></div>');
     html+=field(isDDB?"Rate":"Rate — N/A",uIn("",isDDB?S.ddbRate:"N/A","inp-rate","if(S.method===\'Double-declining\')S.ddbRate=+this.value||0","%",!isDDB)+(!isDDB?'<div class="field-note">Defined by method formula</div>':""));
@@ -332,8 +326,8 @@ function renderPage1(){
   html+=field("Lease Payment",uIn(sym,S.leasePmt,"inp-pmt","S.leasePmt=+this.value||0",pmtLbl,false),false,true);
   html+='</div></div>';
 
-  html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--t3)"></div><div class="panel-title">'+(isC?"Financial Data":"Firm Data")+'</div></div><div class="field-grid">';
-  if(!isC)html+=field("Tax Rate",uIn("",S.taxRate,"inp-tax","S.taxRate=+this.value||0","%",false));
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--t3)"></div><div class="panel-title">'+("Firm Data")+'</div></div><div class="field-grid">';
+  html+=field("Tax Rate",uIn("",S.taxRate,"inp-tax","S.taxRate=+this.value||0","%",false));
   html+=field("Your Borrowing Rate",uIn("",S.borrowRate,"inp-borrow","S.borrowRate=+this.value||0","%",false),false,true,"The rate at which you could borrow to purchase");
   html+='</div></div>';
 
@@ -341,14 +335,14 @@ function renderPage1(){
   html+='<div class="action-row" style="justify-content:space-between;align-items:center"><span style="font-size:11.5px;color:var(--t3)">New here? Try <strong style="color:var(--t2)">Load Example</strong></span><div style="display:flex;gap:10px"><button class="btn-ghost" onclick="loadExample()">Load Example</button><button class="btn-ghost" onclick="resetInputs()">Reset</button><button class="btn-primary" onclick="goToResults()">Calculate ›</button></div></div>';
   html+='</main></div></div>';
   document.getElementById("main-content").innerHTML=html;
-  makeBNList(S.mode==="consumer"?NOTES_CON:NOTES_BUS,"bn-list1");
+  makeBNList(NOTES_BUS,"bn-list1");
   renderCoC();
   var fs=document.getElementById("freq-sel");if(fs)fs.value=String(S.freq);
   document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
 }
 
 function renderPage2(){
-  var res=S.res,sym=getSym(),isC=S.mode==="consumer";
+  var res=S.res,sym=getSym();
   var isBorrow=res.decision==="borrow";
   var bannerClass=isBorrow?"borrow":"lease";
   var bannerColor=isBorrow?"var(--green)":"var(--blue)";
@@ -389,7 +383,7 @@ function renderPage2(){
   html+='</div>';
 
   // DCF
-  if(!isC){
+  {
     html+='<div class="collapsible"><div class="coll-head" onclick="S.show_dcf=!S.show_dcf;renderPage2()"><span class="coll-title">DCF Detail at Implied Rate</span><span class="coll-arr" style="transform:'+(S.show_dcf?'rotate(90deg)':'rotate(0deg)')+'" >›</span></div>';
     if(S.show_dcf){
       var r=res.implied/100;
@@ -412,7 +406,7 @@ function renderPage2(){
   }
   html+='</main></div></div>';
   document.getElementById("main-content").innerHTML=html;
-  makeBNList(S.mode==="consumer"?NOTES_CON:NOTES_BUS,"bn-list2");
+  makeBNList(NOTES_BUS,"bn-list2");
   setTimeout(function(){drawChart("rate-chart",res.pmtSens,+S.leasePmt)},50);
   document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
 }
