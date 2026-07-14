@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CapPlan — Equipment Purchase Analysis</title>
+<title>CapPlan — Asset Purchase Analysis</title>
 <style>
+:root {
+  --blue:#1B3F6E; --green:#2E7D52; --surface:#F7F8FA; --panel:#fff;
+  --border:#E2E6EC; --t1:#0F1D2E; --t2:#4A5568; --t3:#8A96A6; --warn:#C84B31;
+  --blue-soft:rgba(27,63,110,0.08); --green-soft:rgba(46,125,82,0.09);
+  --amber:#F59E0B; --amber-soft:#FFFBEB; --amber-dark:#92400E;
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: system-ui, sans-serif; background: #F7F8FA; color: #0F1D2E; font-size: 14px; }
 input, select, button { font-family: inherit; font-size: 14px; }
@@ -241,7 +247,15 @@ tr:nth-child(even) { background: #F7F8FA; }
 .print-btn:hover { border-color: #1B3F6E; color: #1B3F6E; }
 
 
-/* wizard CSS now in .helper-* classes above */
+/* ── BENEFIT WIZARD ─────────────────────────────────────────────────────── */
+.p2-wizard{background:rgba(27,63,110,0.04);border:1.5px solid var(--border);border-radius:8px;margin-bottom:18px;overflow:hidden}
+.wizard-toggle{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.wizard-toggle:hover{background:rgba(27,63,110,0.06)}
+.wizard-body{padding:14px 16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:14px}
+.wizard-row{display:flex;flex-direction:column;gap:6px}
+.wizard-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3)}
+.wizard-result{background:var(--green-soft);border:1px solid var(--green);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.wizard-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
 /* ── SENSITIVITY INDICATOR ──────────────────────────────────────────────── */
 .sens-indicator{border-radius:8px;padding:14px 18px;margin-bottom:18px;border:1.5px solid transparent}
 .si-positive{background:var(--green-soft);border-color:var(--green)}
@@ -255,21 +269,6 @@ tr:nth-child(even) { background: #F7F8FA; }
 .si-val{font-family:monospace;font-size:20px;font-weight:800}
 .si-val.ok{color:var(--green)}.si-val.bad{color:var(--warn)}
 .si-sub{font-size:10px;color:var(--t3)}
-
-/* ── HELPER / GUIDANCE ELEMENTS (amber) ──────────────────────────────────── */
-:root { --amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7; }
-.helper-card{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:18px}
-.helper-head{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--amber-mid)}
-.helper-head:hover{background:#fde68a}
-.helper-icon{font-size:18px;flex-shrink:0}
-.helper-title{font-size:13px;font-weight:700;color:var(--amber-dark);flex:1}
-.helper-toggle{font-size:11px;font-weight:600;color:var(--amber-dark);opacity:.7}
-.helper-body{padding:16px;border-top:1.5px solid var(--amber);display:flex;flex-direction:column;gap:14px}
-.helper-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dark)}
-.helper-result{background:var(--green-soft);border:1.5px solid var(--green);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.helper-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
-.asset-picker{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;padding:14px 16px;margin-bottom:18px}
-.asset-picker-label{font-size:12px;font-weight:700;color:var(--amber-dark);margin-bottom:8px;display:flex;align-items:center;gap:6px}
 
 @media print {
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -302,11 +301,11 @@ tr:nth-child(even) { background: #F7F8FA; }
 <div id="masthead">
   <div class="logo">
     <div class="logo-icon">
-      <svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg>
+      <svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"></polyline></svg>
     </div>
     <div class="logo-text">Cap<span>Plan</span></div>
   </div>
-  <div class="module-name">Original Equipment Purchase Analysis</div>
+  <div class="module-name">Asset Purchase Analysis</div>
   <div style="position:relative">
     <button class="cur-btn" onclick="toggleCur()">
       <span id="cur-label">$ USD</span> ▾
@@ -316,14 +315,29 @@ tr:nth-child(even) { background: #F7F8FA; }
 </div>
 
 <div id="stepper">
-  <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Asset Details</div></div>
+  <div class="step active" id="step1" style="cursor: default;"><div class="step-num" id="sn1">1</div><div class="step-label">Asset Details</div></div>
   <div class="step-sep">›</div>
-  <div class="step" id="step2"><div class="step-num" id="sn2">2</div><div class="step-label">Economic Benefits</div></div>
+  <div class="step" id="step2" style="cursor: default;"><div class="step-num" id="sn2">2</div><div class="step-label">Economic Benefits</div></div>
   <div class="step-sep">›</div>
-  <div class="step" id="step3"><div class="step-num" id="sn3">3</div><div class="step-label">Results</div></div>
+  <div class="step" id="step3" style="cursor: default;"><div class="step-num" id="sn3">3</div><div class="step-label">Results</div></div>
 </div>
 
-<div id="main-content"></div>
+<div id="main-content"><div class="page"><div class="page-grid"><aside><div class="section-label">Briefing Notes</div><div class="briefing-list" id="bn-list1"><div class="bn-item"><div class="bn-head"><div class="bn-qmark">?</div><div class="bn-q">What is included in the cost of the asset?</div><div class="bn-arr" id="arrbn-list10">›</div></div><div class="bn-body" id="bodybn-list10">The
+ cost includes the purchase price plus any delivery, installation, or 
+setup costs required to make the asset ready for use. Does not include 
+ongoing operating costs.<button class="watch-btn">▶ Learn More</button></div></div><div class="bn-item"><div class="bn-head"><div class="bn-qmark">?</div><div class="bn-q">How do I know if my project is eligible for an Investment Tax Credit?</div><div class="bn-arr" id="arrbn-list11">›</div></div><div class="bn-body" id="bodybn-list11">ITC
+ eligibility depends on your jurisdiction and the type of asset. In 
+Canada, certain clean energy and R&amp;D equipment qualify. If you're 
+unsure, leave this at 0%.<button class="watch-btn">▶ Learn More</button></div></div><div class="bn-item"><div class="bn-head"><div class="bn-qmark">?</div><div class="bn-q">How do I estimate economic life and salvage value?</div><div class="bn-arr" id="arrbn-list12">›</div></div><div class="bn-body" id="bodybn-list12">Economic
+ life is how long the asset will be useful to your business. Salvage 
+value is what you expect to sell it for at the end. Conservative 
+estimates are recommended.<button class="watch-btn">▶ Learn More</button></div></div><div class="bn-item"><div class="bn-head"><div class="bn-qmark">?</div><div class="bn-q">What depreciation method should I use and what is the half-year rule?</div><div class="bn-arr" id="arrbn-list13">›</div></div><div class="bn-body" id="bodybn-list13">Double-declining
+ gives the largest early deductions. Straight-line spreads them evenly. 
+Sum-of-years-digits is in between. The half-year rule halves the first 
+year's deduction.<button class="watch-btn">▶ Learn More</button></div></div><div class="bn-item"><div class="bn-head"><div class="bn-qmark">?</div><div class="bn-q">How do I calculate the required rate of return?</div><div class="bn-arr" id="arrbn-list14">›</div></div><div class="bn-body" id="bodybn-list14">This
+ is your cost of capital — the minimum return needed to justify the 
+investment. Use the Cost of Capital Calculator below to estimate it 
+using WACC or CAPM.<button class="watch-btn">▶ Learn More</button></div></div></div><div class="section-label">Tools</div><div class="tools-box"><div id="coc-box"><button class="coc-trigger" onclick="S.coc_open=true;renderCoC()"><div class="coc-icon"><svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="#2E7D52" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="9" r="3"></circle><path d="M9 2v2M9 14v2M2 9h2M14 9h2"></path></svg></div><div><div style="font-size:13px;font-weight:700;color:#1B3F6E">Cost of Capital Calculator</div><div style="font-size:11px;color:#8A96A6;margin-top:2px">WACC · Capital Asset Pricing Model</div></div><span style="margin-left:auto;color:#8A96A6;font-size:15px">›</span></button></div></div></aside><main><div class="panel" style="margin-bottom:18px"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Information</div></div><div class="field-grid"><div class="field"><div class="field-label">Cost of Asset</div><div class="underline-input"><span class="pfx">$</span><input type="text" id="inp-cost" onblur="S.cost=isNaN(+this.value)?S.cost:(+this.value);document.getElementById('cur-label').textContent=getSym()+' '+S.currency" onfocus="this.style.borderBottomColor='#1B3F6E'" onblur2="this.style.borderBottomColor='#E2E6EC'"></div></div><div class="field"><div class="field-label">Investment Tax Credit</div><div class="underline-input"><input type="text" id="inp-itc" onblur="S.itcPct=isNaN(+this.value)?S.itcPct:(+this.value);document.getElementById('cur-label').textContent=getSym()+' '+S.currency" onfocus="this.style.borderBottomColor='#1B3F6E'" onblur2="this.style.borderBottomColor='#E2E6EC'"><span class="sfx">%</span></div></div><div class="field"><div class="field-label">Economic Life</div><div class="underline-input"><input type="text" id="inp-life" onblur="S.life=isNaN(+this.value)?S.life:(+this.value);document.getElementById('cur-label').textContent=getSym()+' '+S.currency" onfocus="this.style.borderBottomColor='#1B3F6E'" onblur2="this.style.borderBottomColor='#E2E6EC'"><span class="sfx">years</span></div></div><div class="field"><div class="field-label">Salvage Value</div><div class="underline-input"><span class="pfx">$</span><input type="text" id="inp-salv" onblur="S.salvage=isNaN(+this.value)?S.salvage:(+this.value);document.getElementById('cur-label').textContent=getSym()+' '+S.currency" onfocus="this.style.borderBottomColor='#1B3F6E'" onblur2="this.style.borderBottomColor='#E2E6EC'"></div></div><div class="field full last"><div class="field-label">Working Capital Required</div><div class="underline-input"><span class="pfx">$</span><input type="text" id="inp-wc" onblur="S.workingCapital=isNaN(+this.value)?S.workingCapital:(+this.value);document.getElementById('cur-label').textContent=getSym()+' '+S.currency" onfocus="this.style.borderBottomColor='#1B3F6E'" onblur2="this.style.borderBottomColor='#E2E6EC'"></div></div></div></div><div class="panel" style="margin-bottom:18px"><div class="panel-head"><div class="panel-dot" style="background:#2E7D52"></div><div class="panel-title">Depreciation</div></div><div class="field-grid"><div class="field"><div class="field-label">Method</div><div class="underline-input"><select id="inp-method" onchange="S.method=this.value;render()"><option selected="selected">Double-declining</option><option>Straight-line</option><option>Sum-of-years-digits</option></select></div></div><div class="field"><div class="field-label">Depreciation Rate</div><div class="underline-input"><input type="text" id="inp-rate" onblur="S.ddbRate=isNaN(+this.value)?S.ddbRate:(+this.value);document.getElementById('cur-label').textContent=getSym()+' '+S.currency" onfocus="this.style.borderBottomColor='#1B3F6E'" onblur2="this.style.borderBottomColor='#E2E6EC'"><span class="sfx">%</span></div></div><div class="field full last"><div class="field-label">Half-Year Rule</div><div class="pills"><div class="pill active" onclick="S.hyr=true;render()"><div class="pill-dot"></div>Yes</div><div class="pill" onclick="S.hyr=false;render()"><div class="pill-dot"></div>No</div></div></div></div></div><div class="panel" style="margin-bottom:18px"><div class="panel-head"><div class="panel-dot" style="background:#8A96A6"></div><div class="panel-title">Firm Data</div></div><div class="field-grid"><div class="field"><div class="field-label">Tax Rate</div><div class="underline-input"><input type="text" id="inp-tax" onblur="S.taxRate=isNaN(+this.value)?S.taxRate:(+this.value);document.getElementById('cur-label').textContent=getSym()+' '+S.currency" onfocus="this.style.borderBottomColor='#1B3F6E'" onblur2="this.style.borderBottomColor='#E2E6EC'"><span class="sfx">%</span></div></div><div class="field last"><div class="field-label">Required Rate of Return</div><div class="underline-input"><input type="text" id="inp-coc" onblur="S.coc=isNaN(+this.value)?S.coc:(+this.value);document.getElementById('cur-label').textContent=getSym()+' '+S.currency" onfocus="this.style.borderBottomColor='#1B3F6E'" onblur2="this.style.borderBottomColor='#E2E6EC'"><span class="sfx">%</span></div></div></div></div><div class="action-row" style="justify-content:space-between;align-items:center"><span style="font-size:11.5px;color:#8A96A6">New here? Try <strong style="color:#4A5568">Load Example</strong> to see how it works.</span><div style="display:flex;gap:10px"><button class="btn-ghost" onclick="loadExample()">Load Example</button><button class="btn-ghost" onclick="resetInputs()">Reset</button><button class="btn-primary" onclick="goToPage2()">Next: Economic Benefits ›</button></div></div></main></div></div></div>
 
 <script>
 // ── STATE ────────────────────────────────────────────────────────────────────
@@ -701,6 +715,15 @@ function renderPage1() {
   // RIGHT
   html += '<main>';
 
+  // How This Works amber card
+  html += '<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:10px">';
+  html += '<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Asset details.</strong> Enter the purchase price, depreciation method, tax rate, and your required return. The cost of capital calculator can help.</div></div>';
+  html += '<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Economic benefits.</strong> Enter the annual value the asset generates — cost savings, revenue, or efficiency gains — year by year.</div></div>';
+  html += '<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Results.</strong> NPV, benefit-cost ratio, IRR, and payback — all the metrics needed to justify or reject the investment.</div></div>';
+  html += '</div></div>';
+
   // Asset Info
   html += '<div class="panel" style="margin-bottom:18px">';
   html += '<div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Information</div></div>';
@@ -836,13 +859,13 @@ function renderPage2() {
 
 
   // Benefit estimation wizard
-  html += '<div class="helper-card">';
-  html += '<div class="helper-head" onclick="S.bw_open=!S.bw_open;render()">';
-  html += '<span class="helper-icon">💡</span><span class="helper-title">Help me estimate benefits</span>';
-  html += '<span class="helper-toggle">'+(S.bw_open?'▲ hide':'▼ show')+'</span>';
+  html += '<div class="p2-wizard">';
+  html += '<div class="wizard-toggle" onclick="S.bw_open=!S.bw_open;render()">';
+  html += '<span style="font-size:13px;font-weight:600;color:var(--blue)">💡 Help me estimate benefits</span>';
+  html += '<span style="font-size:12px;color:var(--t3);margin-left:8px">'+(S.bw_open?"▲ hide":"▼ show")+'</span>';
   html += '</div>';
   if(S.bw_open){
-    html += '<div class="helper-body">';
+    html += '<div class="wizard-body">';
     html += '<div class="wizard-row"><div class="wizard-label">What type of benefit?</div>';
     html += '<div class="pills" style="margin-top:6px">';
     html += '<div class="pill'+(S.bw_type==="cost_saving"?" active":"")+'" onclick="S.bw_type=\'cost_saving\';render()"><div class="pill-dot"></div>Cost saving</div>';
@@ -859,9 +882,9 @@ function renderPage2() {
     html += '<div class="ui" style="max-width:200px"><input type="text" value="'+(S.bw_improvement||"")+'" placeholder="0" onblur="S.bw_improvement=+this.value||0" onfocus="this.style.borderBottomColor=\'var(--blue)\'"><span class="sfx">%</span></div></div>';
     if(S.bw_current && S.bw_improvement){
       var suggested = Math.round(S.bw_current * S.bw_improvement / 100);
-      html += '<div class="helper-result">';
+      html += '<div class="wizard-result">';
       html += '<div style="font-size:13px;color:var(--t2)">Suggested annual benefit: <strong style="color:var(--green)">'+fmtM(suggested)+'</strong></div>';
-      html += '<button class="helper-use" onclick="S.annuity=true;S.annuityAmount='+suggested+';S.bw_open=false;render()">Use this estimate ›</button>';
+      html += '<button class="wizard-use" onclick="S.annuity=true;S.annuityAmount='+suggested+';S.bw_open=false;render()">Use this estimate ›</button>';
       html += '</div>';
     }
     html += '</div>';
@@ -915,19 +938,21 @@ function updateYB(idx, val) {
   S.yearlyBenefits[idx] = val;
 }
 
+
 function validateInputs(){
   var errs=[];
   if(+S.cost<=0) errs.push("Asset cost must be greater than zero");
   if(+S.life<=0) errs.push("Asset life must be greater than zero");
-  if(S.salvage!==undefined&&+S.salvage<0) errs.push("Salvage value cannot be negative");
-  if(S.salvage!==undefined&&S.cost&&+S.salvage>=+S.cost) errs.push("Salvage cannot equal or exceed the cost");
+  if(S.salvage!==''&&+S.salvage<0) errs.push("Salvage value cannot be negative");
+  if(S.salvage!==''&&S.cost!==''&&+S.salvage>=+S.cost) errs.push("Salvage cannot equal or exceed the asset cost");
   if(S.method==="Double-declining"&&!(+S.ddbRate>0)) errs.push("Depreciation rate must be greater than zero for double-declining method");
   if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
   if(+S.coc<=0) errs.push("Required return must be greater than zero");
+  if(+S.coc>=100) errs.push("Required return cannot equal or exceed 100%");
   return errs;
 }
 function runCalc() {
-  var valErrs=validateInputs();if(valErrs.length>0){S.missing=valErrs;render();return;}
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
   try { S.res = calcAll(); S.page = 3; render(); }
   catch(e) { console.error(e); alert("Calculation error: "+e.message); }
 }
@@ -1088,5 +1113,6 @@ function render() {
 
 render();
 </script>
-</body>
-</html>
+
+
+</body></html>
