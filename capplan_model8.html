@@ -490,6 +490,16 @@ function renderPage1(){
   html+='<div class="panel"><div id="coc-box"></div></div>';
   html+='</aside><main>';
 
+  // How this works
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What it does.</strong> Calculates the minimum price to quote on a contract that uses a specific asset, ensuring full cost recovery at a target return including depreciation, operating costs, and markup.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you need.</strong> Asset cost, life, salvage, annual hours, operating costs, markup percentage, tax rate, and required return.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you get.</strong> The minimum viable tender price — the floor below which you are not recovering your cost of capital.</div></div>';
+  html+='</div></div>';
+
+
   // ── Helper 1: Rental hours estimator ────────────────────────────────────────
   html+='<div class="helper-card">';
   html+='<div class="helper-head" onclick="S.hrs_open=!S.hrs_open;render()">';

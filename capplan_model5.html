@@ -536,7 +536,16 @@ function renderPage1(){
   html+='</aside>';
 
   html+='<main>';
-  html += '<div class="model-overview">Finds the replacement year that minimises equivalent annual cost — where declining capital cost and rising operating cost meet. <strong>You need:</strong> asset cost, maximum useful life, year one O&M, annual escalation rate, salvage rate, and required return.</div>';
+
+  // How this works
+  html += '<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:10px">';
+  html += '<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What it does.</strong> Finds the year at which replacing an asset minimises your total annual cost — the point where declining capital cost and rising operating cost meet.</div></div>';
+  html += '<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you need.</strong> Asset cost, maximum useful life, year one operating and maintenance cost, annual O&M escalation rate, salvage rate, and required return.</div></div>';
+  html += '<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you get.</strong> The optimal replacement year, a chart of equivalent annual cost by year, and the EAC at your current age versus the optimum.</div></div>';
+  html += '</div></div>';
+
 
   // Asset class defaults picker
   html+='<div class="asset-picker helper-card">';

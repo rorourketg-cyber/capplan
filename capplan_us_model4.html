@@ -537,6 +537,16 @@ function loadExample(){
 
 function renderPage1(){
   var html='<div class="page"><div class="page-grid"><aside><div class="section-label">Briefing Notes</div><div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div><div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div></aside><main>';
+
+  // How this works
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What it does.</strong> Compares multiple replacement options against your current asset on a net present value basis.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you need.</strong> Current asset trade-in value. For each option: cost, life, annual benefit, salvage, and depreciation method. Plus tax rate and required return. MACRS depreciation applies — select the property class for your asset type.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you get.</strong> A ranked comparison of all replacement options versus keeping your current asset — showing the financially optimal choice.</div></div>';
+  html+='</div></div>';
+
   html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:13px;color:var(--amber-dark);line-height:1.6"><strong>US Edition:</strong> The old asset\'s disposal is treated as a separate transaction from each new asset purchase, since TCJA eliminated like-kind exchange treatment for personal property. 100% bonus depreciation is permanent under OBBBA.</div>';
 
   html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--warn)"></div><div class="panel-title">Old Asset Being Replaced</div></div><div class="field-grid">';

@@ -568,8 +568,17 @@ function loadExample(){
 
 function renderPage1(){
   var html='<div class="page"><div class="page-grid"><aside><div class="section-label">Briefing Notes</div><div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div><div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div></aside><main>';
-  html+='<div class="model-overview"><strong>US Edition — MACRS applies.</strong> Select the property class for your asset type. Bonus depreciation (100%, permanent under OBBBA) and Section 179 are available where applicable. Calculates whether the cash released by selling exceeds the cost of forfeited depreciation shields and lease obligations. <strong>You need:</strong> sale price, remaining life, salvage, leaseback terms, depreciation method, tax rate, borrowing rate, and required return.</div>';
-  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset</div></div><div class="field-grid">';
+
+  // How this works
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What it does.</strong> Calculates whether selling an asset and leasing it back creates or destroys value — weighing the cash released against forfeited depreciation shields and lease obligations.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you need.</strong> Asset sale price, remaining life, salvage, leaseback terms, tax rate, borrowing rate, and required return. MACRS depreciation applies — select the property class for your asset type.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you get.</strong> The NPV of the leaseback, a benefit-cost ratio, and a full cash flow breakdown in present value terms.</div></div>';
+  html+='</div></div>';
+
+    html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset</div></div><div class="field-grid">';
   html+=field("Asset Sale Price (proceeds received)",uInput("$",S.price,"inp-price","S.price=+this.value||0",""),false,false,"What the buyer will pay — this is the cash you receive at t=0");
   html+=field("Remaining Asset Life",uInput("",S.life,"inp-life","S.life=+this.value||0","years"));
   html+=field("Expected Salvage at End of Life",uInput("$",S.salvage,"inp-salv","S.salvage=+this.value||0",""),false,true);

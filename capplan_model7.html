@@ -507,6 +507,16 @@ function renderPage1(){
   html+='<div class="panel"><div id="coc-box"></div></div>';
   html+='</aside><main>';
 
+  // How this works
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What it does.</strong> Calculates the minimum hourly charge-out rate needed to recover the full cost of an asset — depreciation, operating costs, and financing — at a target return.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you need.</strong> Asset cost, life, salvage, annual utilisation in hours, year one operating costs, O&M escalation, tax rate, and required return.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you get.</strong> The minimum viable hourly rate and a sensitivity table showing how it varies with utilisation and other key inputs.</div></div>';
+  html+='</div></div>';
+
+
   // Rental hours estimator (amber helper card)
   html+='<div class="helper-card">';
   html+='<div class="helper-head" onclick="S.hrs_open=!S.hrs_open;render()">';

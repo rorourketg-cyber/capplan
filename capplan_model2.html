@@ -626,7 +626,16 @@ function renderPage1(){
 
   // RIGHT
   html+='<main>';
-  html += '<div class="model-overview">Compares multiple options on NPV, accounting for depreciation tax shields, annual benefits, and resale. <strong>You need:</strong> cost, life, annual benefit, salvage, depreciation method, tax rate, and required return for each option.</div>';
+
+  // How this works
+  html += '<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:10px">';
+  html += '<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What it does.</strong> Compares two or more asset options on a like-for-like NPV basis, accounting for price, annual benefits, depreciation tax shields, and resale.</div></div>';
+  html += '<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you need.</strong> For each option: cost, useful life, annual benefit, expected resale, and depreciation method. Plus your tax rate and required return.</div></div>';
+  html += '<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you get.</strong> A ranked comparison showing which option delivers the best net present value — and by how much.</div></div>';
+  html += '</div></div>';
+
 
   // Alt tabs
   html+='<div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:18px;overflow:hidden">';

@@ -632,7 +632,16 @@ function renderPage1(){
   html+='<div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div>';
   html+='</aside><main>';
 
-  html+='<div class="model-overview"><strong>US Edition — MACRS applies.</strong> Select the property class for your asset type. Bonus depreciation (100%, permanent under OBBBA) and Section 179 are available where applicable. Full investment appraisal: NPV, benefit-cost ratio, IRR, and payback. Enter asset details on page one, annual economic benefits on page two. <strong>You need:</strong> cost, depreciation method, tax rate, required return, and projected annual benefits.</div>';
+  // How this works
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What it does.</strong> Full investment appraisal using MACRS depreciation: NPV, benefit-cost ratio, IRR, and payback. Bonus depreciation and Section 179 are fully supported.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you need.</strong> Asset cost, MACRS property class, life, salvage, tax rate, required return, and projected annual benefits. Enter asset details on page one, benefits year by year on page two.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you get.</strong> A complete investment appraisal with NPV, benefit-cost ratio, IRR, payback period, and sensitivity analysis on key assumptions.</div></div>';
+  html+='</div></div>';
+
+
 
   html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Data</div></div><div class="field-grid">';
   html+=field("Cost of Asset",uInput("$",S.cost,"inp-cost","S.cost=+this.value||0;render()","",false),false,false,"Purchase price plus installation, transportation, and other costs to place in service");

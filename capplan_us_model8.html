@@ -562,8 +562,17 @@ function loadExample(){
 
 function renderPage1(){
   var html='<div class="page"><div class="page-grid"><aside><div class="section-label">Briefing Notes</div><div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div><div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div></aside><main>';
-  html+='<div class="model-overview"><strong>US Edition — MACRS applies.</strong> Select the property class for your asset type. Bonus depreciation (100%, permanent under OBBBA) and Section 179 are available where applicable. Calculates the minimum contract price that recovers all asset costs at a target return, including depreciation, operating costs, and markup. <strong>You need:</strong> asset cost, life, salvage, annual hours, operating costs, markup, tax rate, and required return.</div>';
 
+  // How this works
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What it does.</strong> Calculates the minimum contract price that recovers all asset costs at a target return, including depreciation, operating costs, and markup.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you need.</strong> Asset cost, life, salvage, annual hours, operating costs, markup percentage, tax rate, and required return. MACRS depreciation applies — select the property class for your asset type.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you get.</strong> The minimum viable tender price — the floor below which you are not recovering your cost of capital.</div></div>';
+  html+='</div></div>';
+
+  
   html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Data</div></div><div class="field-grid">';
   html+=field("Asset Cost",uInput("$",S.cost,"inp-cost","S.cost=+this.value||0","",false));
   html+=field("Asset Life",uInput("",S.life,"inp-life","S.life=+this.value||0","years",false));

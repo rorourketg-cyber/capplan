@@ -537,8 +537,17 @@ function loadExample(){
 }
 function renderPage1(){
   var html='<div class="page"><div class="page-grid"><aside><div class="section-label">Briefing Notes</div><div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div><div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div></aside><main>';
-  html+='<div class="model-overview"><strong>US Edition — MACRS applies.</strong> Select the property class for your asset type. Bonus depreciation (100%, permanent under OBBBA) and Section 179 are available where applicable. Calculates the price ceiling that still earns your target return, accounting for depreciation tax shields and salvage. <strong>You need:</strong> expected annual benefit, asset life, salvage as a percentage of price, depreciation method, tax rate, and target return.</div>';
-  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Value</div></div><div class="field-grid">';
+
+  // How this works
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What it does.</strong> Calculates the maximum price you should pay for an asset and still earn your target return — accounting for depreciation tax shields and salvage value, both of which scale with the price paid.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you need.</strong> Expected annual benefit, asset life, salvage as a percentage of price, tax rate, and target return. MACRS depreciation applies — select the property class for your asset type.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you get.</strong> Your price ceiling, a nominal ceiling at zero return, and sensitivity tables showing how the maximum changes with return and benefit assumptions.</div></div>';
+  html+='</div></div>';
+
+    html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Value</div></div><div class="field-grid">';
   html+=field("Annual After-Tax Benefit",uInput("$",S.benefits,"inp-ben","S.benefits=+this.value||0",""),false,false,"The net annual value the asset provides — cost savings, revenue, or efficiency gains, after tax");
   html+=field("Asset Life",uInput("",S.life,"inp-life","S.life=+this.value||0","years"));
   html+=field("Salvage Value (% of purchase price)",uInput("",S.svPct,"inp-sv","S.svPct=+this.value||0","%"),false,true,"Estimated resale value as a percentage of whatever you pay — scales with the unknown price");

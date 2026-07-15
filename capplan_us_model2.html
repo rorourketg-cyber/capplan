@@ -535,8 +535,17 @@ function loadExample(){
 
 function renderPage1(){
   var html='<div class="page"><div class="page-grid"><aside><div class="section-label">Briefing Notes</div><div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div><div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div></aside><main>';
-  html+='<div class="model-overview"><strong>US Edition — MACRS applies.</strong> Select the property class for your asset type. Bonus depreciation (100%, permanent under OBBBA) and Section 179 are available where applicable. Compares multiple options on NPV, accounting for depreciation tax shields, annual benefits, and resale. <strong>You need:</strong> cost, life, annual benefit, salvage, depreciation method, tax rate, and required return for each option.</div>';
 
+  // How this works
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What it does.</strong> Compares multiple asset options on NPV, accounting for depreciation tax shields, annual benefits, and resale.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you need.</strong> For each option: cost, useful life, annual benefit, expected resale, and depreciation method. Plus tax rate and required return. MACRS depreciation applies — select the property class for your asset type.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you get.</strong> A ranked comparison showing which option delivers the best net present value — and by how much.</div></div>';
+  html+='</div></div>';
+
+  
   html+='<div class="alt-tabs">';
   S.alts.forEach(function(a,i){html+='<div class="alt-tab'+(S.activeTab===i?" active":"")+'" onclick="S.activeTab='+i+';render()">'+a.label+(S.alts.length>2?'<span class="alt-remove" onclick="event.stopPropagation();removeAlt('+i+')">×</span>':'')+'</div>';});
   if(S.alts.length<5)html+='<div class="alt-add" onclick="addAlt()">+ Add Alternative</div>';
