@@ -90,7 +90,20 @@ tr.highlight td{background:var(--green-soft)!important;font-weight:700;color:var
 .modal-head{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
 .modal-close{font-size:22px;color:var(--t3);line-height:1;cursor:pointer}
 .video-wrap{position:relative;padding-bottom:56.25%;height:0}.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%}
-@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;background:white}#masthead{position:static!important;height:auto!important;padding:8px 0!important}#stepper,.btn-ghost,.print-btn,.coll-arr{display:none!important}.page-grid,.p2-grid{display:block!important}aside{display:none!important}.coll-body{display:block!important}.coll-head{break-after:avoid!important}.result-banner,.metric,.chart-box,.collapsible,.helper-card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid}table{font-size:9px;table-layout:fixed}th,td{padding:3px 5px}thead{display:table-header-group}tr{break-inside:avoid}@page{margin:0.5in;size:landscape}}</style>
+@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;background:white}#masthead{position:static!important;height:auto!important;padding:8px 0!important}#stepper,.btn-ghost,.print-btn,.coll-arr{display:none!important}.page-grid,.p2-grid{display:block!important}aside{display:none!important}.coll-body{display:block!important}.coll-head{break-after:avoid!important}.result-banner,.metric,.chart-box,.collapsible,.helper-card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid}table{font-size:9px;table-layout:fixed}th,td{padding:3px 5px}thead{display:table-header-group}tr{break-inside:avoid}@page{margin:0.5in;size:landscape}}
+#model-banner {
+  background: var(--blue);
+  color: white;
+  text-align: center;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: Georgia, serif;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  border-bottom: 2px solid rgba(255,255,255,0.12);
+}
+</style>
 </head>
 <body>
 <div id="masthead">
@@ -98,6 +111,7 @@ tr.highlight td{background:var(--green-soft)!important;font-weight:700;color:var
   <div class="module-name">What's the Least I Should Accept?</div>
   <div style="position:relative"><button style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600" id="cur-btn" onclick="toggleCur()"><span id="cur-label">$ USD</span> ▾</button><div id="cur-dropdown" style="display:none;position:absolute;right:0;top:110%;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,29,46,.16);min-width:200px;z-index:300;overflow:hidden"></div></div>
 </div>
+<div id="model-banner">What is the minimum price I should accept if I sell this asset?</div>
 <div id="stepper">
   <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Asset details</div></div>
   <div class="step-sep">›</div>

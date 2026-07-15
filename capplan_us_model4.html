@@ -133,6 +133,31 @@ tr.highlight td{background:var(--blue-soft)!important;font-weight:700;color:var(
 .alt-add{background:var(--blue-soft);border:1.5px dashed var(--blue);border-radius:8px;padding:9px 16px;cursor:pointer;font-size:13px;font-weight:600;color:var(--blue)}
 .compare-card{border-radius:10px;padding:16px;border:2px solid var(--border);background:var(--surface)}
 .compare-card.winner{border-color:var(--green);background:var(--green-soft)}
+
+#model-banner {
+  background: var(--blue);
+  color: white;
+  text-align: center;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: Georgia, serif;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  border-bottom: 2px solid rgba(255,255,255,0.12);
+}
+
+.model-overview {
+  background: var(--amber-soft);
+  border: 1.5px solid var(--amber);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--amber-dark);
+  line-height: 1.6;
+}
+.model-overview strong { color: var(--amber-dark); }
 </style>
 </head>
 <body>
@@ -141,6 +166,7 @@ tr.highlight td{background:var(--blue-soft)!important;font-weight:700;color:var(
   <div class="module-name">Asset Replacement With Alternatives <span style="opacity:.6;font-weight:500">— US</span></div>
   <div style="position:relative"><button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600">$ USD</button></div>
 </div>
+<div id="model-banner">Which replacement option gives us the best financial outcome?</div>
 <div id="stepper">
   <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Inputs for the Old Asset &amp; Alternatives</div></div>
   <div class="step-sep">›</div>

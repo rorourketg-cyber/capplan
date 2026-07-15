@@ -125,7 +125,32 @@ tr.highlight td{background:var(--blue-soft)!important;font-weight:700;color:var(
 .macrs-class-btn.active{background:var(--blue-soft);border-left:3px solid var(--blue)}
 .macrs-class-label{font-size:13px;font-weight:700;color:var(--t1)}
 .macrs-class-sub{font-size:10px;color:var(--t3);margin-top:2px}
-.bonus-toggle{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--green-soft);border-radius:8px;border:1.5px solid var(--green)}</style>
+.bonus-toggle{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--green-soft);border-radius:8px;border:1.5px solid var(--green)}
+#model-banner {
+  background: var(--blue);
+  color: white;
+  text-align: center;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: Georgia, serif;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  border-bottom: 2px solid rgba(255,255,255,0.12);
+}
+
+.model-overview {
+  background: var(--amber-soft);
+  border: 1.5px solid var(--amber);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--amber-dark);
+  line-height: 1.6;
+}
+.model-overview strong { color: var(--amber-dark); }
+</style>
 </head>
 <body>
 <div id="masthead">
@@ -133,6 +158,7 @@ tr.highlight td{background:var(--blue-soft)!important;font-weight:700;color:var(
   <div class="module-name">Asset Purchase Analysis <span style="opacity:.6;font-weight:500">— US</span></div>
   <div style="position:relative"><button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600" id="cur-btn" onclick="toggleCur()"><span id="cur-label">$ USD</span> ▾</button><div id="cur-dropdown" style="display:none;position:absolute;right:0;top:110%;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,29,46,.16);min-width:200px;z-index:300;overflow:hidden"></div></div>
 </div>
+<div id="model-banner">Does this capital investment meet our required return?</div>
 <div id="stepper">
   <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Asset Details</div></div>
   <div class="step-sep">›</div>
@@ -606,7 +632,7 @@ function renderPage1(){
   html+='<div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div>';
   html+='</aside><main>';
 
-  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:13px;color:var(--amber-dark);line-height:1.6"><strong>US Edition:</strong> This model uses MACRS depreciation and current federal bonus depreciation / Section 179 rules under the One Big Beautiful Bill Act (OBBBA). 100% bonus depreciation was made <strong>permanent</strong> by OBBBA, with no scheduled sunset date — unlike the prior phase-down schedule. All figures are in US dollars.</div>';
+  html+='<div class="model-overview"><strong>US Edition — MACRS applies.</strong> Select the property class for your asset type. Bonus depreciation (100%, permanent under OBBBA) and Section 179 are available where applicable. Full investment appraisal: NPV, benefit-cost ratio, IRR, and payback. Enter asset details on page one, annual economic benefits on page two. <strong>You need:</strong> cost, depreciation method, tax rate, required return, and projected annual benefits.</div>';
 
   html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Data</div></div><div class="field-grid">';
   html+=field("Cost of Asset",uInput("$",S.cost,"inp-cost","S.cost=+this.value||0;render()","",false),false,false,"Purchase price plus installation, transportation, and other costs to place in service");

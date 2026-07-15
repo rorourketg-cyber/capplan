@@ -137,6 +137,31 @@ tr:nth-child(even){background:var(--surface)}
   .overflow-x{overflow-x:visible!important;overflow:visible!important}
   @page{margin:0.5in;size:landscape}
 }
+
+#model-banner {
+  background: var(--blue);
+  color: white;
+  text-align: center;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: Georgia, serif;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  border-bottom: 2px solid rgba(255,255,255,0.12);
+}
+
+.model-overview {
+  background: var(--amber-soft);
+  border: 1.5px solid var(--amber);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--amber-dark);
+  line-height: 1.6;
+}
+.model-overview strong { color: var(--amber-dark); }
 </style>
 </head>
 <body>
@@ -156,6 +181,7 @@ tr:nth-child(even){background:var(--surface)}
   </div>
 </div>
 
+<div id="model-banner">Does replacing this asset now make financial sense?</div>
 <div id="stepper">
   <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Asset Details</div></div>
   <div class="step-sep">›</div>
@@ -593,6 +619,7 @@ function renderPage1(){
   html+='<div class="panel" style="margin-bottom:0"><div id="coc-box"></div></div>';
   html+='</aside>';
   html+='<main>';
+  html += '<div class="model-overview">Calculates the NPV of switching to a new asset, accounting for the trade-in value of the old one and incremental benefits. <strong>You need:</strong> new asset cost and details, current asset trade-in value, incremental annual benefit, tax rate, and required return.</div>';
 
   // New Asset card
   html+='<div class="panel">';

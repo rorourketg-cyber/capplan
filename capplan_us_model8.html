@@ -125,7 +125,32 @@ tr.highlight td{background:var(--blue-soft)!important;font-weight:700;color:var(
 .macrs-class-btn.active{background:var(--blue-soft);border-left:3px solid var(--blue)}
 .macrs-class-label{font-size:13px;font-weight:700;color:var(--t1)}
 .macrs-class-sub{font-size:10px;color:var(--t3);margin-top:2px}
-.bonus-toggle{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--green-soft);border-radius:8px;border:1.5px solid var(--green)}</style>
+.bonus-toggle{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--green-soft);border-radius:8px;border:1.5px solid var(--green)}
+#model-banner {
+  background: var(--blue);
+  color: white;
+  text-align: center;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: Georgia, serif;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  border-bottom: 2px solid rgba(255,255,255,0.12);
+}
+
+.model-overview {
+  background: var(--amber-soft);
+  border: 1.5px solid var(--amber);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--amber-dark);
+  line-height: 1.6;
+}
+.model-overview strong { color: var(--amber-dark); }
+</style>
 </head>
 <body>
 <div id="masthead">
@@ -133,6 +158,7 @@ tr.highlight td{background:var(--blue-soft)!important;font-weight:700;color:var(
   <div class="module-name">Rental Rate with Operator <span style="opacity:.6;font-weight:500">— US</span></div>
   <div style="position:relative"><button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600">$ USD</button></div>
 </div>
+<div id="model-banner">What is the minimum we should quote on this contract?</div>
 <div id="stepper">
   <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Asset &amp; Operator</div></div>
   <div class="step-sep">›</div>
@@ -536,7 +562,7 @@ function loadExample(){
 
 function renderPage1(){
   var html='<div class="page"><div class="page-grid"><aside><div class="section-label">Briefing Notes</div><div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div><div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div></aside><main>';
-  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:13px;color:var(--amber-dark);line-height:1.6"><strong>US Edition:</strong> MACRS depreciation replaces the method selector. No ITC — apply energy or investment credits as a direct reduction to cost. Salvage proceeds above remaining MACRS basis trigger Section 1245 recapture. The operator rate is additive to the capital rate.</div>';
+  html+='<div class="model-overview"><strong>US Edition — MACRS applies.</strong> Select the property class for your asset type. Bonus depreciation (100%, permanent under OBBBA) and Section 179 are available where applicable. Calculates the minimum contract price that recovers all asset costs at a target return, including depreciation, operating costs, and markup. <strong>You need:</strong> asset cost, life, salvage, annual hours, operating costs, markup, tax rate, and required return.</div>';
 
   html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Data</div></div><div class="field-grid">';
   html+=field("Asset Cost",uInput("$",S.cost,"inp-cost","S.cost=+this.value||0","",false));
