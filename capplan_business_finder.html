@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CapPlan — Business Solution Finder</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#F7F8FA;color:#0F1D2E;font-size:15px;line-height:1.6;min-height:100vh}
+:root{
+  --blue:#1B3F6E;--blue-warm:#1E4880;--blue-soft:rgba(27,63,110,0.09);--blue-mid:#E8EFF8;
+  --green:#2E7D52;--green-soft:rgba(46,125,82,0.09);
+  --amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;
+  --surface:#F7F8FA;--panel:#ffffff;--border:#E2E6EC;
+  --t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;--warn:#C84B31;
+}
+
+/* ── HEADER ── */
+#header{
+  background:var(--blue);
+  padding:16px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 12px rgba(15,29,46,.18);
+}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:30px;height:30px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:Georgia,serif;font-size:20px;color:white}
+.logo-text span{color:#A8C5E8}
+.logo-sub{font-size:12px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.06em;margin-left:4px;padding-left:10px;border-left:1px solid rgba(255,255,255,.25)}
+.header-back{font-size:12px;color:rgba(255,255,255,.7);cursor:pointer;padding:6px 12px;border-radius:5px;border:1px solid rgba(255,255,255,.2);transition:all .15s}
+.header-back:hover{background:rgba(255,255,255,.1);color:white}
+
+/* ── TRACK ── */
+#finder{max-width:780px;margin:0 auto;padding:32px 20px 60px}
+#breadcrumb{font-size:12px;color:var(--t3);margin-bottom:20px;min-height:18px}
+#breadcrumb span{color:var(--t2)}
+#start-over{display:none;font-size:12px;color:var(--blue);cursor:pointer;text-decoration:underline;margin-left:10px}
+
+/* ── REGION TOGGLE ── */
+.region-toggle{display:flex;gap:0;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:28px;max-width:360px}
+.region-btn{flex:1;padding:10px 16px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:#fff;color:var(--t2);transition:all .15s}
+.region-btn.active{background:var(--blue);color:white}
+.region-btn:not(.active):hover{background:var(--blue-soft)}
+
+/* ── QUESTION CARD ── */
+.q-card{background:var(--panel);border:1.5px solid var(--border);border-radius:12px;padding:28px;margin-bottom:20px;box-shadow:0 2px 8px rgba(15,29,46,.06)}
+.q-step-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);margin-bottom:8px}
+.q-title{font-family:Georgia,serif;font-size:21px;font-weight:700;color:var(--t1);margin-bottom:6px;line-height:1.35}
+.q-sub{font-size:13px;color:var(--t2);margin-bottom:22px}
+
+/* ── CHOICE BUTTONS ── */
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice-btn{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:14px 18px;
+  background:#fff;border:1.5px solid var(--border);border-radius:10px;
+  cursor:pointer;text-align:left;transition:all .15s;width:100%
+}
+.choice-btn:hover{border-color:var(--blue);background:var(--blue-soft)}
+.choice-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.choice-text{}
+.choice-title{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:2px}
+.choice-desc{font-size:12px;color:var(--t2);line-height:1.45}
+
+/* ── RESULT CARD ── */
+.result-card{background:var(--panel);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(15,29,46,.10)}
+.result-head{background:var(--blue);padding:22px 28px;display:flex;align-items:flex-start;gap:16px}
+.result-badge{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);background:white;border-radius:4px;padding:3px 8px;flex-shrink:0;margin-top:3px}
+.result-head-text{}
+.result-model-label{font-size:11px;color:rgba(255,255,255,.65);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.result-title{font-family:Georgia,serif;font-size:22px;color:white;font-weight:700;line-height:1.3}
+.result-region{font-size:11px;color:rgba(255,255,255,.6);margin-top:4px}
+.result-body{padding:24px 28px}
+.result-question{font-size:15px;font-style:italic;color:var(--t1);margin-bottom:14px;font-family:Georgia,serif}
+.result-desc{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:20px}
+
+/* HTW card in result */
+.htw-card{background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:20px}
+.htw-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px}
+.htw-steps{display:flex;flex-direction:column;gap:10px}
+.htw-step{display:flex;gap:10px;align-items:flex-start}
+.htw-num{width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.htw-step-text{font-size:12px;color:var(--t2);line-height:1.5}
+.htw-step-text strong{color:var(--amber-dark)}
+
+.result-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.open-btn{
+  background:var(--blue);color:white;border:none;border-radius:8px;
+  padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;
+  transition:background .15s;text-decoration:none;display:inline-block
+}
+.open-btn:hover{background:var(--blue-warm)}
+.also-label{font-size:12px;color:var(--t3);margin-top:16px;margin-bottom:8px}
+.also-chips{display:flex;gap:8px;flex-wrap:wrap}
+.also-chip{
+  font-size:12px;font-weight:600;color:var(--blue);
+  background:var(--blue-soft);border:1px solid rgba(27,63,110,.18);
+  border-radius:6px;padding:4px 10px;cursor:pointer;transition:all .15s
+}
+.also-chip:hover{background:var(--blue);color:white}
+
+/* ── BACK BUTTON ── */
+#back-btn{display:none;margin-bottom:16px}
+.back-link{font-size:13px;color:var(--blue);cursor:pointer;background:none;border:none;padding:0;text-decoration:underline}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 18 18" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg>
+    </div>
+    <div class="logo-text">Cap<span>Plan</span></div>
+    <div class="logo-sub">Business</div>
+  </div>
+  <div class="header-back" onclick="window.location.href='capplan_landing.html'">← Back to capplan.online</div>
+</div>
+
+<div id="finder">
+  <div id="breadcrumb"></div>
+  <div id="back-btn"><button class="back-link" onclick="goBack()">← Back</button> <span id="start-over" onclick="startOver()">Start over</span></div>
+  <div id="main-content"></div>
+</div>
+
+<script>
+// ── MODEL DATA ────────────────────────────────────────────────────────────────
+var MODELS = {
+
+  // ── NON-US MODELS ──
+  M1:{id:'M1',region:'non-us',file:'capplan_model1.html',
+    title:'Asset Purchase Analysis',
+    question:'Does this capital investment meet our required return?',
+    desc:'Full investment appraisal: NPV, benefit-cost ratio, IRR, and payback. Enter asset details on page one, annual economic benefits on page two.',
+    steps:[
+      ['What it does.','Full investment appraisal — NPV, benefit-cost ratio, IRR, and payback — using standard depreciation methods.'],
+      ['What you need.','Cost, depreciation method, tax rate, required return, and projected annual benefits entered year by year.'],
+      ['What you get.','A complete investment appraisal showing whether the asset earns your required return and by how much.']
+    ],
+    also:['M2','M12','M13']},
+
+  M2:{id:'M2',region:'non-us',file:'capplan_model2.html',
+    title:'Which Option Should We Buy?',
+    question:'Which asset option delivers the best return on investment?',
+    desc:'Compares multiple options on NPV, accounting for depreciation tax shields, annual benefits, and resale.',
+    steps:[
+      ['What it does.','Compares two or more asset options on a like-for-like NPV basis, accounting for price, annual benefits, depreciation tax shields, and resale.'],
+      ['What you need.','For each option: cost, useful life, annual benefit, expected resale, and depreciation method. Plus your tax rate and required return.'],
+      ['What you get.','A ranked comparison showing which option delivers the best net present value — and by how much.']
+    ],
+    also:['M1','M4']},
+
+  M3:{id:'M3',region:'non-us',file:'capplan_model3.html',
+    title:'Should We Replace This Asset?',
+    question:'Does replacing this asset now make financial sense?',
+    desc:'Calculates the NPV of switching to a new asset, accounting for the trade-in value of the old one and the incremental benefits the new one provides.',
+    steps:[
+      ['What it does.','Calculates whether replacing an existing asset now makes financial sense, accounting for the trade-in value and incremental benefits.'],
+      ['What you need.','New asset cost and details, current asset trade-in value, incremental annual benefit, tax rate, and required return.'],
+      ['What you get.','The NPV of replacing now. Positive means replacing is justified; negative means keep what you have.']
+    ],
+    also:['M4','M5']},
+
+  M4:{id:'M4',region:'non-us',file:'capplan_model4.html',
+    title:'Which Replacement Is Best?',
+    question:'Which replacement option gives us the best financial outcome?',
+    desc:'Compares multiple replacement options against your current asset on an NPV basis.',
+    steps:[
+      ['What it does.','Compares multiple replacement options against your current asset on a net present value basis.'],
+      ['What you need.','Current asset trade-in value, and for each option: cost, life, annual benefit, salvage, depreciation method, tax rate, and required return.'],
+      ['What you get.','A ranked comparison of all replacement options versus keeping your current asset.']
+    ],
+    also:['M3','M5']},
+
+  M5:{id:'M5',region:'non-us',file:'capplan_model5.html',
+    title:'When Should We Replace It?',
+    question:'What is the optimal year to replace this asset?',
+    desc:'Finds the replacement year that minimises equivalent annual cost — where declining capital cost and rising operating cost meet.',
+    steps:[
+      ['What it does.','Finds the year at which replacing an asset minimises total annual cost — where declining capital cost and rising operating cost meet.'],
+      ['What you need.','Asset cost, maximum useful life, year one O&M cost, annual escalation rate, salvage rate, and required return.'],
+      ['What you get.','The optimal replacement year, a cost curve by year, and EAC at your current age versus the optimum.']
+    ],
+    also:['M3','M4']},
+
+  M6:{id:'M6',region:'non-us',file:'capplan_model6.html',
+    title:'Minimum Lease Payment',
+    question:'What is the minimum lease payment that covers our costs?',
+    desc:'Calculates the minimum payment that recovers the asset cost including depreciation tax shields and salvage at a target return.',
+    steps:[
+      ['What it does.','Calculates the minimum lease payment a lessor must charge to recover the full cost of the asset at a target return.'],
+      ['What you need.','Asset price, useful life, expected salvage, lease term, depreciation method, tax rate, and required return.'],
+      ['What you get.','The minimum viable lease payment per period and a sensitivity table.']
+    ],
+    also:['M7','M8']},
+
+  M7:{id:'M7',region:'non-us',file:'capplan_model7.html',
+    title:'Minimum Hourly Rate',
+    question:'What is the minimum rate we need to charge per hour?',
+    desc:'Calculates the hourly rate needed to recover full asset cost including depreciation, operating costs, and financing at a target return.',
+    steps:[
+      ['What it does.','Calculates the minimum hourly charge-out rate needed to recover the full cost of an asset at a target return.'],
+      ['What you need.','Asset cost, life, salvage, annual utilisation hours, operating costs, O&M escalation, tax rate, and required return.'],
+      ['What you get.','The minimum viable hourly rate and a sensitivity table showing how it varies with utilisation.']
+    ],
+    also:['M6','M8']},
+
+  M8:{id:'M8',region:'non-us',file:'capplan_model8.html',
+    title:'Minimum Tender Price',
+    question:'What is the minimum we should quote on this contract?',
+    desc:'Calculates the minimum contract price that recovers all asset costs at a target return, including depreciation, operating costs, and markup.',
+    steps:[
+      ['What it does.','Calculates the minimum contract price that recovers all asset costs at a target return, including depreciation, operating costs, and markup.'],
+      ['What you need.','Asset cost, life, salvage, annual hours, operating costs, markup percentage, tax rate, and required return.'],
+      ['What you get.','The minimum viable tender price — the floor below which you are not recovering your cost of capital.']
+    ],
+    also:['M6','M7']},
+
+  M9:{id:'M9',region:'non-us',file:'capplan_model9.html',
+    title:'Lease vs Purchase',
+    question:'Should we lease or purchase this asset?',
+    desc:'Compares the after-tax present value of leasing versus purchasing, and calculates the interest rate implied by the lease payments.',
+    steps:[
+      ['What it does.','Compares the after-tax present value of leasing versus purchasing an asset, and calculates the interest rate implied by the lease payments.'],
+      ['What you need.','Asset price, life, salvage, depreciation method, lease term, payment amount and frequency, deposit if any, tax rate, borrowing rate, and required return.'],
+      ['What you get.','Which option costs less in present value terms, the implied financing rate in the lease, and the break-even lease payment.']
+    ],
+    also:['M10','M11']},
+
+  M10:{id:'M10',region:'non-us',file:'capplan_model10.html',
+    title:'Sale and Leaseback',
+    question:'Does selling and leasing back this asset make financial sense?',
+    desc:'Calculates whether the cash released by selling exceeds the cost of forfeited depreciation shields and lease obligations.',
+    steps:[
+      ['What it does.','Calculates whether selling an asset and leasing it back creates or destroys value — weighing cash released against forfeited depreciation shields and lease obligations.'],
+      ['What you need.','Asset sale price, remaining life, salvage, leaseback terms, depreciation method, tax rate, borrowing rate, and required return.'],
+      ['What you get.','The NPV of the leaseback, a benefit-cost ratio, and a full cash flow breakdown in present value terms.']
+    ],
+    also:['M9','M11']},
+
+  M11:{id:'M11',region:'non-us',file:'capplan_model11.html',
+    title:'Implied Cost of Leasing',
+    question:'What is this lease actually costing us as a financing rate?',
+    desc:'Finds the effective annual rate embedded in the lease by comparing its after-tax cost to the purchase alternative with depreciation tax shields.',
+    steps:[
+      ['What it does.','Finds the effective annual financing rate embedded in a lease by comparing its after-tax cost to the purchase alternative.'],
+      ['What you need.','Asset price, life, salvage, depreciation method, lease term, payment amount, deposit if any, tax rate, and your borrowing rate.'],
+      ['What you get.','The implied lease rate compared to your borrowing rate — so you can see whether the lease is cheap or expensive financing.']
+    ],
+    also:['M9','M10']},
+
+  M12:{id:'M12',region:'non-us',file:'capplan_model12.html',
+    title:'Minimum Selling Price',
+    question:'What is the minimum we should accept if we sell this asset?',
+    desc:'Calculates the sale price needed to earn your target return given original cost, depreciation shields claimed, and benefits received.',
+    steps:[
+      ['What it does.','Calculates the minimum price you should accept for an asset you own, ensuring you earn your target return given your original investment and what the asset has returned so far.'],
+      ['What you need.','Original cost, total asset life, current age, average annual benefit received, depreciation method, tax rate, and target return.'],
+      ['What you get.','Your floor price, your current financial position, and how the floor changes with age and target return.']
+    ],
+    also:['M13','M1']},
+
+  M13:{id:'M13',region:'non-us',file:'capplan_model13.html',
+    title:'Maximum Purchase Price',
+    question:'What is the maximum we should pay for this asset?',
+    desc:'Calculates the price ceiling that still earns your target return, accounting for depreciation tax shields and salvage value.',
+    steps:[
+      ['What it does.','Calculates the maximum price you should pay for an asset and still earn your target return — accounting for depreciation tax shields and salvage value, both of which scale with the price paid.'],
+      ['What you need.','Expected annual benefit, asset life, salvage as a percentage of price, depreciation method, tax rate, and target return.'],
+      ['What you get.','Your price ceiling, a nominal ceiling at zero return, and sensitivity tables showing how the maximum changes with return and benefit assumptions.']
+    ],
+    also:['M12','M1']},
+
+  // ── US MODELS ──
+  UM1:{id:'UM1',region:'us',file:'capplan_us_model1.html',
+    title:'Capital Investment Analysis (MACRS)',
+    question:'Does this capital investment meet our required return?',
+    desc:'Full investment appraisal using MACRS depreciation: NPV, benefit-cost ratio, IRR, and payback. Bonus depreciation and Section 179 fully supported.',
+    steps:[
+      ['What it does.','Full investment appraisal using MACRS depreciation — NPV, benefit-cost ratio, IRR, and payback. Bonus depreciation and Section 179 are fully supported.'],
+      ['What you need.','Asset cost, MACRS property class, life, salvage, tax rate, required return, and projected annual benefits entered year by year.'],
+      ['What you get.','A complete investment appraisal showing whether the asset earns your required return, with sensitivity analysis on key assumptions.']
+    ],
+    also:['UM2','UM12','UM13']},
+
+  UM2:{id:'UM2',region:'us',file:'capplan_us_model2.html',
+    title:'Which Option? (MACRS)',
+    question:'Which asset option delivers the best return on investment?',
+    desc:'Compares multiple options on NPV using MACRS depreciation. Bonus depreciation and Section 179 can be applied per option.',
+    steps:[
+      ['What it does.','Compares multiple asset options on NPV using MACRS depreciation, accounting for tax shields, annual benefits, and resale.'],
+      ['What you need.','For each option: cost, MACRS property class, life, annual benefit, and salvage. Plus tax rate and required return.'],
+      ['What you get.','A ranked comparison showing which option delivers the best net present value — and by how much.']
+    ],
+    also:['UM1','UM4']},
+
+  UM3:{id:'UM3',region:'us',file:'capplan_us_model3.html',
+    title:'Replace This Asset? (MACRS)',
+    question:'Does replacing this asset now make financial sense?',
+    desc:'Calculates the NPV of replacing an existing asset, accounting for MACRS shields on the new asset and recapture tax on the old one.',
+    steps:[
+      ['What it does.','Calculates whether replacing an existing asset now makes financial sense, accounting for MACRS shields on the new one and recapture tax on the old one.'],
+      ['What you need.','New asset cost, MACRS property class, old asset sale price and remaining basis, incremental annual benefit, tax rate, and required return.'],
+      ['What you get.','The NPV of replacing now. Positive means replacing is justified; negative means keep what you have.']
+    ],
+    also:['UM4','UM5']},
+
+  UM4:{id:'UM4',region:'us',file:'capplan_us_model4.html',
+    title:'Which Replacement? (MACRS)',
+    question:'Which replacement option gives us the best financial outcome?',
+    desc:'Compares multiple MACRS-depreciated replacement options against your current asset on an NPV basis.',
+    steps:[
+      ['What it does.','Compares multiple MACRS-depreciated replacement options against your current asset on a net present value basis.'],
+      ['What you need.','Current asset sale price and remaining basis, and for each option its cost, MACRS property class, life, annual benefit, and salvage.'],
+      ['What you get.','A ranked comparison of all replacement options versus keeping your current asset.']
+    ],
+    also:['UM3','UM5']},
+
+  UM5:{id:'UM5',region:'us',file:'capplan_us_model5.html',
+    title:'Optimal Replacement Year (MACRS)',
+    question:'What is the optimal year to replace this asset?',
+    desc:'Finds the year that minimises equivalent annual cost for a MACRS-depreciated asset, balancing declining capital cost against rising operating cost.',
+    steps:[
+      ['What it does.','Finds the replacement year that minimises equivalent annual cost — balancing declining MACRS capital cost against rising operating cost.'],
+      ['What you need.','Asset cost, MACRS property class, maximum useful life, O&M costs, escalation rate, tax rate, and required return.'],
+      ['What you get.','The optimal replacement year, a cost curve by year, and EAC at your current age versus the optimum.']
+    ],
+    also:['UM3','UM4']},
+
+  UM6:{id:'UM6',region:'us',file:'capplan_us_model6.html',
+    title:'Minimum Lease Payment (MACRS)',
+    question:'What is the minimum lease payment that covers our costs?',
+    desc:'Calculates the minimum annual lease payment that recovers the lessor\'s cost including MACRS tax shields at a target return.',
+    steps:[
+      ['What it does.','Calculates the minimum lease payment a lessor must charge to recover the full asset cost including MACRS tax shields and salvage at a target return.'],
+      ['What you need.','Asset price, MACRS property class, life, salvage, lease term, tax rate, and required return.'],
+      ['What you get.','The minimum viable lease payment per period and a sensitivity table showing how it changes with term and other inputs.']
+    ],
+    also:['UM7','UM8']},
+
+  UM7:{id:'UM7',region:'us',file:'capplan_us_model7.html',
+    title:'Minimum Hourly Rate (MACRS)',
+    question:'What is the minimum rate we need to charge per hour?',
+    desc:'Calculates the minimum charge-out rate per hour to recover the cost of a MACRS asset at a target return, including operating costs.',
+    steps:[
+      ['What it does.','Calculates the minimum hourly charge-out rate to recover the full MACRS asset cost including depreciation, operating costs, and financing at a target return.'],
+      ['What you need.','Asset cost, MACRS property class, life, salvage, annual utilisation hours, O&M costs, tax rate, and required return.'],
+      ['What you get.','The minimum viable hourly rate and a sensitivity table showing how it varies with utilisation.']
+    ],
+    also:['UM6','UM8']},
+
+  UM8:{id:'UM8',region:'us',file:'capplan_us_model8.html',
+    title:'Minimum Tender Price (MACRS)',
+    question:'What is the minimum we should quote on this contract?',
+    desc:'Calculates the minimum contract price for work performed with a MACRS asset, ensuring full cost recovery at a target return.',
+    steps:[
+      ['What it does.','Calculates the minimum contract price that recovers all MACRS asset costs at a target return, including depreciation, operating costs, and markup.'],
+      ['What you need.','Asset cost, MACRS property class, life, salvage, annual hours, O&M costs, markup, tax rate, and required return.'],
+      ['What you get.','The minimum viable tender price — the floor below which you are not recovering your cost of capital.']
+    ],
+    also:['UM6','UM7']},
+
+  UM9:{id:'UM9',region:'us',file:'capplan_us_model9.html',
+    title:'Lease vs Purchase (MACRS)',
+    question:'Should we lease or purchase this asset?',
+    desc:'Compares the after-tax present value of leasing versus purchasing using MACRS depreciation, and calculates the pre-tax implied lease rate.',
+    steps:[
+      ['What it does.','Compares the after-tax present value of leasing versus purchasing using MACRS depreciation, and calculates the pre-tax implied lease rate.'],
+      ['What you need.','Asset price, MACRS property class, life, salvage, lease terms, tax rate, borrowing rate, and required return.'],
+      ['What you get.','Which option costs less in present value terms, the implied financing rate, and the break-even lease payment.']
+    ],
+    also:['UM10','UM11']},
+
+  UM10:{id:'UM10',region:'us',file:'capplan_us_model10.html',
+    title:'Sale and Leaseback (MACRS)',
+    question:'Does selling and leasing back this asset make financial sense?',
+    desc:'Calculates whether a sale and leaseback creates value, accounting for forfeited MACRS shields and leaseback obligations.',
+    steps:[
+      ['What it does.','Calculates whether selling and leasing back creates value — weighing cash released against forfeited MACRS shields and lease obligations.'],
+      ['What you need.','Asset sale price, MACRS property class, remaining life, salvage, leaseback terms, tax rate, borrowing rate, and required return.'],
+      ['What you get.','The NPV of the leaseback, a benefit-cost ratio, and a full cash flow breakdown in present value terms.']
+    ],
+    also:['UM9','UM11']},
+
+  UM11:{id:'UM11',region:'us',file:'capplan_us_model11.html',
+    title:'Implied Cost of Leasing (MACRS)',
+    question:'What is this lease actually costing us as a financing rate?',
+    desc:'Finds the pre-tax financing rate embedded in the lease by comparing lease cash flows to the MACRS purchase alternative.',
+    steps:[
+      ['What it does.','Finds the pre-tax financing rate embedded in the lease by comparing lease cash flows to the MACRS purchase alternative. Compare to your borrowing rate to judge value.'],
+      ['What you need.','Asset price, MACRS property class, life, salvage, lease terms, tax rate, and your borrowing rate.'],
+      ['What you get.','The implied lease rate compared to your borrowing rate — so you can see whether the lease is cheap or expensive financing.']
+    ],
+    also:['UM9','UM10']},
+
+  UM12:{id:'UM12',region:'us',file:'capplan_us_model12.html',
+    title:'Minimum Selling Price (MACRS)',
+    question:'What is the minimum we should accept if we sell this asset?',
+    desc:'Calculates the minimum acceptable sale price for a MACRS asset you own, accounting for shields already claimed and your target return.',
+    steps:[
+      ['What it does.','Calculates the minimum price you should accept for a MACRS asset you own, given original cost, shields claimed, and your target return.'],
+      ['What you need.','Original cost, MACRS property class, asset life, current age, annual benefit, tax rate, and target return.'],
+      ['What you get.','Your floor price, your current financial position, and how the floor changes with age and target return.']
+    ],
+    also:['UM13','UM1']},
+
+  UM13:{id:'UM13',region:'us',file:'capplan_us_model13.html',
+    title:'Maximum Purchase Price (MACRS)',
+    question:'What is the maximum we should pay for this asset?',
+    desc:'Calculates the maximum you should pay for a MACRS asset and earn your target return, using depreciation and salvage value analytically.',
+    steps:[
+      ['What it does.','Calculates the maximum price you should pay for a MACRS asset and still earn your target return — accounting for MACRS tax shields and salvage value, both of which scale with the price paid.'],
+      ['What you need.','Expected annual benefit, asset life, MACRS property class, salvage as a percentage of price, tax rate, and target return.'],
+      ['What you get.','Your price ceiling, a nominal ceiling at zero return, and sensitivity tables showing how the maximum changes with return and benefit assumptions.']
+    ],
+    also:['UM12','UM1']},
+};
+
+// ── DECISION TREE ─────────────────────────────────────────────────────────────
+var TREE = {
+
+  root:{id:'root',step:1,label:'What kind of decision are you facing?',
+    question:'What kind of decision are you facing?',
+    sub:'Tell us what you are trying to work out and we will point you to the right model.',
+    choices:[
+      {icon:'🛒',title:'Buying or acquiring an asset',
+       desc:'Evaluating a purchase, comparing options, or working out the maximum you should pay',
+       next:'buying'},
+      {icon:'🔄',title:'Replacing an asset we own',
+       desc:'Deciding whether to replace, comparing replacements, or finding the optimal timing',
+       next:'replacing'},
+      {icon:'📋',title:'Leasing — as lessee or lessor',
+       desc:'Comparing lease vs buy, setting a lease rate, or finding out what a lease is costing us',
+       next:'leasing'},
+      {icon:'💰',title:'Pricing our equipment or services',
+       desc:'Setting a minimum hourly rate, tender price, or lease payment to recover our costs',
+       next:'pricing'},
+      {icon:'🏷️',title:'Valuing an asset we own',
+       desc:'Finding the minimum we should accept if selling, or the floor price for negotiation',
+       next:'valuing'},
+    ]},
+
+  buying:{id:'buying',step:2,label:'Buying or acquiring',
+    question:'What best describes your situation?',
+    sub:'',
+    choices:[
+      {icon:'✅',title:'Evaluating a single asset purchase',
+       desc:'I want to know whether buying this specific asset makes financial sense',
+       next:'M'},
+      {icon:'⚖️',title:'Comparing two or more options',
+       desc:'I have several candidates and want to pick the one with the best financial return',
+       next:'M_compare'},
+      {icon:'💲',title:'Working out the maximum I should pay',
+       desc:'I know what the asset will return — I want to find my price ceiling',
+       next:'M_maxprice'},
+    ]},
+
+  replacing:{id:'replacing',step:2,label:'Replacing an asset',
+    question:'What best describes your situation?',
+    sub:'',
+    choices:[
+      {icon:'🔁',title:'Should I replace now?',
+       desc:'I want to know whether replacing my current asset with a new one is financially justified',
+       next:'M_replace_now'},
+      {icon:'🏆',title:'Which replacement is best?',
+       desc:'I have multiple replacement options and want to pick the one with the highest NPV',
+       next:'M_replace_which'},
+      {icon:'📅',title:'When is the right time to replace?',
+       desc:'I want to find the year that minimises my total annual cost of ownership',
+       next:'M_replace_when'},
+    ]},
+
+  leasing:{id:'leasing',step:2,label:'Leasing',
+    question:'What best describes your situation?',
+    sub:'',
+    choices:[
+      {icon:'⚖️',title:'Lease vs buy — which is cheaper?',
+       desc:'I am deciding whether to lease or purchase an asset and want to compare the total cost',
+       next:'M_lease_vs_buy'},
+      {icon:'🏦',title:'I own an asset — should I sell and lease it back?',
+       desc:'I am considering releasing capital by selling and leasing back an asset I currently own',
+       next:'M_leaseback'},
+      {icon:'📊',title:'I am already leasing — what is it costing me?',
+       desc:'I want to find the effective financing rate embedded in my current lease',
+       next:'M_lease_cost'},
+    ]},
+
+  pricing:{id:'pricing',step:2,label:'Pricing equipment or services',
+    question:'What type of pricing are you setting?',
+    sub:'',
+    choices:[
+      {icon:'📝',title:'Minimum lease payment',
+       desc:'I own an asset and want to lease it out — what is the minimum payment I need to charge?',
+       next:'M_pricing_lease'},
+      {icon:'🕐',title:'Minimum hourly rate',
+       desc:'I rent out equipment by the hour — what is the minimum rate to recover my costs?',
+       next:'M_pricing_hourly'},
+      {icon:'📄',title:'Minimum tender or contract price',
+       desc:'I am quoting on a contract that uses a specific asset — what is my cost floor?',
+       next:'M_pricing_tender'},
+    ]},
+
+  valuing:{id:'valuing',step:2,label:'Valuing an asset',
+    question:'What do you need to know?',
+    sub:'',
+    choices:[
+      {icon:'🔻',title:'Minimum selling price',
+       desc:'I want to sell an asset I own — what is the lowest price I should accept?',
+       next:'M_minprice'},
+      {icon:'🔺',title:'Maximum purchase price',
+       desc:'I am buying an asset — what is the highest price I should pay to earn my target return?',
+       next:'M_maxprice'},
+    ]},
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var REGION = 'non-us';  // 'non-us' or 'us'
+var CURRENT = 'root';
+var PATH = [];
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function modelId(base){
+  // Map base model IDs to region-specific IDs
+  if(REGION==='us') return 'U'+base;  // M1 → UM1
+  return base;
+}
+
+function getModel(base){
+  return MODELS[modelId(base)];
+}
+
+function goBack(){
+  if(PATH.length===0) return;
+  CURRENT = PATH.pop();
+  render();
+}
+
+function startOver(){
+  CURRENT='root';
+  PATH=[];
+  render();
+}
+
+function choose(next){
+  // next is either a tree node id or a model base id starting with 'M_' or 'M'
+  PATH.push(CURRENT);
+  CURRENT = next;
+  render();
+}
+
+function openModel(file){
+  window.location.href = file;
+}
+
+// ── RESULT NODES (map tree leaf IDs to model base IDs) ───────────────────────
+var RESULTS = {
+  'M':           'M1',   // single asset evaluation
+  'M_compare':   'M2',
+  'M_maxprice':  'M13',
+  'M_replace_now':   'M3',
+  'M_replace_which': 'M4',
+  'M_replace_when':  'M5',
+  'M_lease_vs_buy':  'M9',
+  'M_leaseback':     'M10',
+  'M_lease_cost':    'M11',
+  'M_pricing_lease':   'M6',
+  'M_pricing_hourly':  'M7',
+  'M_pricing_tender':  'M8',
+  'M_minprice':  'M12',
+};
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render(){
+  renderBreadcrumb();
+  document.getElementById('back-btn').style.display = PATH.length>0?'block':'none';
+  document.getElementById('start-over').style.display = PATH.length>0?'block':'none';
+
+  // Check if current node is a result
+  if(RESULTS[CURRENT]){
+    renderResult(getModel(RESULTS[CURRENT]));
+  } else {
+    renderQuestion(TREE[CURRENT]);
+  }
+}
+
+function renderBreadcrumb(){
+  var crumbs = [];
+  for(var i=0;i<PATH.length;i++){
+    var node = TREE[PATH[i]];
+    if(node && node.label) crumbs.push(node.label);
+  }
+  if(RESULTS[CURRENT]){
+    crumbs.push('Recommendation');
+  } else if(TREE[CURRENT]){
+    crumbs.push(TREE[CURRENT].label);
+  }
+  var bc = document.getElementById('breadcrumb');
+  bc.innerHTML = crumbs.map(function(c,i){
+    return i===crumbs.length-1 ?
+      '<span>'+c+'</span>' :
+      c+' <span style="color:var(--t3)">›</span> ';
+  }).join('');
+}
+
+function renderQuestion(node){
+  var html = '';
+
+  // Region toggle only on root
+  if(node.id==='root'){
+    html += '<div style="margin-bottom:24px">';
+    html += '<div style="font-size:12px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Jurisdiction</div>';
+    html += '<div class="region-toggle">';
+    html += '<button class="region-btn'+(REGION==='non-us'?' active':'')+'" onclick="setRegion(\'non-us\')">🌍 Non-US</button>';
+    html += '<button class="region-btn'+(REGION==='us'?' active':'')+'" onclick="setRegion(\'us\')">🇺🇸 United States (MACRS)</button>';
+    html += '</div>';
+    if(REGION==='us'){
+      html += '<div style="font-size:12px;color:var(--t2);background:var(--blue-soft);border:1px solid rgba(27,63,110,.15);border-radius:6px;padding:8px 12px;margin-top:6px">';
+      html += '🏛️ <strong>US Edition</strong> — MACRS depreciation applies. Bonus depreciation (100%, permanent under OBBBA) and Section 179 expensing are available where applicable.';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  html += '<div class="q-card">';
+  if(node.step) html += '<div class="q-step-label">Step '+node.step+' of 2</div>';
+  html += '<div class="q-title">'+node.question+'</div>';
+  if(node.sub) html += '<div class="q-sub">'+node.sub+'</div>';
+  html += '<div class="choices">';
+  node.choices.forEach(function(c){
+    html += '<button class="choice-btn" onclick="choose(\''+c.next+'\')">'+
+      '<div class="choice-icon">'+c.icon+'</div>'+
+      '<div class="choice-text">'+
+        '<div class="choice-title">'+c.title+'</div>'+
+        '<div class="choice-desc">'+c.desc+'</div>'+
+      '</div>'+
+    '</button>';
+  });
+  html += '</div></div>';
+  document.getElementById('main-content').innerHTML = html;
+}
+
+function renderResult(model){
+  var alsoModels = (model.also||[]).map(function(id){
+    // id may be like 'M2' or 'UM2' — look up directly
+    return MODELS[id] || MODELS['U'+id] || MODELS[id.replace('U','')];
+  }).filter(Boolean);
+
+  var regionLabel = model.region==='us' ? '🇺🇸 US Edition — MACRS' : '🌍 Non-US Edition';
+
+  var html = '<div class="result-card">';
+
+  // Head
+  html += '<div class="result-head">';
+  html += '<div class="result-badge">Recommended</div>';
+  html += '<div class="result-head-text">';
+  html += '<div class="result-model-label">Your model</div>';
+  html += '<div class="result-title">'+model.title+'</div>';
+  html += '<div class="result-region">'+regionLabel+'</div>';
+  html += '</div></div>';
+
+  // Body
+  html += '<div class="result-body">';
+  html += '<div class="result-question">'+model.question+'</div>';
+  html += '<div class="result-desc">'+model.desc+'</div>';
+
+  // HTW card
+  html += '<div class="htw-card">';
+  html += '<div class="htw-title">How this works</div>';
+  html += '<div class="htw-steps">';
+  model.steps.forEach(function(step,i){
+    html += '<div class="htw-step">';
+    html += '<div class="htw-num">'+(i+1)+'</div>';
+    html += '<div class="htw-step-text"><strong>'+step[0]+'</strong> '+step[1]+'</div>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+
+  // Action button
+  html += '<div class="result-actions">';
+  html += '<button class="open-btn" onclick="openModel(\''+model.file+'\')">Open '+model.title+' →</button>';
+  html += '</div>';
+
+  // Also consider
+  if(alsoModels.length>0){
+    html += '<div class="also-label">Also worth considering</div>';
+    html += '<div class="also-chips">';
+    alsoModels.forEach(function(m){
+      html += '<span class="also-chip" onclick="showModel(\''+m.id+'\')">'+m.title+'</span>';
+    });
+    html += '</div>';
+  }
+
+  html += '</div></div>';
+  document.getElementById('main-content').innerHTML = html;
+  window.scrollTo(0,0);
+}
+
+function showModel(id){
+  var model = MODELS[id];
+  if(!model) return;
+  PATH.push(CURRENT);
+  CURRENT = '_model_'+id;
+  // Temporarily store result
+  RESULTS['_model_'+id] = id.startsWith('U') ? id.replace('U','M') : id;
+  // Find the right model
+  renderResult(model);
+  renderBreadcrumb();
+  document.getElementById('back-btn').style.display='block';
+  document.getElementById('start-over').style.display='block';
+}
+
+function setRegion(r){
+  REGION = r;
+  render();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
