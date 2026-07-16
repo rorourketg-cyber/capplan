@@ -323,44 +323,13 @@ function updateStepper(){
 
 // ── BRIEFING NOTES ────────────────────────────────────────────────────────────
 var NOTES1=[
-  {q:"What does this model provide beyond the rental rate?",
-   a:"In addition to the minimum rental rate, this model provides three pieces of additional assistance on the results page. First, a rental rate by hours sensitivity table showing how the rate changes as annual rental hours vary — essential for understanding how sensitive your rate is to utilisation. Second, a rental rate by term length table showing how economic life affects the rate. Third, on the inputs page, a rental hours estimator to help you arrive at a realistic annual hours figure from utilisation rates and available working time.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is included in the cost of the asset?",
-   a:"The cost includes the purchase price plus transportation, installation, training, and all other costs required to put the asset in service. Tax authorities in most jurisdictions require that installation costs be added to the purchase price to determine the depreciable value. If in doubt, consult your accountant.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I estimate economic life and salvage value?",
-   a:"Economic life is how long the asset will be productive as a rental asset. Use your experience with similar assets or industry replacement data. Salvage value at end of life depends on obsolescence, market conditions, and physical condition — use your experience with similar assets or industry data.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What depreciation method should I use and what is the half-year rule?",
-   a:"The applicable method is set by your tax jurisdiction. Double-declining gives the largest early deductions; straight-line spreads them evenly; sum-of-years-digits falls in between. The half-year rule assumes the asset is placed in service at mid-year, halving the first year's deduction.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What are operating expenses and how do I estimate them?",
-   a:"Operating expenses include fuel, electricity, lubrication, parts, repairs, and scheduled maintenance. Enter year-1 expenses from your own records or industry data. Subsequent years can be modelled as a constant dollar increase, a constant percentage increase, or entered year by year.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I estimate rental hours per year?",
-   a:"There are two sources: your own records for similar assets, or industry and trade data for new asset types. The rental hours estimator on the inputs page can help you build up an estimate from utilisation rate and available working days. Whatever estimate you use, test its sensitivity — run the analysis at 2 or 3 different hour levels to see how the rental rate changes. If hours fall below estimate you may need to raise rates; if hours exceed estimate you may be able to reduce them.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I calculate a required rate of return?",
-   a:"Your required rate of return reflects the cost of the funds invested in the asset — a blend of your borrowing rate and your opportunity cost. Use the Cost of Capital Calculator to estimate it using WACC or CAPM.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What are operating expenses and how do I estimate them?",a:"Annual costs to operate and maintain the asset — fuel, servicing, repairs, consumables. Year one is your best estimate; the escalation rate is how fast they grow each year."},
+  {q:"How do I estimate rental hours per year?",a:"The number of billable hours you expect the asset to be used annually. Be realistic — downtime for maintenance, seasonality, and market demand all reduce effective utilisation."}
 ];
 var NOTES2=[
-  {q:"What does this analysis tell me?",
-   a:"The analysis calculates the minimum rental rate that recovers your full investment in the asset — including the cost of the asset, operating expenses, and cost of capital — while accounting for all tax benefits. Any rate above this figure earns more than your required return; any rate below it means you are not fully recovering your investment.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I use this to make a pricing decision?",
-   a:"This is a floor rate — the minimum you must charge to recover your investment. Your actual pricing decision must also consider market rates for similar rental assets. If market rates are below your calculated floor, reconsider the investment. If market rates are above your floor, you have flexibility to price competitively while still exceeding your required return.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does the sensitivity chart tell me?",
-   a:"The chart shows how the rental rate changes as your required return varies. A steeper slope means the rate is more sensitive to your financing costs. Use this to understand how much your rental rate would need to change if your cost of capital changed.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"Why does the rental hours estimate matter so much?",
-   a:"Rental hours appear in the denominator of the rate formula — doubling hours roughly halves the rate. This makes hours one of the most sensitive inputs in the model. The hours sensitivity table on this page shows exactly how much the rate changes for different utilisation levels, helping you understand the range of rates you may need to consider.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does the DCF summary tell me?",
-   a:"The DCF summary shows the present value of each component of your outflows — the net cost of the asset after tax benefits, plus the after-tax present value of operating expenses. The rental rate is calculated to recover this total present value through the after-tax rental revenue stream over the asset's economic life.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What does this analysis tell me?",a:"The minimum hourly rate you must charge to recover all asset costs — capital, operating, tax, and financing — at your required return. Charging below this rate means you are not covering your cost of capital."},
+  {q:"Why does the rental hours estimate matter so much?",a:"Fixed costs are spread over hours — the fewer the hours, the higher the rate needed per hour. A 10% drop in utilisation can require a significant rate increase to maintain the same return."},
+  {q:"What does the sensitivity chart tell me?",a:"How the minimum rate changes as utilisation and other inputs vary. Use it to set a pricing floor for different demand scenarios."}
 ];
 
 function makeBNList(notes,containerId){

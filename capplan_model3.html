@@ -357,42 +357,14 @@ function updateStepper(){
 
 // ── BRIEFING NOTES ────────────────────────────────────────────────────────────
 var NOTES1=[
-  {q:"What is included in the cost of the replacement asset?",
-   a:"The cost includes the purchase price plus delivery, installation, training, and any other costs required to put the asset in service. Tax authorities in most jurisdictions require installation costs to be added to the purchase price to determine the depreciable value. If in doubt, consult your accountant.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is the current salvage value of the existing asset?",
-   a:"The current salvage value is the market price at which you could sell the existing asset today — what you would receive if you sold it in the marketplace right now. Any selling costs should be subtracted from the proceeds. Important: if the existing asset is being traded in, subtract the trade-in value from the cost of the new asset and enter the net amount as asset cost. Do not enter trade-in value as current salvage value.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I estimate the economic life and salvage value of the new asset?",
-   a:"Economic life is how long the replacement asset will be useful to your business — not its physical life. Use your experience with similar assets or industry replacement-interval data as a guide. Salvage value can be estimated using the formula SV = CF(n+1)/(k-g), where CF(n+1) is the cash flow one year after economic life, k is your required rate of return, and g is the projected growth rate in cash flows. Alternatively, use a percentage of original cost.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What depreciation method should I use and what is the half-year rule?",
-   a:"The applicable depreciation method is set by your tax jurisdiction. Double-declining balance gives the largest early deductions; straight-line spreads them evenly; sum-of-years-digits falls in between. The half-year rule, applied in many jurisdictions, assumes the asset is placed in service at mid-year, halving the first year's deduction.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What are economic benefits and how do I estimate them?",
-   a:"Economic benefits are the incremental after-tax cash flows attributable to replacing the existing asset — the additional revenues or cost savings over the replacement asset's economic life. These should represent only the change in cash flows caused by the replacement decision, not the total cash flows of the business.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I calculate the required rate of return?",
-   a:"Your required rate of return reflects the cost of the funds you are investing in the project — a blend of your cost of debt (lender's rate) and your opportunity cost (what you could earn elsewhere). Use the Cost of Capital Calculator below to estimate it using WACC or CAPM.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What is the current salvage value of the existing asset?",a:"What you could sell your current asset for today — not what you paid, not its book value, but the actual market price for a used asset in its current condition."},
+  {q:"What are economic benefits and how do I estimate them?",a:"The incremental annual after-tax benefits the new asset provides over the old one — lower operating costs, higher output, reduced maintenance. Only the improvement counts, not the total value of the new asset."},
+  {q:"Why is the net initial investment different from the cost of the new asset?",a:"Because selling the old asset reduces your out-of-pocket cost, and any tax on the sale proceeds affects the net outlay. The model accounts for both."}
 ];
 
 var NOTES3=[
-  {q:"What are the after-tax cash flows?",
-   a:"After-tax economic benefit = benefit × (1 − tax rate). After-tax depreciation shield = depreciation × tax rate. Together these form the annual inflows from the replacement investment.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does the payback analysis tell me?",
-   a:"Payback is how long it takes to recover the net initial investment (cost of new asset less current salvage of old asset) from after-tax cash flows. Accept if payback is less than your maximum acceptable period; reject if it exceeds it.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does the discounted cash flow analysis tell me?",
-   a:"If the NPV (or ANPV) is greater than $0, the replacement creates value — accept. If NPV is negative, the replacement does not earn your required return — reject. Equivalently: accept if B/C > 1 or IRR exceeds your cost of capital.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"Why is the net initial investment different from the cost of the new asset?",
-   a:"Because selling the existing asset generates cash inflow that partly offsets the cost of the new one. The net investment = cost of new asset − current salvage of old asset + any new working capital required. This is what you are truly putting at risk with the replacement decision.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What do the sensitivity graphs tell me?",
-   a:"The graphs show how NPV changes as the cost of capital and economic benefits vary from your estimates. If your accept/reject decision flips easily within a realistic range of these estimates, treat the result with more caution and consider whether the replacement decision is truly robust.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What does the NPV tell me?",a:"A positive NPV means replacing now earns at least your required return — the incremental benefits plus the new asset's salvage exceed the net replacement cost. Negative means keep the existing asset."},
+  {q:"What do the sensitivity graphs tell me?",a:"How much the NPV changes as key assumptions vary. If the result flips with small changes to benefit or salvage estimates, the decision is marginal and warrants more careful data gathering."}
 ];
 
 function makeBNList(notes,containerId){

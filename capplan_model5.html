@@ -303,41 +303,14 @@ function updateStepper(){
 
 // ── BRIEFING NOTES ────────────────────────────────────────────────────────────
 var NOTES1=[
-  {q:"What is the initial investment?",
-   a:"The initial investment includes the cost of acquiring, constructing, or modifying the asset, along with all related costs such as transportation, installation, additional personnel, and training. Most tax authorities require that installation costs be added to the purchase price to determine the depreciable value. If in doubt, consult your accountant.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I estimate the physical life of the asset?",
-   a:"Physical life is how long the asset can function before it must be scrapped or replaced — not its economic life. If you have experience with similar assets, use that as your guide. Otherwise, look for industry data on typical replacement intervals for your asset class. The asset class defaults in this model provide typical starting points drawn from fleet management, IRS class-life, and industry maintenance data.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I estimate the rate of decline in salvage value?",
-   a:"Salvage value declines faster in early years for most assets. The rate entered here is applied as a constant percentage each year — for example, 30% means the asset retains 70% of the prior year's value each year. The asset class defaults suggest typical starting rates based on auction data, IRS class lives, and fleet management benchmarks. For vehicles, Kelley Blue Book and NADA guides provide market-specific data.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I estimate operating expenses?",
-   a:"Operating expenses are the costs associated with operating and maintaining the asset. They normally increase with age. Year 1 O&M typically ranges from 2–15% of asset cost depending on asset class — the defaults in this model suggest starting points by asset type. You can model subsequent years as a constant percentage increase, a constant dollar increase per year, or by entering each year separately.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What are the asset class default values and where do they come from?",
-   a:"The asset class defaults are suggested starting points drawn from fleet management benchmarks (Fleetio 2026 Fleet Benchmark Report), IRS asset class lives, SMRP maintenance cost metrics, and published industry O&M data. They are illustrative ranges, not guarantees. Your own experience with similar assets is always the best source of data.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I calculate a required rate of return?",
-   a:"Your required rate of return reflects the cost of funds you are investing — a blend of your borrowing rate and your opportunity cost. Use the Cost of Capital Calculator to estimate it using WACC or CAPM.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What is equivalent annual cost?",a:"The total annual cost of owning an asset for a given number of years, expressed as a level annual amount. It combines capital cost and operating cost into one comparable figure across different holding periods."},
+  {q:"How do I estimate the rate of decline in salvage value?",a:"The percentage of value the asset loses over its full life. A vehicle losing 80% of its value means you recover 20% when selling. Check used market prices for guidance."},
+  {q:"How do I estimate operating expenses?",a:"Year one O&M is your best estimate of maintenance, repairs, and operating costs in the first year. The escalation rate is how fast those costs grow annually as the asset ages."}
 ];
 var NOTES2=[
-  {q:"What does the analysis tell me?",
-   a:"The analysis calculates the Equivalent Annual Cost (EAC) for every possible replacement interval from year 1 up to the physical life of the asset. The interval with the lowest EAC is the optimal replacement cycle — the point where rising O&M costs are exactly offset by savings from lower capital recovery costs.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is the Equivalent Annual Cost?",
-   a:"EAC converts the total cost of owning the asset over a given number of years — including the initial investment, all operating costs, and recovered salvage value — into a single annual figure using the capital recovery factor. This allows you to compare replacement cycles of different lengths on an equal footing.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is the capital recovery factor?",
-   a:"The capital recovery factor converts a present-value sum into an equivalent series of equal annual payments. It is the same calculation used to determine loan repayment amounts, and depends on your cost of capital and the number of years in the replacement cycle.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does the EAC chart tell me?",
-   a:"The chart shows how EAC changes across all replacement intervals. The curve typically declines in early years as capital recovery costs fall, then rises as O&M costs begin to dominate. The bottom of the curve is the optimal replacement interval. A flat curve means the decision is not very sensitive to the exact replacement year.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"Does a change in cost of capital affect the optimal replacement interval?",
-   a:"Changes in cost of capital shift the EAC curve up or down but do not necessarily change which year has the lowest EAC. If the curve is relatively flat near its minimum, changes in cost of capital are unlikely to change your replacement decision. If the curve is steep, higher capital costs may push the optimal interval earlier.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What does the EAC chart tell me?",a:"The optimal replacement year is where the EAC curve reaches its lowest point — marked with a star. Before this, capital cost dominates; after it, rising operating costs push total cost up."},
+  {q:"What if I am past the optimal year?",a:"Being past optimal does not mean replace immediately. Only replace when the cost of another year exceeds the EAC of a new equivalent asset. The chart shows you exactly where that crossover is."},
+  {q:"Does a change in cost of capital affect the optimal replacement interval?",a:"Yes. A higher required return makes future salvage values worth less, favouring shorter holding periods. A lower required return does the opposite. The sensitivity table shows the effect."}
 ];
 
 function makeBNList(notes,containerId){

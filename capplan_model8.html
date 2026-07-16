@@ -300,47 +300,13 @@ function updateStepper(){
 
 // ── BRIEFING NOTES ────────────────────────────────────────────────────────────
 var NOTES1=[
-  {q:"What does this model provide beyond the rental rate?",
-   a:"This model calculates a two-part rental rate: the capital recovery component (recovering your investment in the asset, operating expenses, and cost of capital) plus the operator component (the operator's loaded cost marked up for profit). On the inputs page, two helpers are provided: a rental hours estimator to build annual hours from utilisation data, and an operator cost builder to calculate the all-in hourly cost from wage rate and overhead. On the results page, a rate decomposition visual shows exactly what each dollar of your rental rate covers, and a markup sensitivity table shows how the total rate changes as markup varies.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is included in the cost of the asset?",
-   a:"The cost includes the purchase price plus transportation, installation, training, and all other costs required to put the asset in service. Tax authorities in most jurisdictions require that installation costs be added to the purchase price to determine the depreciable value.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I estimate economic life and salvage value?",
-   a:"Economic life is how long the asset will be productive as a rental asset. Use your experience with similar assets or industry replacement data. Salvage value depends on obsolescence, market conditions, and physical condition.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What depreciation method should I use and what is the half-year rule?",
-   a:"The applicable method is set by your tax jurisdiction. Double-declining gives the largest early deductions; straight-line spreads them evenly; sum-of-years-digits falls in between. The half-year rule assumes the asset is placed in service at mid-year, halving the first year's deduction.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What are operating expenses and how do I estimate them?",
-   a:"Operating expenses include fuel, electricity, lubrication, parts, repairs, and scheduled maintenance. Enter year-1 expenses from your own records or industry data. Subsequent years can be modelled as a constant dollar increase, constant percentage increase, or entered year by year.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I estimate rental hours per year?",
-   a:"Use your own records for similar assets, or industry trade data for new asset types. The rental hours estimator on this page can help you build an estimate from working days, hours per day, and utilisation rate. Test sensitivity by running the analysis at 2-3 different hour levels.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"Why include an operator cost and markup?",
-   a:"If you use an existing employee as operator, you incur an opportunity cost — you lose their services while they are on the rental contract, even though you continue paying them. If you hire externally, you pay that person directly. Either way, you are out the cost. Without a markup you earn nothing on this investment of labour. Most businesses mark up employee cost by 100% or more. The markup covers profit, administrative overhead, and compensation for bench time between contracts.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I calculate a required rate of return?",
-   a:"Your required rate of return reflects the cost of the funds invested in the asset — a blend of your borrowing rate and your opportunity cost. Use the Cost of Capital Calculator to estimate it using WACC or CAPM.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What are operating expenses and how do I estimate them?",a:"Annual costs to operate and maintain the asset — fuel, servicing, repairs, consumables. Year one is your best estimate; the escalation rate is how fast they grow each year."},
+  {q:"Why include an operator cost and markup?",a:"Operator cost covers the labour to run the asset. Markup covers overhead and profit margin above the bare cost of capital and operations. Together they ensure the tender price covers all costs and returns a profit."}
 ];
 var NOTES2=[
-  {q:"What does this analysis tell me?",
-   a:"The analysis calculates the minimum rental rate that: (1) recovers your full investment in the asset including operating expenses and cost of capital, and (2) recovers the operator cost at your chosen markup. Any rate above this figure earns more than your required return on both the asset and the operator investment.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I use this to make a pricing decision?",
-   a:"This is a floor rate — the minimum you must charge. Your actual price must also consider market rates. If market rates are below your floor, reconsider the investment or the markup level. The markup sensitivity table shows you exactly how much flexibility you have by adjusting markup.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does the rate decomposition show?",
-   a:"The rate decomposition breaks your total rental rate into its two components: the capital recovery portion (covering the asset investment, O&M, and cost of capital) and the operator portion (the operator cost plus markup). This helps you explain and defend your pricing to clients and understand where the costs originate.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does the markup sensitivity table tell me?",
-   a:"The table shows the total rental rate at markup levels from 0% to 300%. Use it to understand the range of rates you could quote depending on market conditions, and to identify the minimum markup at which you are still satisfied with the return on your labour investment.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does the sensitivity chart tell me?",
-   a:"The chart shows how the total rental rate changes as your required return on the asset varies. The operator rate component is fixed — it does not change with cost of capital — so only the capital recovery portion of the rate responds to changes in required return.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What does this analysis tell me?",a:"The minimum contract price that recovers all costs — asset, operating, operator, and financing — at your required return. Bidding below this means you are not covering your cost of capital."},
+  {q:"What does the rate decomposition show?",a:"How the total rate breaks down into capital recovery, operating cost, operator cost, and markup. Use it to understand where cost reduction opportunities lie."},
+  {q:"What does the markup sensitivity table tell me?",a:"How the total rate changes as markup varies. Use it to model different margin scenarios and understand the cost of competing on price."}
 ];
 
 function makeBNList(notes,containerId){

@@ -296,44 +296,14 @@ function updateStepper(){
 
 // ── BRIEFING NOTES ────────────────────────────────────────────────────────────
 var NOTES1=[
-  {q:"What is a sale and leaseback?",
-   a:"A sale and leaseback is an arrangement where you sell an asset you currently own to a buyer, and then immediately lease the same asset back from that buyer. You receive cash from the sale and continue using the asset. This model helps you decide whether this arrangement is financially worthwhile.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"Why would I consider a sale and leaseback?",
-   a:"The main reason is to raise cash from an asset you already own without losing the use of it. Common motivations include: freeing up capital for other investments, improving your balance sheet by removing a fixed asset and its associated debt, or taking advantage of a favourable selling price for the asset. The cost is that you take on lease payments and lose the tax shields from depreciation.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"Why are two different discount rates used in this analysis?",
-   a:"This is an important distinction. The after-tax borrowing rate is used to discount cash flows that are contractual and relatively certain — specifically, the lease payments, the tax shields on those payments, and the depreciation tax shields you give up. These cash flows are similar in nature to debt obligations and carry low risk, so the after-tax cost of borrowing is the appropriate rate.\n\nThe required return on investment (your cost of capital) is used only for the salvage value and the associated tax shield on salvage. Salvage value is inherently uncertain — it depends on market conditions, the physical condition of the asset, and obsolescence years in the future. Because it is risky, it deserves to be discounted at a higher rate that reflects that risk. Using your full cost of capital for this component, and the lower after-tax borrowing rate for the certain cash flows, produces a more accurate valuation than using a single rate throughout.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is the selling price of the asset?",
-   a:"This is the price you receive from the buyer/lessor for the asset. It is also used as the depreciable base for the depreciation tax shields you give up, on the assumption that the selling price reflects the current book value of the asset. If the selling price differs materially from the book value, the depreciation schedule may need adjustment.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What are the outflows in this analysis?",
-   a:"By selling the asset you give up: (1) the depreciation tax shields you would have received as owner, and (2) the salvage value at end of economic life. By leasing it back you take on: (3) the deposit and subsequent lease payments, offset by (4) the tax shields on those payments. The net present value of the selling price minus all these outflows determines whether the arrangement is worthwhile.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"Does the lease term have to equal the economic life?",
-   a:"For this analysis, yes. You are leasing the asset for its remaining useful life, which should match the term over which depreciation would have been claimed.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I calculate a required rate of return?",
-   a:"Your required rate of return reflects the cost of capital — a blend of your borrowing rate and opportunity cost. Use the Cost of Capital Calculator to estimate it using WACC or CAPM.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What is a sale and leaseback?",a:"You sell an asset you own to a financial institution or investor, then immediately lease it back from them. You receive cash upfront and continue using the asset, but give up ownership and the depreciation tax shields."},
+  {q:"Why are two different discount rates used?",a:"The after-tax borrowing rate discounts contractual outflows — lease payments and forfeited depreciation shields. The required return on investment discounts the forfeited salvage value, which is uncertain and long-term."}
 ];
 var NOTES2=[
-  {q:"What does the NPV tell me?",
-   a:"A positive NPV means the sale and leaseback is financially worthwhile — the present value of what you receive (the sale proceeds) exceeds the present value of what you give up (depreciation shields, salvage value, and net lease payments). A negative NPV means the arrangement costs you more than you receive.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is the annualised NPV?",
-   a:"The annualised NPV converts the total NPV into an equivalent annual figure, using the required return as the discount rate over the economic life. This allows you to compare the value of this arrangement with other annual investment opportunities on a consistent basis.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does the benefit/cost ratio tell me?",
-   a:"The benefit/cost ratio compares the selling price (inflow) to the total present value of outflows. A ratio above 1.0 means inflows exceed outflows — the arrangement is worthwhile. A ratio of 1.16, for example, means you receive $1.16 in sale proceeds for every $1.00 of present value of outflows.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does the sensitivity chart tell me?",
-   a:"The chart shows how the NPV changes as your borrowing rate varies. A higher borrowing rate means a higher after-tax discount rate on the lease payment outflows, reducing their present value and therefore improving the NPV of the arrangement. The chart helps you understand how sensitive the decision is to your financing costs.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What are the two discount rates and how do they appear in the DCF?",
-   a:"The DCF summary shows each component's discount rate. Lease payments, deposit, and depreciation shields are discounted at the after-tax borrowing rate. Salvage value and the associated tax shield are discounted at the required return on investment. This two-rate structure reflects the different levels of certainty in these cash flows.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What does the NPV tell me?",a:"A positive NPV means the sale proceeds exceed the present value of all costs — you are better off with the cash. Negative means retaining the asset and its depreciation shields is worth more than the cash you would receive."},
+  {q:"What is the annualised NPV?",a:"The NPV expressed as a level annual amount over the asset life at your required return. It allows comparison with other capital deployment options that may have different time horizons."},
+  {q:"What does the benefit/cost ratio tell me?",a:"Sale proceeds divided by present value of all outflows. A ratio above 1.0 means the deal creates value. Below 1.0 means the costs exceed the proceeds — the deal destroys value."},
+  {q:"What are the two discount rates and how do they appear in the DCF?",a:"The after-tax borrowing rate discounts the lease payments and forfeited tax shields — these are contractual, lower-risk outflows. The required return discounts the forfeited salvage — uncertain and longer-term. The DCF breakdown shows each separately."}
 ];
 
 function makeBNList(notes,containerId){

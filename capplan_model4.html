@@ -427,48 +427,14 @@ function updateStepper(){
 
 // ── BRIEFING NOTES ────────────────────────────────────────────────────────────
 var NOTES1=[
-  {q:"What is included in the cost of each alternative?",
-   a:"The cost includes the purchase price plus delivery, installation, training, and all other costs required to put the asset in service. Tax authorities in most jurisdictions require installation costs to be added to the purchase price to determine the depreciable value. If in doubt, consult your accountant.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is the current salvage value of the existing asset?",
-   a:"The current salvage value is the market price at which you could sell the existing asset today. Any selling costs should be deducted from the proceeds. Important: if the asset is being traded in, subtract the trade-in value from the cost of the new asset and enter the net amount as asset cost — do not enter trade-in value here.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I estimate economic life and salvage value for each alternative?",
-   a:"Economic life is how long the replacement asset will be useful — not its physical life. Use your own experience with similar assets or industry replacement data as a guide. For salvage value, use the formula SV = CF(n+1)/(k-g), where k is your required return and g is projected growth in cash flows, or use a percentage of original cost.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What depreciation method should I use and what is the half-year rule?",
-   a:"The applicable method is set by your tax jurisdiction. Double-declining gives the largest early deductions; straight-line spreads them evenly; sum-of-years-digits falls in between. The half-year rule, used in many jurisdictions, assumes assets are placed in service mid-year, halving the first year's deduction.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What are economic benefits and how do I estimate them?",
-   a:"Economic benefits are the incremental after-tax cash flows attributable to the replacement — the additional revenues or cost savings over each alternative's economic life. These represent only the change in cash flows caused by the replacement decision.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is the difference between independent and mutually exclusive alternatives?",
-   a:"Independent alternatives can each be accepted if they have positive NPVs — accepting one does not prevent accepting another. Mutually exclusive alternatives compete with each other — you can only replace the existing asset with one of them, so only the best one is chosen.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is capital rationing and how does it change the decision?",
-   a:"Capital rationing means your funds are limited. Instead of maximizing total NPV, the goal becomes maximizing value per dollar invested — measured by the Benefit/Cost ratio. Select the alternative with the highest B/C ratio above 1.0. If B/C and NPV point to different alternatives, follow the B/C decision.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I calculate the required rate of return?",
-   a:"Your required rate of return reflects your cost of capital — a blend of your borrowing rate and your opportunity cost. All alternatives share the same firm-level cost of capital. Use the Cost of Capital Calculator to estimate it using WACC or CAPM.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What is the current salvage value of the existing asset?",a:"What you could sell your current asset for today — the actual market price, not book value or original cost."},
+  {q:"What are economic benefits and how do I estimate them?",a:"The incremental annual after-tax improvement each replacement provides over your current asset. Only count the difference, not the total value of the replacement."},
+  {q:"What is capital rationing and how does it change the decision?",a:"When budget limits which alternatives you can fund. Rank by benefit-cost ratio rather than NPV to get the most value from available funds."}
 ];
 
 var NOTES3=[
-  {q:"What are the after-tax cash flows?",
-   a:"After-tax economic benefit = benefit × (1 − tax rate). After-tax depreciation shield = depreciation × tax rate. Together these form each alternative's annual inflows from the replacement investment.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does the payback analysis tell me for each alternative?",
-   a:"Payback is how long it takes to recover the net initial investment from after-tax cash flows, ignoring time value. For independent alternatives, accept any whose payback is within your maximum acceptable period. For mutually exclusive alternatives, favour the shortest payback — provided it is within your maximum acceptable period.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does the discounted cash flow analysis tell me?",
-   a:"If alternatives are independent, accept all with positive NPV, B/C > 1, or IRR above your required return. If mutually exclusive with adequate capital, select the alternative with the largest NPV. If mutually exclusive under capital rationing, select the alternative with the largest B/C ratio. If B/C and NPV conflict under rationing, follow the B/C decision.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"Why is the net initial investment different from the cost of the new asset?",
-   a:"Selling the existing asset generates cash that offsets the cost of the new one. The net investment = cost of new asset − current salvage of existing asset + any new working capital. This is the amount truly at risk with the replacement decision.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What do the sensitivity graphs for each alternative tell me?",
-   a:"The graphs show how NPV changes as cost of capital and economic benefits vary from your estimates. If your replacement decision flips easily within a realistic range, treat the result with more caution. Sensitivity analysis helps you understand the robustness of the replacement choice.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What does the DCF analysis tell me?",a:"The NPV of each replacement option versus keeping your current asset. Positive NPV means replacing is justified at your required return; negative means keep what you have."},
+  {q:"Why is the net initial investment different from the cost of the replacement?",a:"Because selling the old asset reduces your out-of-pocket cost. The model accounts for the trade-in proceeds and any tax effects."}
 ];
 
 function makeBNList(notes,containerId){

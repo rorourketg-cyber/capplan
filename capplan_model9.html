@@ -364,44 +364,13 @@ function updateStepper(){
 
 // ── BRIEFING NOTES ────────────────────────────────────────────────────────────
 var NOTES_BUSINESS=[
-  {q:"What does this model tell me?",
-   a:"This model compares the present value of outflows for purchasing an asset versus leasing it. The option with the lower PV of outflows is financially preferred. Purchasing outflows include the asset cost less tax shields from depreciation and salvage value. Leasing outflows include the deposit and lease payments less tax shields on those payments. The model also identifies the break-even lease payment, the implied interest rate in the lease, and the cost you incur if you lease despite purchasing being cheaper.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What purchase price should I use?",
-   a:"Use the cash price — the price you would pay if paying immediately with no financing. Vendors often have list prices that can be negotiated down. If you are negotiating a lease, you may not get the cash price, so be careful to obtain it separately for this analysis.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What discount rate is used and why two rates?",
-   a:"This model uses two rates. The after-tax borrowing rate is used to discount tax-related cash flows — depreciation shields, ITC, and lease payment tax shields — because these are relatively certain and tied to contractual or regulatory commitments. The required return on investment is used to discount salvage value, which is uncertain. Using a higher rate for uncertain cash flows is standard financial practice.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"Does the lease term have to equal the economic life?",
-   a:"For a valid comparison, yes — the analysis must cover the same period for both options. If the lease term is shorter than the economic life, you would need to account for what happens to the asset after the lease ends.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is the deposit?",
-   a:"The deposit is an upfront payment at the start of the lease, which may equal the first lease payment. It is taxable income for the lessor and a deductible expense for you in the following year.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is the implied lease interest rate?",
-   a:"The implied rate is the effective interest rate embedded in the lease structure — the rate at which the present value of all lease payments equals the purchase price of the asset. Comparing this to your borrowing rate tells you whether the lease is more or less expensive than financing the purchase directly.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I calculate a required rate of return?",
-   a:"Your required rate of return reflects the cost of the funds invested in the asset — a blend of your borrowing rate and your opportunity cost. Use the Cost of Capital Calculator to estimate it using WACC or CAPM.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What purchase price should I use?",a:"The cash price of the asset — what you would pay if buying outright. Ask for this separately if negotiating a financed deal, since dealers often bundle the cost of finance into a single price."},
+  {q:"What discount rate is used and why two rates?",a:"The after-tax borrowing rate discounts contractual outflows — lease payments and depreciation shields. The required return on investment discounts the salvage value. Two rates reflect the different risk of each cash flow."}
 ];
 var NOTES_CONSUMER=[
-  {q:"What does this model tell me?",
-   a:"This model compares the true cost of leasing versus purchasing an asset. If purchasing is cheaper but you need to lease due to capital constraints, the model quantifies exactly how much more you are paying — expressed both as a present value and as an equivalent monthly cost. This helps you make an informed decision and understand the real price of the flexibility that leasing provides.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"Why might I lease even if purchasing is cheaper?",
-   a:"Capital constraints are the most common reason — you may not have the purchase price available or wish to preserve cash for other uses. Leasing also transfers maintenance risk in some contracts, provides flexibility to upgrade, and avoids the risk of owning a depreciating asset. These are real benefits, but they have a real cost that this model quantifies.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is the implied lease interest rate?",
-   a:"The implied rate is the effective interest rate the lessor is charging you for financing the asset through the lease. If this rate is higher than your borrowing rate, the lease is more expensive than taking a loan to purchase. Comparing the two rates is one of the most useful outputs of this analysis.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does the cost of leasing constraint mean?",
-   a:"If purchasing is the cheaper option, the cost of leasing constraint is the additional amount you pay in present value terms by choosing to lease. The model also converts this to a monthly equivalent — the extra dollars per month you pay for the privilege of leasing rather than purchasing.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What purchase price should I use?",
-   a:"Use the cash price — the price you would pay if paying immediately. Do not use a financed price that includes dealer financing costs. Negotiate the cash price separately even if you intend to lease.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What does this model tell me?",a:"Which option — lease or purchase — has the lower present value cost after tax. The difference is the financial advantage of the preferred option."},
+  {q:"What is the implied lease interest rate?",a:"The effective annual financing rate embedded in the lease — the rate at which lease cash flows equal the purchase cost. If it exceeds your borrowing rate, you could finance the purchase more cheaply than leasing."},
+  {q:"What is the break-even lease payment?",a:"The payment level at which leasing and buying cost exactly the same. Use it as your ceiling in negotiations."}
 ];
 
 function makeBNList(notes,containerId){

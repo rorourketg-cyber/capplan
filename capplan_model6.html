@@ -334,50 +334,14 @@ function updateStepper(){
 
 // ── BRIEFING NOTES ────────────────────────────────────────────────────────────
 var NOTES1=[
-  {q:"What does this model provide beyond the lease rate?",
-   a:"In addition to calculating the required lease rate, this model provides four pieces of additional assistance on the results page. First, a deposit solver: since the deposit and the lease rate are interdependent, the tool iterates to find the lease payment when the deposit equals one payment — solving a circular reference you cannot resolve manually. Second, an end-of-lease purchase price estimator on the inputs page, which suggests a purchase option price based on an expected annual decline in asset value. Third, a lease rate by term length table, showing how the required payment changes as the lease term varies — useful for structuring the contract offer. Fourth, a lease rate by deposit amount table, showing how different deposit levels affect the ongoing payment — useful for negotiating with your lessee.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is the selling price of the asset?",
-   a:"This is the price you, as the lessor, would be prepared to sell the asset rather than lease it. It represents your full investment in the asset and is the starting point for calculating the lease rate.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I estimate economic life and salvage value?",
-   a:"Economic life is how long the asset will be useful and productive — typically the term of the lease. Use your own experience with similar assets or industry replacement data. Salvage value at lease end depends on obsolescence, market conditions, and physical condition. It can also be set equal to the purchase price option extended to the lessee.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What depreciation method should I use and what is the half-year rule?",
-   a:"The applicable depreciation method is determined by your tax jurisdiction. Double-declining gives the largest early deductions; straight-line spreads them evenly; sum-of-years-digits falls in between. The half-year rule, applied in many jurisdictions, assumes the asset is placed in service at mid-year, halving the first year's deduction.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"Does the lease term have to equal the economic life?",
-   a:"For the purposes of this analysis, yes — the lease term should equal the asset's economic life. As the lessor, you are leasing the asset for its full useful life and recovering your investment over that period.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is the initial deposit?",
-   a:"The initial deposit is an upfront payment made by the lessee at the start of the lease. It may or may not equal the subsequent lease payments, and may include taxes on the asset. The deposit is received immediately at year 0, but is taxable income to you in year 1.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is the purchase price at end of lease?",
-   a:"This is an option price extended to the lessee to purchase the asset at or before the end of the lease. It should be specified in the lease contract. This price reduces the amount you need to recover through lease payments, since you receive it as a terminal cash inflow.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I calculate a required rate of return?",
-   a:"Your required rate of return reflects the cost of the funds you invested in the asset — a blend of your borrowing rate and your opportunity cost. Use the Cost of Capital Calculator to estimate it using WACC or CAPM.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does this model provide beyond the lease rate?",
-   a:"In addition to calculating the required lease rate, this model provides four pieces of additional assistance on the results page. First, a deposit solver: since the deposit and the lease rate are interdependent, the tool iterates to find the lease payment when the deposit equals one payment — solving a circular reference you cannot resolve manually. Second, an end-of-lease purchase price estimator on the inputs page, which suggests a purchase option price based on an expected annual decline in asset value. Third, a lease rate by term length table, showing how the required payment changes as the lease term varies — useful for structuring the contract offer. Fourth, a lease rate by deposit amount table, showing how different deposit levels affect the ongoing payment — useful for negotiating with your lessee.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"Does the lease term have to equal the economic life?",a:"No — but the longer the lease term relative to the asset's life, the lower the required payment, since more of the asset's value is recovered through use rather than resale."},
+  {q:"What is the initial deposit?",a:"A security deposit held by the lessor during the lease. It is returned at the end and is not a cost — but it reduces the effective lease payment the lessee needs to make."},
+  {q:"Why does the depreciation method affect the lease rate?",a:"Depreciation generates tax shields that reduce the after-tax cost of owning the asset. Methods that front-load depreciation produce larger early shields, allowing a lower lease rate."}
 ];
 var NOTES2=[
-  {q:"What does this analysis tell me?",
-   a:"The analysis calculates the lease payment that will recover your investment in the asset and earn your required rate of return. It works by taking the cost of the asset and subtracting the present value of all other cash inflows — the deposit, ITC, tax shields, and end-of-lease purchase price — leaving the gap to be recovered through lease payments.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"How do I use this output to make a decision?",
-   a:"The calculated lease rate is the minimum payment that earns your required return. If you can charge at least this rate in the marketplace, the lease is worthwhile. This rate should form the basis of the lease contract with your lessee. Any rate above this figure generates additional return; any rate below it means you are not earning your cost of capital.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What does the sensitivity chart tell me?",
-   a:"The chart shows how the required lease rate changes as your cost of capital varies. A higher required return means you need larger lease payments to recover your investment. Use this to understand how sensitive your lease rate is to your financing costs.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"Why does the depreciation method affect the lease rate?",
-   a:"Depreciation creates a tax shield — a reduction in taxes you owe — that is a real cash inflow. Methods that produce larger early deductions (like double-declining balance) generate higher early tax shields, which have a higher present value. Higher PV tax shields mean less needs to be recovered through lease payments, so the required lease rate is lower with accelerated depreciation.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {q:"What is the after-tax annuity factor?",
-   a:"Lease payments are taxable income to you. The after-tax annuity factor converts the net present value gap into an equivalent series of after-tax annual payments. It equals the standard annuity factor multiplied by (1 − tax rate), reflecting that each lease payment is reduced by the tax you pay on it.",
-   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+  {q:"What does this analysis tell me?",a:"The minimum lease payment that allows the lessor to recover the full cost of the asset — including financing, tax shields, and salvage — at the required return. Any payment below this destroys value for the lessor."},
+  {q:"What does the sensitivity chart tell me?",a:"How the minimum payment changes as key inputs vary. Use it to understand which assumptions drive the rate most — and to model different deal structures."},
+  {q:"What is the after-tax annuity factor?",a:"The present value of one dollar received per period, after tax, at the given discount rate. It translates the stream of lease payments into a single present value figure for comparison with the asset cost."}
 ];
 
 function makeBNList(notes,containerId){
