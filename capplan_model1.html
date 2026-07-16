@@ -233,8 +233,8 @@ tr:nth-child(even) { background: #F7F8FA; }
 .modal-head { padding: 11px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2E6EC; }
 .modal-head span { font-size: 13px; font-weight: 700; color: #4A5568; }
 .modal-close { background: none; border: none; font-size: 22px; color: #8A96A6; cursor: pointer; line-height: 1; }
-.video-wrap { position: relative; padding-bottom: 56.25%; height: 0; }
-.video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+
 
 /* Test Panel */
 
@@ -651,15 +651,6 @@ function makeBriefingList(notes, containerId) {
   });
 }
 
-function openVideo(url) {
-  var id = url.split(/[/?=v]/).filter(function(s){return s.length>5;}).pop()||"";
-  var overlay = document.createElement("div");
-  overlay.className = "modal-overlay";
-  overlay.innerHTML = '<div class="modal-box"><div class="modal-head"><span>Learn More</span><button class="modal-close">×</button></div><div class="video-wrap"><iframe src="https://www.youtube.com/embed/'+id+'" allowfullscreen frameborder="0"></iframe></div></div>';
-  overlay.querySelector(".modal-close").onclick = function(){ overlay.remove(); };
-  overlay.onclick = function(e){ if(e.target===overlay) overlay.remove(); };
-  document.body.appendChild(overlay);
-}
 
 // ── CoC CALCULATOR ────────────────────────────────────────────────────────────
 function renderCoC() {
