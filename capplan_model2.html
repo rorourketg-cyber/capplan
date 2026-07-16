@@ -252,7 +252,12 @@ tr:nth-child(even){background:var(--surface)}
     <div class="logo-text">Cap<span>Plan</span></div>
   </div>
   <div class="module-name">Asset Purchase — Choice of Alternatives</div>
-  <button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600" onclick="window.location='capplan_model1.html'">← Model 1</button>
+  <div style="position:relative" id="cur-wrap">
+    <button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600;cursor:pointer" id="cur-btn" onclick="toggleCur()">
+      <span id="cur-label">$ USD</span> ▾
+    </button>
+    <div id="cur-dropdown" style="display:none;position:absolute;right:0;top:110%;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,29,46,.16);min-width:200px;z-index:300;overflow:hidden"></div>
+  </div>
 </div>
 
 <div id="model-banner">Which asset option delivers the best return on investment?</div>
@@ -267,9 +272,38 @@ tr:nth-child(even){background:var(--surface)}
 <div id="main-content"></div>
 
 <script>
+var CURRENCIES=[
+  {code:"USD",symbol:"$",label:"US Dollar"},
+  {code:"EUR",symbol:"€",label:"Euro"},
+  {code:"JPY",symbol:"¥",label:"Japanese Yen"},
+  {code:"GBP",symbol:"£",label:"British Pound"},
+  {code:"INR",symbol:"₹",label:"Indian Rupee"},
+  {code:"CHF",symbol:"CHF",label:"Swiss Franc"},
+  {code:"CAD",symbol:"CA$",label:"Canadian Dollar"},
+  {code:"AUD",symbol:"AU$",label:"Australian Dollar"},
+  {code:"NZD",symbol:"NZ$",label:"New Zealand Dollar"}
+];
+function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
+function toggleCur(){
+  S.cur_open=!S.cur_open;
+  var dd=document.getElementById("cur-dropdown");
+  dd.style.display=S.cur_open?"block":"none";
+  if(S.cur_open){
+    dd.innerHTML="";
+    CURRENCIES.forEach(function(c){
+      var b=document.createElement("button");
+      b.style.cssText="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:"+(c.code===S.currency?"var(--blue-soft)":"transparent")+";border:none;border-bottom:1px solid var(--border);cursor:pointer;text-align:left";
+      b.innerHTML='<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--blue);width:36px;flex-shrink:0">'+c.symbol+'</span><span style="font-size:13px;color:var(--t1)">'+c.label+'</span>';
+      b.onclick=function(){S.currency=c.code;S.cur_open=false;render()};
+      dd.appendChild(b);
+    });
+  }
+}
+
 // ── STATE ────────────────────────────────────────────────────────────────────
 var S = {
   page: 1,
+  currency:"USD",cur_open:false,
   numAlts: 2,
   activeAlt: 0,
   investType: "mutually_exclusive",
@@ -1088,6 +1122,7 @@ function printSummary(){
 }
 
 function render(){
+  var lbl=document.getElementById("cur-label");if(lbl)lbl.textContent=getSym()+" "+S.currency;
   updateStepper();
   if(S.page===1)renderPage1();
   else if(S.page===2)renderPage2();
