@@ -613,7 +613,7 @@ function drawChart(canvasId,data,xkey,ykey,xfmt){
   var vals=data.map(function(d){return d[ykey]});
   var minV=Math.min.apply(null,vals),maxV=Math.max.apply(null,vals);
   var rng=maxV-minV||Math.abs(maxV||1)*0.4;
-  var lo=minV-rng*0.15,hi=maxV+rng*0.15;
+  var lo=minV>=0?0:minV-rng*0.15,hi=maxV+rng*0.15;
   var gap=cw/data.length,bw=Math.floor(gap*0.6);
   var midIdx=Math.floor(data.length/2);
   function toY(v){return(hi===lo)?pad.top+ch/2:pad.top+ch*(hi-v)/(hi-lo);}
