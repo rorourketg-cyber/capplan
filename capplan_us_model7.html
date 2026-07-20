@@ -474,9 +474,21 @@ function calcAll(){
     var pvNet2=cost-pvTS2-pvS179-pvSalv+pvOM2;
     lifeSens.push({life:l,rate:hours>0&&af2>0?pvNet2/af2/hours:0});
   }
+
+  // CoC sensitivity — rate vs required return
+  var cocSens=[-4,-3,-2,-1,0,1,2,3,4].map(function(delta){
+    var rc=(+S.coc+delta)/100;if(rc<=0)return{delta:+S.coc+delta,rate:0};
+    var pvTS2=depr.reduce(function(s,d){return s+d.amount*tx/Math.pow(1+rc,d.year)},0);
+    var pvS1792=s179*tx/(1+rc);
+    var td2=depr.reduce(function(s,d){return s+d.amount},0)+(s179||0);var pvSalvNet2=(salvage-Math.max(0,(salvage-Math.max(0,cost-td2))*tx))/Math.pow(1+rc,life);
+    var pvOM2=om.reduce(function(s,o,i){return s+o*(1-tx)/Math.pow(1+rc,i+1)},0);
+    var pvNet2=cost-pvTS2-pvS1792-pvSalvNet2+pvOM2;
+    var af2=rc>0?(1-Math.pow(1+rc,-life))/rc:life;
+    return{delta:+S.coc+delta,rate:hours>0&&af2>0?pvNet2/af2/hours:0};
+  });
   return{annualRate:annualRate,hourlyRate:hourlyRate,pvTS:pvTS,pvS179:pvS179,pvSalv:pvSalv,
     pvOM:pvOM,pvNet:pvNet,depr:depr,om:om,hrsSens:hrsSens,lifeSens:lifeSens,
-    remainBasis:remainBasis,recapTax:recapTax};
+    remainBasis:remainBasis,recapTax:recapTax,cocSens:cocSens};
 }
 
 function updateStepper(){for(var i=1;i<=2;i++){var step=document.getElementById("step"+i),sn=document.getElementById("sn"+i);step.className="step";if(i<S.page){step.classList.add("done");sn.textContent="✓"}else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}else sn.textContent=String(i);var n=i;(function(n,step){step.onclick=function(){if(n<S.page||(n===2&&S.res)){S.page=n;render()}}})(n,step);step.style.cursor=(i<S.page||(i===2&&S.res))?"pointer":"default";}}
@@ -651,8 +663,11 @@ function renderPage2(){
     html+='</tbody></table></div>';
   }
   html+='</div></main></div></div>';
+  
+  html+='<div class="chart-box"><div class="chart-title">Hourly Rate by Required Return</div><canvas id="coc-chart" width="700" height="200" style="width:100%;height:auto;display:block"></canvas></div>';
   document.getElementById("main-content").innerHTML=html;
   makeBNList(NOTES2,"bn-list2");
+  setTimeout(function(){drawChart("coc-chart",res.cocSens,"delta","rate","%");},50);
 }
 function printSummary(){var pd=S.show_dcf,pd2=S.show_hrs_sens;S.show_dcf=true;S.show_hrs_sens=true;renderPage2();setTimeout(function(){window.print();S.show_dcf=pd;S.show_hrs_sens=pd2;renderPage2();},300);}
 function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();}

@@ -684,6 +684,7 @@ function renderPage3(){
   html+='</div>';
 
   html+='<div class="chart-box"><div class="chart-title">NPV by Required Return</div><canvas id="coc-chart" width="700" height="200" style="width:100%;height:auto;display:block"></canvas></div>';
+  html+='<div class="chart-box"><div class="chart-title">NPV by Annual Benefit</div><canvas id="ben-chart" width="700" height="200" style="width:100%;height:auto;display:block"></canvas></div>';
 
   html+='<div class="collapsible"><div class="coll-head" onclick="S.show_dcf=!S.show_dcf;renderPage3()"><span class="coll-title">DCF Summary</span><span class="coll-arr" style="transform:'+(S.show_dcf?'rotate(90deg)':'rotate(0deg)')+'">›</span></div>';
   if(S.show_dcf){
@@ -713,7 +714,7 @@ function renderPage3(){
   html+='</div></main></div></div>';
   document.getElementById("main-content").innerHTML=html;
   makeBNList(NOTES3,"bn-list3");
-  setTimeout(function(){drawChart("coc-chart",res.cocSens,"coc","npv","%")},50);
+  setTimeout(function(){drawChart("coc-chart",res.cocSens,"coc","npv","%");drawChart("ben-chart",res.benSens,"delta","npv","%")},50);
 }
 
 function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2)renderPage2();else if(S.page===3&&S.res)renderPage3();}

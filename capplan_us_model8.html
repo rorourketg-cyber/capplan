@@ -476,10 +476,24 @@ function calcAll(){
     var cap2=calcCapRate(S.cost,S.life,S.salvage,S.taxRate,S.coc,S.section179,depr,om,h);
     return{hours:h,capRate:cap2.capRate,opRate:opRate,total:cap2.capRate+opRate};
   });
+
+  // CoC sensitivity — rate vs required return
+  var cocSens=[-4,-3,-2,-1,0,1,2,3,4].map(function(delta){
+    var rc=(+S.coc+delta)/100,txr=+S.taxRate/100,cost2=+S.cost,s1792=+S.section179||0,salv2=+S.salvage||0;
+    if(rc<=0)return{delta:+S.coc+delta,rate:0};
+    var pvTS2=depr.reduce(function(s,d){return s+d.amount*txr/Math.pow(1+rc,d.year)},0);
+    var pvS1792=s1792*txr/(1+rc);
+    var td2=depr.reduce(function(s,d){return s+d.amount},0)+s1792;
+    var pvSalvNet2=(salv2-Math.max(0,(salv2-Math.max(0,cost2-td2))*txr))/Math.pow(1+rc,life);
+    var pvOM2=om.reduce(function(s,o,i){return s+o*(1-txr)/Math.pow(1+rc,i+1)},0);
+    var pvNet2=cost2-pvTS2-pvS1792-pvSalvNet2+pvOM2;
+    var af2=rc>0?(1-Math.pow(1+rc,-life))/rc:life;
+    return{delta:+S.coc+delta,rate:hours>0&&af2>0?pvNet2/af2/hours:0};
+  });
   return{totalRate:totalRate,capRate:cap.capRate,opRate:opRate,
     pvTS:cap.pvTS,pvS179:cap.pvS179,pvSalv:cap.pvSalv,pvOM:cap.pvOM,pvNet:cap.pvNet,
     depr:depr,om:om,markupSens:markupSens,hrsSens:hrsSens,
-    remainBasis:cap.remainBasis,recapTax:cap.recapTax};
+    remainBasis:cap.remainBasis,recapTax:cap.recapTax,cocSens:cocSens};
 }
 
 function updateStepper(){for(var i=1;i<=2;i++){var step=document.getElementById("step"+i),sn=document.getElementById("sn"+i);step.className="step";if(i<S.page){step.classList.add("done");sn.textContent="✓"}else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}else sn.textContent=String(i);var n=i;(function(n,step){step.onclick=function(){if(n<S.page||(n===2&&S.res)){S.page=n;render()}}})(n,step);step.style.cursor=(i<S.page||(i===2&&S.res))?"pointer":"default";}}
@@ -663,8 +677,11 @@ function renderPage2(){
     html+='</tbody></table></div>';
   }
   html+='</div></main></div></div>';
+  
+  html+='<div class="chart-box"><div class="chart-title">Total Tender Rate by Required Return</div><canvas id="coc-chart" width="700" height="200" style="width:100%;height:auto;display:block"></canvas></div>';
   document.getElementById("main-content").innerHTML=html;
   makeBNList(NOTES2,"bn-list2");
+  setTimeout(function(){drawChart("coc-chart",res.cocSens,"delta","rate","%");},50);
 }
 function printSummary(){var a=S.show_markup_sens,b=S.show_hrs_sens;S.show_markup_sens=true;S.show_hrs_sens=true;renderPage2();setTimeout(function(){window.print();S.show_markup_sens=a;S.show_hrs_sens=b;renderPage2();},300);}
 function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();}

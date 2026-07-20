@@ -466,7 +466,29 @@ function calcAll(){
   var tax=+S.taxRate,coc=+S.coc,oldSale=+S.oldSalePrice||0,oldBasis=+S.oldRemainingBasis||0;
   var results=S.alts.map(function(a){return calcAlt(a,tax,coc,oldSale,oldBasis)});
   var winnerIdx=0;for(var i=1;i<results.length;i++)if(results[i].npv>results[winnerIdx].npv)winnerIdx=i;
-  return{results:results,winnerIdx:winnerIdx};
+  var pcts=[-40,-30,-20,-10,0,10,20,30,40],base=coc;
+  var altSens=results.map(function(r,idx){
+    var a=S.alts[idx];var txr=tax/100,wc=+a.workingCapital||0,salvage=+a.salvage||0;
+    var cocSens=pcts.map(function(p){
+      var tc=base*(1+p/100),tr=tc/100;
+      var pvTS2=r.depr.reduce(function(s,d){return s+d.amount*txr/Math.pow(1+tr,d.year)},0);
+      var pvBen2=r.benefits.reduce(function(s,b,i){return s+b*(1-txr)/Math.pow(1+tr,i+1)},0);
+      var pvSalv2=salvage/Math.pow(1+tr,r.life);
+      var rem2=Math.max(0,r.cost-(r.totalDepr||0));
+      var pvRec2=-(salvage>rem2?(salvage-rem2)*txr:0)/Math.pow(1+tr,r.life);
+      var pvWC2=wc>0?wc/Math.pow(1+tr,r.life):0;
+      var npv2=r.npv+pvTS2-r.pvTS+pvBen2-r.pvBen+pvSalv2-r.pvSalv+pvRec2-r.pvRecapture+pvWC2-r.pvWC;
+      return{delta:p,npv:npv2};
+    });
+    var benSens=pcts.map(function(p){
+      var tr=base/100;
+      var pvBen2=r.benefits.reduce(function(s,b,i){return s+b*(1+p/100)*(1-txr)/Math.pow(1+tr,i+1)},0);
+      var npv2=r.npv+pvBen2-r.pvBen;
+      return{delta:p,npv:npv2};
+    });
+    return{cocSens:cocSens,benSens:benSens};
+  });
+  return{results:results,winnerIdx:winnerIdx,altSens:altSens};
 }
 
 function updateStepper(){for(var i=1;i<=2;i++){var step=document.getElementById("step"+i),sn=document.getElementById("sn"+i);step.className="step";if(i<S.page){step.classList.add("done");sn.textContent="✓"}else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}else sn.textContent=String(i);var n=i;(function(n,step){step.onclick=function(){if(n<S.page||(n===2&&S.res)){S.page=n;render()}}})(n,step);step.style.cursor=(i<S.page||(i===2&&S.res))?"pointer":"default";}}
@@ -617,11 +639,27 @@ function renderPage2(){
   });
 
   html+='</main></div></div>';
+    // Sensitivity charts per alternative
+  if(S.res&&S.res.altSens){
+    S.res.results.forEach(function(r,i){
+      html+='<div class="panel" style="margin-bottom:18px"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Sensitivity — '+(S.alts[i].label||('Alternative '+(i+1)))+'</div></div>';
+      html+='<div class="chart-box"><div class="chart-title">NPV by Required Return</div><canvas id="coc-chart-'+i+'" width="700" height="180" style="width:100%;height:auto;display:block"></canvas></div>';
+      html+='<div class="chart-box"><div class="chart-title">NPV by Annual Benefit</div><canvas id="ben-chart-'+i+'" width="700" height="180" style="width:100%;height:auto;display:block"></canvas></div>';
+      html+='</div>';
+    });
+  }
+
   document.getElementById("main-content").innerHTML=html;
   makeBNList(NOTES2,"bn-list2");
-}
-
-function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();}
+  if(S.res&&S.res.altSens){
+    setTimeout(function(){
+      S.res.altSens.forEach(function(sens,i){
+        drawChart("coc-chart-"+i,sens.cocSens,"delta","npv","%");
+        drawChart("ben-chart-"+i,sens.benSens,"delta","npv","%");
+      });
+    },50);
+  }
+}function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();}
 render();
 </script>
 </body>

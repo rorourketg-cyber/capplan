@@ -623,8 +623,14 @@ function renderPage2(){
     html+='</tbody></table></div>';
   }
   html+='</div></main></div></div>';
+  
+  html+='<div class="chart-box"><div class="chart-title">Implied Rate by Lease Payment</div><canvas id="pmt-chart" width="700" height="200" style="width:100%;height:auto;display:block"></canvas></div>';
   document.getElementById("main-content").innerHTML=html;
   makeBNList(NOTES2,"bn-list2");
+
+  setTimeout(function(){
+    drawChart("pmt-chart",res.pmtSens,"pmt","implied","$");
+  },50);
 }
 function printSummary(){var a=S.show_pmt_sens,b=S.show_depr;S.show_pmt_sens=true;S.show_depr=true;renderPage2();setTimeout(function(){window.print();S.show_pmt_sens=a;S.show_depr=b;renderPage2();},300);}
 function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();}

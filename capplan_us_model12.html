@@ -594,8 +594,14 @@ function renderPage2(){
     html+='</tbody></table></div>';
   }
   html+='</div></main></div></div>';
+  
+  html+='<div class="chart-box"><div class="chart-title">Minimum Price by Required Return</div><canvas id="coc-chart" width="700" height="200" style="width:100%;height:auto;display:block"></canvas></div>';
   document.getElementById("main-content").innerHTML=html;
   makeBNList(NOTES2,"bn-list2");
+
+  setTimeout(function(){
+    drawChart("coc-chart",res.cocSens,"coc","price","%");
+  },50);
 }
 function printSummary(){var a=S.show_coc_sens,b=S.show_age_sens,c=S.show_depr;S.show_coc_sens=true;S.show_age_sens=true;S.show_depr=true;renderPage2();setTimeout(function(){window.print();S.show_coc_sens=a;S.show_age_sens=b;S.show_depr=c;renderPage2();},300);}
 function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();}
