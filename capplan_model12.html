@@ -237,6 +237,8 @@ function loadExample(){
 }
 
 function drawChart(canvasId,data,current){
+  var fresh=canvas.cloneNode(true);canvas.parentNode.replaceChild(fresh,canvas);canvas=fresh;ctx=canvas.getContext('2d');
+
   var canvas=document.getElementById(canvasId);if(!canvas)return;
   var ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;
   var pad={top:16,bottom:48,left:80,right:16};var cw=W-pad.left-pad.right,ch=H-pad.top-pad.bottom;
@@ -247,8 +249,10 @@ function drawChart(canvasId,data,current){
   var bw=Math.floor(cw/data.length*0.6),gap=cw/data.length,midIdx=data.findIndex(function(d){return d.coc===current});if(midIdx<0)midIdx=Math.floor(data.length/2);
   data.forEach(function(d,i){var x=pad.left+gap*i+(gap-bw)/2,bh=(d.price-lo)/(hi-lo)*ch,y=pad.top+ch-bh;ctx.fillStyle=i===midIdx?"#2E7D52":"#6DBF8A";ctx.fillRect(x,y,bw,bh);ctx.fillStyle=i===midIdx?"var(--green)":"#8A96A6";ctx.font=i===midIdx?"bold 10px system-ui":"10px system-ui";ctx.textAlign="center";ctx.fillText(d.coc+"%",x+bw/2,H-pad.bottom+13);});
   ctx.strokeStyle="#4A5568";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(pad.left,pad.top+ch);ctx.lineTo(pad.left+cw,pad.top+ch);ctx.stroke();ctx.fillStyle="#4A5568";ctx.font="bold 12px system-ui";ctx.textAlign="center";ctx.fillText("Required Return (%)",pad.left+cw/2,H-3);
-}
 
+  canvas.style.cursor='crosshair';
+  canvas.addEventListener('touchstart',function(e){e.preventDefault();},{passive:false});
+}
 function renderPage1(){
   var sym=getSym(),isDDB=S.method==="Double-declining";
   var html='<div class="page"><div class="page-grid"><aside>';

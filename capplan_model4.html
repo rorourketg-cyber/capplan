@@ -610,35 +610,87 @@ function loadExample(){
 }
 
 // ── CANVAS CHART ──────────────────────────────────────────────────────────────
-function drawChart(canvasId,data,xLabel){
-  var canvas=document.getElementById(canvasId);if(!canvas)return;
-  var ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;
-  var pad={top:8,bottom:44,left:52,right:8};
-  var cw=W-pad.left-pad.right,ch=H-pad.top-pad.bottom;
-  ctx.clearRect(0,0,W,H);
-  var vals=data.map(function(d){return d.npv});
-  var maxV=Math.max.apply(null,vals.map(Math.abs))||1,rng=maxV*1.2;
-  var hasNeg=vals.some(function(v){return v<0}),zY=hasNeg?pad.top+ch/2:pad.top+ch;
-  ctx.strokeStyle="#E2E6EC";ctx.lineWidth=1;
-  for(var i=0;i<=4;i++){
-    var y=pad.top+(ch/4)*i;ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();
-    var v=hasNeg?(rng-rng*2*(i/4)):(rng*(1-i/4));
-    ctx.fillStyle="#8A96A6";ctx.font="10px system-ui";ctx.textAlign="right";
-    ctx.fillText(Math.round(v/1000)+"k",pad.left-3,y+3);
+function drawChart(canvasId, data, xLabel) {
+  var canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  var fresh=canvas.cloneNode(true);canvas.parentNode.replaceChild(fresh,canvas);canvas=fresh;
+  var ctx = canvas.getContext('2d');
+  var W=canvas.width, H=canvas.height;
+  var pad={top:16,bottom:50,left:64,right:8};
+  var cw=W-pad.left-pad.right, ch=H-pad.top-pad.bottom;
+  var yKey=data[0]&&data[0].npv!==undefined?'npv':'rate';
+  var vals=data.map(function(d){return d[yKey];});
+  var maxV=Math.max.apply(null,vals.map(Math.abs))||1;
+  var hasNeg=vals.some(function(v){return v<0;});
+  var lo=hasNeg?-maxV*1.2:0, hi=maxV*1.2;
+  var rng=hi-lo;
+  var gap=cw/data.length, bw=Math.floor(gap*0.6);
+  var midIdx=Math.floor(data.length/2);
+  function toY(v){return pad.top+ch*(hi-v)/rng;}
+  var zeroY=toY(0);
+  function drawBase(){
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='#E2E6EC'; ctx.lineWidth=1;
+    for(var i=0;i<=4;i++){
+      var y=pad.top+(ch/4)*i;
+      ctx.beginPath(); ctx.moveTo(pad.left,y); ctx.lineTo(pad.left+cw,y); ctx.stroke();
+      var v=hi-rng*(i/4);
+      ctx.fillStyle='#8A96A6'; ctx.font='10px system-ui'; ctx.textAlign='right';
+      ctx.fillText(Math.round(v/1000)+'k',pad.left-3,y+3);
+    }
+    ctx.strokeStyle='#C8D0DA'; ctx.lineWidth=1.5; ctx.setLineDash([5,3]);
+    ctx.beginPath(); ctx.moveTo(pad.left,zeroY); ctx.lineTo(pad.left+cw,zeroY); ctx.stroke();
+    ctx.setLineDash([]);
+    data.forEach(function(d,i){
+      var yv=d[yKey];
+      var x=pad.left+gap*i+(gap-bw)/2;
+      var y0=zeroY, y1=toY(yv), barH=Math.abs(y1-y0), top=Math.min(y0,y1);
+      ctx.fillStyle=yv>=0?(i===midIdx?'#2E7D52':'#6DBF8A'):(i===midIdx?'#C84B31':'#E88A8A');
+      ctx.fillRect(x,top,bw,Math.max(barH,1));
+      ctx.fillStyle=i===midIdx?'#1B3F6E':'#8A96A6';
+      ctx.font=(i===midIdx?'bold ':'')+'10px system-ui'; ctx.textAlign='center';
+      ctx.fillText(d.label||String(i),x+bw/2,H-pad.bottom+14);
+    });
+    ctx.strokeStyle='#4A5568'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(pad.left,pad.top); ctx.lineTo(pad.left,pad.top+ch); ctx.lineTo(pad.left+cw,pad.top+ch); ctx.stroke();
+    ctx.fillStyle='#4A5568'; ctx.font='bold 11px system-ui'; ctx.textAlign='center';
+    ctx.fillText(xLabel,pad.left+cw/2,H-4);
   }
-  ctx.strokeStyle="#4A5568";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(pad.left,zY);ctx.lineTo(pad.left+cw,zY);ctx.stroke();
-  var bw=Math.floor(cw/data.length*.6),gap=cw/data.length;
-  data.forEach(function(d,i){
-    var x=pad.left+gap*i+(gap-bw)/2,bh=Math.abs(d.npv)/rng*(hasNeg?ch/2:ch),y=d.npv>=0?zY-bh:zY;
-    ctx.fillStyle=d.npv>=0?"#2E7D52":"#C84B31";ctx.fillRect(x,y,bw,Math.max(bh,1));
-    ctx.fillStyle="#8A96A6";ctx.font="10px system-ui";ctx.textAlign="center";
-    ctx.fillText(d.label,x+bw/2,H-pad.bottom+12);
-  });
-  ctx.fillStyle="#4A5568";ctx.font="bold 12px system-ui";ctx.textAlign="center";
-  ctx.fillText(xLabel,pad.left+cw/2,H-4);
+  function drawTooltip(i){
+    var d=data[i], yv=d[yKey];
+    var x=pad.left+gap*i+(gap-bw)/2+bw/2, y=toY(yv);
+    ctx.strokeStyle='rgba(27,63,110,0.3)'; ctx.lineWidth=1; ctx.setLineDash([3,2]);
+    ctx.beginPath(); ctx.moveTo(x,pad.top); ctx.lineTo(x,pad.top+ch); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='#1B3F6E'; ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='white'; ctx.beginPath(); ctx.arc(x,y,2,0,Math.PI*2); ctx.fill();
+    var xLbl=d.label||String(i);
+    var yLbl=(yv>=0?'':'-')+'$'+Math.round(Math.abs(yv)/1000)+'k';
+    var text=xLbl+' \u2192 '+yLbl;
+    ctx.font='bold 11px system-ui';
+    var tw=ctx.measureText(text).width+16, th=22, r2=4;
+    var tx=Math.min(Math.max(x-tw/2,pad.left),pad.left+cw-tw);
+    var ty=y-th-8; if(ty<pad.top)ty=y+8;
+    ctx.fillStyle='rgba(15,29,46,0.88)';
+    ctx.beginPath(); ctx.moveTo(tx+r2,ty); ctx.lineTo(tx+tw-r2,ty); ctx.arcTo(tx+tw,ty,tx+tw,ty+r2,r2);
+    ctx.lineTo(tx+tw,ty+th-r2); ctx.arcTo(tx+tw,ty+th,tx+tw-r2,ty+th,r2);
+    ctx.lineTo(tx+r2,ty+th); ctx.arcTo(tx,ty+th,tx,ty+th-r2,r2);
+    ctx.lineTo(tx,ty+r2); ctx.arcTo(tx,ty,tx+r2,ty,r2); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='white'; ctx.textAlign='left'; ctx.fillText(text,tx+8,ty+15);
+  }
+  function hitIdx(cx){
+    var rect=canvas.getBoundingClientRect(), scaleX=canvas.width/rect.width;
+    var px=(cx-rect.left)*scaleX;
+    if(px<pad.left||px>pad.left+cw)return -1;
+    return Math.max(0,Math.min(data.length-1,Math.floor((px-pad.left)/gap)));
+  }
+  canvas.addEventListener('mousemove',function(e){drawBase();var i=hitIdx(e.clientX);if(i>=0)drawTooltip(i);});
+  canvas.addEventListener('mouseleave',function(){drawBase();});
+  canvas.addEventListener('touchstart',function(e){e.preventDefault();},{passive:false});
+  canvas.addEventListener('touchmove',function(e){e.preventDefault();var t=e.touches[0];drawBase();var i=hitIdx(t.clientX);if(i>=0)drawTooltip(i);},{passive:false});
+  canvas.addEventListener('touchend',function(){drawBase();});
+  drawBase();
 }
 
-// ── PAGE 1 ────────────────────────────────────────────────────────────────────
 function renderPage1(){
   ensureAlts();
   var a=S.alts[S.activeAlt],sym=getSym(),isDDB=a.method==="Double-declining";

@@ -470,6 +470,8 @@ function loadExample(){
 
 // ── CHART ─────────────────────────────────────────────────────────────────────
 function drawChart(canvasId,data){
+  var fresh=canvas.cloneNode(true);canvas.parentNode.replaceChild(fresh,canvas);canvas=fresh;ctx=canvas.getContext('2d');
+
   var canvas=document.getElementById(canvasId);if(!canvas)return;
   var ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;
   var pad={top:16,bottom:48,left:80,right:16};
@@ -504,9 +506,10 @@ function drawChart(canvasId,data){
   ctx.beginPath();ctx.moveTo(pad.left,pad.top+ch);ctx.lineTo(pad.left+cw,pad.top+ch);ctx.stroke();
   ctx.fillStyle="#4A5568";ctx.font="bold 12px system-ui";ctx.textAlign="center";
   ctx.fillText("Borrowing Rate (%)",pad.left+cw/2,H-3);
-}
 
-// ── PAGE 1 ────────────────────────────────────────────────────────────────────
+  canvas.style.cursor='crosshair';
+  canvas.addEventListener('touchstart',function(e){e.preventDefault();},{passive:false});
+}
 function renderPage1(){
   var sym=getSym(),isDDB=S.method==="Double-declining";
   var html='<div class="page"><div class="page-grid"><aside>';

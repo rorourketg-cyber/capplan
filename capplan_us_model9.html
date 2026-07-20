@@ -703,6 +703,81 @@ function renderPage2(){
   },50);
 }
 function printSummary(){var a=S.show_pmt_sens,b=S.show_depr;S.show_pmt_sens=true;S.show_depr=true;renderPage2();setTimeout(function(){window.print();S.show_pmt_sens=a;S.show_depr=b;renderPage2();},300);}
+function drawChart(canvasId,data,xkey,ykey,xfmt){
+  var canvas=document.getElementById(canvasId);if(!canvas)return;
+  var fresh=canvas.cloneNode(true);canvas.parentNode.replaceChild(fresh,canvas);canvas=fresh;
+  var ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
+  var pad={top:20,bottom:50,left:80,right:16};
+  var cw=W-pad.left-pad.right,ch=H-pad.top-pad.bottom;
+  var vals=data.map(function(d){return d[ykey]});
+  var minV=Math.min.apply(null,vals),maxV=Math.max.apply(null,vals);
+  var rng=maxV-minV||Math.abs(maxV||1)*0.4;
+  var lo=minV-rng*0.15,hi=maxV+rng*0.15;
+  var gap=cw/data.length,bw=Math.floor(gap*0.6);
+  var midIdx=Math.floor(data.length/2);
+  function toY(v){return(hi===lo)?pad.top+ch/2:pad.top+ch*(hi-v)/(hi-lo);}
+  var zeroY=toY(0);
+  function drawBase(){
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='#E2E6EC';ctx.lineWidth=1;
+    for(var i=0;i<=4;i++){
+      var y=pad.top+ch*(i/4);
+      ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();
+      var v=hi-(hi-lo)*(i/4);
+      ctx.fillStyle='#8A96A6';ctx.font='10px system-ui';ctx.textAlign='right';
+      ctx.fillText((v>=0?'$':'-$')+fmt(Math.abs(v)/1000,1)+'k',pad.left-4,y+3);
+    }
+    ctx.strokeStyle='#C8D0DA';ctx.lineWidth=1.5;ctx.setLineDash([5,3]);
+    ctx.beginPath();ctx.moveTo(pad.left,zeroY);ctx.lineTo(pad.left+cw,zeroY);ctx.stroke();
+    ctx.setLineDash([]);
+    data.forEach(function(d,i){
+      var x=pad.left+gap*i+(gap-bw)/2;
+      var y0=zeroY,y1=toY(d[ykey]),barH=Math.abs(y1-y0),top=Math.min(y0,y1);
+      ctx.fillStyle=d[ykey]>=0?(i===midIdx?'#2E7D52':'#6DBF8A'):(i===midIdx?'#C84B31':'#E88A8A');
+      ctx.fillRect(x,top,bw,Math.max(barH,1));
+      ctx.fillStyle=i===midIdx?'#1B3F6E':'#8A96A6';
+      ctx.font=(i===midIdx?'bold ':'')+'10px system-ui';ctx.textAlign='center';
+      ctx.fillText(String(d[xkey])+(xfmt||''),x+bw/2,H-pad.bottom+14);
+    });
+    ctx.strokeStyle='#4A5568';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(pad.left,pad.top);ctx.lineTo(pad.left,pad.top+ch);ctx.lineTo(pad.left+cw,pad.top+ch);ctx.stroke();
+  }
+  function drawTooltip(i){
+    var d=data[i],x=pad.left+gap*i+(gap-bw)/2+bw/2,y=toY(d[ykey]);
+    ctx.strokeStyle='rgba(27,63,110,0.3)';ctx.lineWidth=1;ctx.setLineDash([3,2]);
+    ctx.beginPath();ctx.moveTo(x,pad.top);ctx.lineTo(x,pad.top+ch);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#1B3F6E';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='white';ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fill();
+    var xLbl=String(d[xkey])+(xfmt||'');
+    var yVal=d[ykey];
+    var isPct=(ykey==='rate'||ykey==='coc'||ykey==='implied');
+    var yLbl=(yVal>=0?'':'-')+(isPct?fmt(Math.abs(yVal),2)+'%':'$'+fmt(Math.abs(yVal)/1000,2)+'k');
+    var text=xLbl+' \u2192 '+yLbl;
+    ctx.font='bold 11px system-ui';
+    var tw=ctx.measureText(text).width+16,th=22,r2=4;
+    var tx=Math.min(Math.max(x-tw/2,pad.left),pad.left+cw-tw);
+    var ty=y-th-8;if(ty<pad.top)ty=y+8;
+    ctx.fillStyle='rgba(15,29,46,0.88)';
+    ctx.beginPath();ctx.moveTo(tx+r2,ty);ctx.lineTo(tx+tw-r2,ty);ctx.arcTo(tx+tw,ty,tx+tw,ty+r2,r2);
+    ctx.lineTo(tx+tw,ty+th-r2);ctx.arcTo(tx+tw,ty+th,tx+tw-r2,ty+th,r2);
+    ctx.lineTo(tx+r2,ty+th);ctx.arcTo(tx,ty+th,tx,ty+th-r2,r2);
+    ctx.lineTo(tx,ty+r2);ctx.arcTo(tx,ty,tx+r2,ty,r2);ctx.closePath();ctx.fill();
+    ctx.fillStyle='white';ctx.textAlign='left';ctx.fillText(text,tx+8,ty+15);
+  }
+  function hitIdx(cx){
+    var rect=canvas.getBoundingClientRect(),scaleX=canvas.width/rect.width;
+    var px=(cx-rect.left)*scaleX;
+    if(px<pad.left||px>pad.left+cw)return -1;
+    return Math.max(0,Math.min(data.length-1,Math.floor((px-pad.left)/gap)));
+  }
+  canvas.addEventListener('mousemove',function(e){drawBase();var i=hitIdx(e.clientX);if(i>=0)drawTooltip(i);});
+  canvas.addEventListener('mouseleave',function(){drawBase();});
+  canvas.addEventListener('touchstart',function(e){e.preventDefault();},{passive:false});
+  canvas.addEventListener('touchmove',function(e){e.preventDefault();var t=e.touches[0];drawBase();var i=hitIdx(t.clientX);if(i>=0)drawTooltip(i);},{passive:false});
+  canvas.addEventListener('touchend',function(){drawBase();});
+  drawBase();
+}
+
 function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();}
 render();
 </script>
