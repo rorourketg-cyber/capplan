@@ -634,7 +634,7 @@ function renderPage1(){
   html+='</div>';
 
   html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:#9F7AEA"></div><div class="panel-title">Annual Benefits</div></div><div class="field-grid">';
-  html+=field("Benefit Stream",'<div class="pills"><div class="pill'+(alt.annuity?' active':'')+" onclick=\"S.alts["+S.activeTab+"].annuity=true;render()\"\"><div class=\"pill-dot\"></div>Annuity (same each year)</div><div class=\"pill"+(!alt.annuity?' active':'')+" onclick=\"S.alts["+S.activeTab+"].annuity=false;render()\"\"><div class=\"pill-dot\"></div>Variable by year</div></div>'",true);
+  html+=field("Benefit Stream",renderBenefitToggle(S.activeTab),true);
   if(alt.annuity){html+=field("Annual Benefit Amount",uInput("$",alt.annuityAmount,"inp-ann","S.alts["+S.activeTab+"].annuityAmount=+this.value||0","/ yr",false),true,true,"After-tax revenue increase or cost saving per year");}
   html+='</div></div>';
   if(!alt.annuity){
@@ -794,6 +794,14 @@ function drawChart(canvasId,data,xkey,ykey,xfmt){
   canvas.addEventListener('touchmove',function(e){e.preventDefault();var t=e.touches[0];drawBase();var i=hitIdx(t.clientX);if(i>=0)drawTooltip(i);},{passive:false});
   canvas.addEventListener('touchend',function(){drawBase();});
   drawBase();
+}
+
+
+function renderBenefitToggle(tabIdx){
+  var a=S.alts[tabIdx];
+  var p1='<div class="pill'+(a.annuity?' active':'')+'" onclick="S.alts['+tabIdx+'].annuity=true;S.alts['+tabIdx+'].yearlyBenefits=[];render()"><div class="pill-dot"></div>Annuity (same each year)</div>';
+  var p2='<div class="pill'+(!a.annuity?' active':'')+'" onclick="S.alts['+tabIdx+'].annuity=false;render()"><div class="pill-dot"></div>Variable by year</div>';
+  return '<div class="pills">'+p1+p2+'</div>';
 }
 
 function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();}
