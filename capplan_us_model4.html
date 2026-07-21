@@ -458,8 +458,44 @@ function calcAlt(alt,taxRate,coc,oldSale,oldBasis){
   var pvWC=wc>0?wc/Math.pow(1+r,life):0;
   var netOutlay=cost-netOldProceeds+wc;
   var npv=-netOutlay+pvTS+pvS179+pvBen+pvSalv+pvRecapture+pvWC;
-  return{label:alt.label,npv:npv,netOutlay:netOutlay,cost:cost,life:life,tax:tax,r:r,benefits:benefits,pvTS:pvTS,pvS179:pvS179,
-    pvBen:pvBen,pvSalv:pvSalv,pvRecapture:pvRecapture,pvWC:pvWC,depr:depr,netOldProceeds:netOldProceeds};
+
+  // Additional metrics per alternative
+  var pvIn4=pvTS+pvS179+pvBen+pvSalv+pvRecapture+pvWC;
+  var pvOut4=netOutlay;
+  var af4=r>0?(1-Math.pow(1+r,-life))/r:life;
+  var anpv4=af4>0?npv/af4:0;
+  var bc4=pvOut4>0?pvIn4/pvOut4:0;
+  function npvAlt4(rate){
+    var cfs=[-pvOut4];
+    for(var i=0;i<life;i++){
+      var yr=i+1,ts=depr.find(function(d){return d.year===yr;});
+      var cf=(benefits[i]||0)*(1-tax)+(ts?ts.amount*tax:0)+(yr===1?s179*tax:0);
+      if(yr===life)cf+=(salvage-recaptureTax)+(wc>0?wc:0);
+      cfs.push(cf);
+    }
+    return cfs.reduce(function(s,cf,i){return s+cf/Math.pow(1+rate,i);},0);
+  }
+  var irr4=r;
+  for(var _i4=0;_i4<120;_i4++){
+    var f4=npvAlt4(irr4),df4=(npvAlt4(irr4+0.0001)-f4)/0.0001;
+    if(Math.abs(df4)<1e-10)break;
+    var nx4=irr4-f4/df4;
+    if(Math.abs(nx4-irr4)<1e-8){irr4=nx4;break;}
+    irr4=nx4; if(irr4<-0.99||irr4>100){irr4=NaN;break;}
+  }
+  var payback4=null,cum4=-pvOut4;
+  for(var _j4=0;_j4<life;_j4++){
+    var yr=_j4+1,ts4=depr.find(function(d){return d.year===yr;});
+    var atcf4=(benefits[_j4]||0)*(1-tax)+(ts4?ts4.amount*tax:0)+(_j4===0?s179*tax:0);
+    if(yr===life)atcf4+=(salvage-recaptureTax)+(wc>0?wc:0);
+    var prev4=cum4; cum4+=atcf4;
+    if(cum4>=0&&prev4<0){payback4=_j4+(Math.abs(prev4)/(Math.abs(prev4)+cum4));break;}
+  }
+  return{label:alt.label,npv:npv,netOutlay:netOutlay,cost:cost,life:life,tax:tax,r:r,
+    benefits:benefits,pvTS:pvTS,pvS179:pvS179,pvBen:pvBen,pvSalv:pvSalv,
+    pvRecapture:pvRecapture,pvWC:pvWC,depr:depr,netOldProceeds:netOldProceeds,
+    irr:irr4,payback:payback4,bc:bc4,anpv:anpv4,pvIn:pvIn4,pvOut:pvOut4,af:af4,
+    salvage:salvage,recaptureTax:recaptureTax,wc:wc};
 }
 
 function calcAll(){
@@ -498,7 +534,11 @@ var NOTES1=[
   {q:"Can each alternative use different MACRS treatment?",a:"Yes — each alternative has its own property class selector and bonus depreciation toggle. Set them independently if alternatives are different asset types."}
 ];
 var NOTES2=[
-  {q:"What does the winning alternative mean?",a:"The replacement with the highest NPV creates the most after-tax value at your required return. Positive NPV means replacing is justified; negative for all alternatives means keeping the current asset may be the right decision."}
+  {q:"How do I choose between replacement options?",a:"For mutually exclusive replacements, choose the option with the highest positive NPV — it creates the most value after accounting for all costs and benefits. If all NPVs are negative, none of the replacements earns your required return."},
+  {q:"What is IRR per replacement option?",a:"IRR is the actual annual return each replacement earns on the net investment (new cost minus after-tax proceeds from the old asset). If IRR exceeds your required return, the replacement is individually worthwhile."},
+  {q:"What does Payback Period tell me here?",a:"The years to recover the net outlay (new cost minus old asset proceeds) from incremental after-tax cash flows. A short payback is good for liquidity but does not confirm the replacement earns your required return."},
+  {q:"What is the B/C ratio?",a:"Present value of all incremental inflows divided by the net outlay. Above 1.0 means the replacement returns more than it costs in present value terms."},
+  {q:"Why do the sensitivity charts matter?",a:"They show how sensitive each replacement's NPV is to your assumptions. Narrow NPV differences between options are a signal to check assumptions carefully before committing."}
 ];
 function makeBNList(notes,id){var list=document.getElementById(id);if(!list)return;list.innerHTML="";notes.forEach(function(n,i){var item=document.createElement("div");item.className="bn-item";var head=document.createElement("div");head.className="bn-head";head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+id+i+'">›</div>';var body=document.createElement("div");body.className="bn-body";body.textContent=n.a;head.onclick=function(){var open=body.classList.contains("open");body.classList.toggle("open");document.getElementById("arr"+id+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";head.style.background=open?"":"var(--surface)";};item.appendChild(head);item.appendChild(body);list.appendChild(item);});}
 
@@ -614,7 +654,13 @@ function renderPage2(){
   html+='<div class="result-banner" style="border-radius:10px;padding:20px 24px;margin-bottom:18px;background:var(--green-soft);border:1.5px solid var(--green);display:flex;align-items:center;justify-content:space-between;gap:20px"><div><div style="font-family:Georgia,serif;font-size:22px;color:var(--green);line-height:1.3"><strong>'+winner.label+'</strong> is the preferred replacement.</div><div style="font-size:13px;color:var(--t2);margin-top:8px;line-height:1.6">Highest net present value among the alternatives compared.</div></div><div style="background:var(--green);border-radius:10px;padding:14px 20px;text-align:center;flex-shrink:0"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.75)">NPV</div><div style="font-family:monospace;font-size:26px;font-weight:800;color:white;margin-top:4px">'+fmtM(winner.npv)+'</div></div></div>';
 
   html+='<div style="display:grid;grid-template-columns:repeat('+Math.min(res.results.length,3)+',1fr);gap:14px;margin-bottom:18px">';
-  res.results.forEach(function(r){var isWin=r===winner;html+='<div class="compare-card'+(isWin?" winner":"")+'"><div style="font-size:12px;font-weight:700;color:'+(isWin?"var(--green)":"var(--t2)")+';margin-bottom:8px">'+r.label+(isWin?" ✓":"")+'</div><div style="font-family:monospace;font-size:22px;font-weight:800;color:'+(isWin?"var(--green)":"var(--t1)")+'">'+fmtM(r.npv)+'</div><div style="font-size:10px;color:var(--t3);margin-top:4px">NPV</div><div style="margin-top:10px;font-size:11px;color:var(--t2);line-height:1.7">Cost: '+fmtM(r.cost)+'<br>Net outlay: '+fmtM(r.netOutlay)+'<br>Life: '+r.life+' yrs<br>PV Benefits: '+fmtM(r.pvBen)+'</div></div>';});
+  res.results.forEach(function(r){var isWin=r===winner;html+='<div class="compare-card'+(isWin?" winner":"")+'"><div style="font-size:12px;font-weight:700;color:'+(isWin?"var(--green)":"var(--t2)")+';margin-bottom:8px">'+r.label+(isWin?" ✓":"")+'</div><div style="font-family:monospace;font-size:22px;font-weight:800;color:'+(isWin?"var(--green)":"var(--t1)")+'">'+fmtM(r.npv)+'</div><div style="font-size:10px;color:var(--t3);margin-top:4px">NPV</div><div style="margin-top:10px;font-size:11px;color:var(--t2);line-height:1.7">Cost: '+fmtM(r.cost)+'<br>Net outlay: '+fmtM(r.netOutlay)+'<br>Life: '+r.life+' yrs<br>PV Benefits: '+fmtM(r.pvBen)+'</div>'+
+      (r.irr!==undefined?('<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
+        '<div style="font-size:10px;color:var(--t3)">IRR<br><span style="font-size:13px;font-weight:700;color:'+(!isNaN(r.irr)&&r.irr*100>=+S.coc?'var(--green)':'var(--warn)')+'">'+(!isNaN(r.irr)?(r.irr*100).toFixed(1)+'%':'--')+'</span></div>'+
+        '<div style="font-size:10px;color:var(--t3)">Payback<br><span style="font-size:13px;font-weight:700;color:'+(r.payback&&r.payback<=r.life?'var(--green)':'var(--warn)')+'">'+( r.payback?r.payback.toFixed(2)+' yrs':'Beyond life')+'</span></div>'+
+        '<div style="font-size:10px;color:var(--t3)">B/C Ratio<br><span style="font-size:13px;font-weight:700;color:'+(r.bc>=1?'var(--green)':'var(--warn)')+'">'+r.bc.toFixed(3)+'</span></div>'+
+        '<div style="font-size:10px;color:var(--t3)">Ann. NPV<br><span style="font-size:13px;font-weight:700;color:'+(r.anpv>=0?'var(--green)':'var(--warn)')+'">'+fmtM(r.anpv)+'</span></div>'+
+      '</div>'):'')+'</div>';});
   html+='</div>';
 
   html+='<div class="collapsible"><div class="coll-head" style="cursor:default"><span class="coll-title">Full Comparison</span></div><div class="coll-body open"><table><thead><tr><th class="left">Alternative</th><th>Cost</th><th>Net Outlay</th><th>PV Tax Shields</th><th>PV Benefits</th><th>NPV</th></tr></thead><tbody>';
