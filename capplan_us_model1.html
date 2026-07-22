@@ -852,9 +852,9 @@ function renderPage3(){
 
 
   // Metrics grid — IRR, Payback, B/C, Annualized NPV
-  var fmtPct=function(v){return(v*100).toFixed(1)+'%';};
+  var fmtPctIRR=function(v){return(v*100).toFixed(1)+'%';};
   var metrics=[
-    {l:'IRR',v:isNaN(res.irr)?'--':fmtPct(res.irr),s:'vs '+S.coc+'% required',ok:!isNaN(res.irr)&&res.irr*100>=+S.coc},
+    {l:'IRR',v:isNaN(res.irr)?'--':fmtPctIRR(res.irr),s:'vs '+S.coc+'% required',ok:!isNaN(res.irr)&&res.irr*100>=+S.coc},
     {l:'Payback Period',v:res.payback?res.payback.toFixed(2)+' yrs':'Beyond life',s:S.life+'-year economic life',ok:res.payback!==null&&res.payback<=+S.life},
     {l:'Benefit / Cost',v:res.bc.toFixed(3),s:'PV inflows / PV outflows',ok:res.bc>=1},
     {l:'Annualized NPV',v:fmtM(res.anpv),s:'per year equivalent',ok:res.anpv>=0}
