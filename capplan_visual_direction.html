@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan – Visual Direction</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ── TOKEN SYSTEM ─────────────────────────────────────────────
+     Primary:   #1B3F6E  (deep counsel blue)
+     Accent:    #2E7D52  (measured green — growth, go-ahead)
+     Surface:   #F7F8FA  (near-white, not cream)
+     Panel:     #FFFFFF
+     Border:    #E2E6EC
+     Text-1:    #0F1D2E  (near-black)
+     Text-2:    #4A5568  (mid-grey)
+     Text-3:    #8A96A6  (light-grey — labels, captions)
+     Warn:      #C84B31  (only for validation errors)
+  ────────────────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue:    #1B3F6E;
+    --green:   #2E7D52;
+    --surface: #F7F8FA;
+    --panel:   #FFFFFF;
+    --border:  #E2E6EC;
+    --t1:      #0F1D2E;
+    --t2:      #4A5568;
+    --t3:      #8A96A6;
+    --warn:    #C84B31;
+    --radius:  8px;
+    --shadow:  0 1px 4px rgba(15,29,46,0.08), 0 4px 16px rgba(15,29,46,0.04);
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--surface);
+    color: var(--t1);
+    min-height: 100vh;
+  }
+
+  /* ── MASTHEAD ─────────────────────────────────────────────── */
+  .masthead {
+    background: var(--blue);
+    padding: 0 32px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    background: var(--green);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-mark svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: white;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .logo-text {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 20px;
+    color: white;
+    letter-spacing: 0.02em;
+  }
+
+  .logo-text span {
+    color: #A8C5E8;
+  }
+
+  .masthead-module {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+
+  /* ── PAGE STEPPER ─────────────────────────────────────────── */
+  .stepper-bar {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px 14px 0;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .step + .step::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .step-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .step.done .step-num   { background: var(--green); color: white; }
+  .step.active .step-num { background: var(--blue); color: white; }
+  .step.idle .step-num   { background: var(--border); color: var(--t3); }
+
+  .step-label {
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .step.done .step-label   { color: var(--green); }
+  .step.active .step-label { color: var(--blue); }
+  .step.idle .step-label   { color: var(--t3); }
+
+  .step.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--blue);
+    border-radius: 1px 1px 0 0;
+  }
+
+  .step-divider {
+    color: var(--border);
+    font-size: 18px;
+    padding: 0 4px;
+    user-select: none;
+  }
+
+  /* ── MAIN LAYOUT ──────────────────────────────────────────── */
+  .page-body {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 24px;
+  }
+
+  /* ── LEFT: BRIEFING NOTES ─────────────────────────────────── */
+  .briefing-col {}
+
+  .briefing-header {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--t3);
+    margin-bottom: 14px;
+  }
+
+  .briefing-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .briefing-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .briefing-item:last-child { border-bottom: none; }
+  .briefing-item:hover { background: var(--surface); }
+
+  .briefing-icon {
+    width: 24px;
+    height: 24px;
+    background: rgba(27,63,110,0.08);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .briefing-icon svg {
+    width: 12px;
+    height: 12px;
+    fill: var(--blue);
+  }
+
+  .briefing-q {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--blue);
+    font-weight: 400;
+  }
+
+  .briefing-chevron {
+    margin-left: auto;
+    color: var(--t3);
+    font-size: 14px;
+    flex-shrink: 0;
+    align-self: center;
+  }
+
+  /* Cost of Capital link */
+  .coc-link {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    text-decoration: none;
+  }
+
+  .coc-link:hover {
+    border-color: var(--blue);
+    background: rgba(27,63,110,0.02);
+  }
+
+  .coc-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(46,125,82,0.10);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .coc-icon svg {
+    width: 18px; height: 18px;
+    stroke: var(--green);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  .coc-text-block {}
+  .coc-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--blue);
+  }
+  .coc-sub {
+    font-size: 12px;
+    color: var(--t3);
+    margin-top: 2px;
+  }
+
+  /* ── RIGHT: INPUT FORM ────────────────────────────────────── */
+  .inputs-col {}
+
+  .section-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .section-head {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-head-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--blue);
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--t2);
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .field-item {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+
+  .field-item:nth-child(even) { border-right: none; }
+  .field-item:nth-last-child(-n+2) { border-bottom: none; }
+  .field-item.full-width {
+    grid-column: 1 / -1;
+    border-right: none;
+  }
+
+  .field-label {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--t3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .field-label .help-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--border);
+    color: var(--t3);
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: help;
+  }
+
+  .field-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .field-prefix {
+    font-size: 13px;
+    color: var(--t3);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .field-input input,
+  .field-input select {
+    font-family: 'DM Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--t1);
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    padding: 2px 0;
+    border-bottom: 2px solid var(--border);
+    transition: border-color 0.15s;
+  }
+
+  .field-input input:focus,
+  .field-input select:focus {
+    border-bottom-color: var(--blue);
+  }
+
+  /* radio group */
+  .radio-group {
+    display: flex;
+    gap: 16px;
+  }
+
+  .radio-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--t2);
+    padding: 6px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    transition: all 0.15s;
+  }
+
+  .radio-pill input[type=radio] { display: none; }
+
+  .radio-pill.selected {
+    border-color: var(--blue);
+    background: rgba(27,63,110,0.06);
+    color: var(--blue);
+  }
+
+  .radio-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .radio-pill.selected .radio-dot::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--blue);
+  }
+
+  /* select styled */
+  .field-input select {
+    appearance: none;
+    cursor: pointer;
+  }
+
+  /* ── ACTION ROW ───────────────────────────────────────────── */
+  .action-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 4px;
+    padding: 0 4px;
+  }
+
+  .btn-primary {
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 12px 28px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .btn-primary:hover {
+    background: #163357;
+    transform: translateY(-1px);
+  }
+
+  .btn-primary svg {
+    width: 14px;
+    height: 14px;
+    stroke: white;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--t2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-ghost:hover { border-color: var(--t2); color: var(--t1); }
+
+  /* ── COLOUR PALETTE SWATCH ────────────────────────────────── */
+  .palette-section {
+    max-width: 1100px;
+    margin: 0 auto 24px;
+    padding: 0 24px;
+  }
+
+  .palette-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--t3);
+    margin-bottom: 12px;
+  }
+
+  .swatches {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .swatch-block {
+    width: 64px;
+    height: 40px;
+    border-radius: 6px;
+    border: 1px solid rgba(0,0,0,0.07);
+  }
+
+  .swatch-name {
+    font-size: 10px;
+    color: var(--t3);
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── TYPEFACE SAMPLE ──────────────────────────────────────── */
+  .type-section {
+    max-width: 1100px;
+    margin: 0 auto 32px;
+    padding: 0 24px;
+  }
+
+  .type-sample {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .t-display {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 32px;
+    color: var(--t1);
+    line-height: 1.2;
+  }
+
+  .t-display em {
+    font-style: italic;
+    color: var(--blue);
+  }
+
+  .t-body {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--t2);
+    max-width: 560px;
+  }
+
+  .t-mono {
+    font-family: 'DM Mono', monospace;
+    font-size: 20px;
+    color: var(--green);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .t-caption {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    color: var(--t3);
+  }
+
+  .direction-note {
+    max-width: 1100px;
+    margin: 0 auto 24px;
+    padding: 0 24px;
+    font-size: 13px;
+    color: var(--t2);
+    line-height: 1.7;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--blue);
+    border-radius: var(--radius);
+  }
+
+  .direction-note p { padding: 14px 16px; }
+  .direction-note strong { color: var(--t1); }
+
+  @media (max-width: 768px) {
+    .page-body { grid-template-columns: 1fr; }
+    .field-grid { grid-template-columns: 1fr; }
+    .field-item { border-right: none !important; }
+    .field-item:nth-last-child(-n+2) { border-bottom: 1px solid var(--border); }
+    .field-item:last-child { border-bottom: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── DIRECTION NOTES ─────────────────────────────────────── -->
+<div style="background:var(--blue);padding:16px 24px;margin-bottom:0;">
+  <p style="color:rgba(255,255,255,0.7);font-size:12px;max-width:1100px;margin:0 auto;font-family:Inter,sans-serif;">
+    <strong style="color:white;">CapPlan Visual Direction — Prototype</strong> &nbsp;·&nbsp;
+    This is a design direction mockup, not the final app. Review the palette, type, and component feel before we build the three-page PWA.
+  </p>
+</div>
+
+<!-- ── MASTHEAD ─────────────────────────────────────────────── -->
+<header class="masthead">
+  <a class="logo" href="#">
+    <div class="logo-mark">
+      <svg viewBox="0 0 18 18">
+        <polyline points="3,10 7,14 15,4"/>
+      </svg>
+    </div>
+    <span class="logo-text">Cap<span>Plan</span></span>
+  </a>
+  <span class="masthead-module">Equipment Purchase Analysis</span>
+</header>
+
+<!-- ── PAGE STEPPER ─────────────────────────────────────────── -->
+<nav class="stepper-bar">
+  <div class="step done">
+    <div class="step-num">✓</div>
+    <span class="step-label">Asset Details</span>
+  </div>
+  <span class="step-divider">›</span>
+  <div class="step active">
+    <div class="step-num">2</div>
+    <span class="step-label">Economic Benefits</span>
+  </div>
+  <span class="step-divider">›</span>
+  <div class="step idle">
+    <div class="step-num">3</div>
+    <span class="step-label">Results</span>
+  </div>
+</nav>
+
+<!-- ── PALETTE + TYPE ────────────────────────────────────────── -->
+<div style="height:28px;"></div>
+
+<div class="palette-section">
+  <p class="palette-label">Colour Palette</p>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-block" style="background:#1B3F6E;"></div><span class="swatch-name">#1B3F6E<br>Counsel Blue</span></div>
+    <div class="swatch"><div class="swatch-block" style="background:#2E7D52;"></div><span class="swatch-name">#2E7D52<br>Go-Ahead Green</span></div>
+    <div class="swatch"><div class="swatch-block" style="background:#F7F8FA;"></div><span class="swatch-name">#F7F8FA<br>Surface</span></div>
+    <div class="swatch"><div class="swatch-block" style="background:#FFFFFF;border:1px solid #E2E6EC;"></div><span class="swatch-name">#FFFFFF<br>Panel</span></div>
+    <div class="swatch"><div class="swatch-block" style="background:#E2E6EC;"></div><span class="swatch-name">#E2E6EC<br>Border</span></div>
+    <div class="swatch"><div class="swatch-block" style="background:#4A5568;"></div><span class="swatch-name">#4A5568<br>Body Text</span></div>
+    <div class="swatch"><div class="swatch-block" style="background:#C84B31;"></div><span class="swatch-name">#C84B31<br>Error / Warn</span></div>
+  </div>
+</div>
+
+<div class="type-section">
+  <p class="palette-label" style="margin-bottom:12px;">Typography</p>
+  <div class="type-sample">
+    <span class="t-caption">DM Serif Display — module titles, result headlines</span>
+    <p class="t-display">Should you <em>buy</em> this asset?</p>
+    <span class="t-caption" style="margin-top:4px;">Inter — body, labels, UI copy</span>
+    <p class="t-body">CapPlan walks you through the key numbers behind your capital decision. Answer a few questions about the asset, your expected benefits, and your business finances — we'll show you whether it makes economic sense.</p>
+    <span class="t-caption" style="margin-top:4px;">DM Mono — numbers, financial figures, input values</span>
+    <p class="t-mono">NPV $49,363 &nbsp;·&nbsp; IRR 21.9% &nbsp;·&nbsp; Payback 3.8 yrs</p>
+  </div>
+</div>
+
+<!-- ── FULL PAGE 1 MOCKUP ─────────────────────────────────────── -->
+<!-- Reset stepper to page 1 for the mockup -->
+<div style="background:var(--panel);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:0;max-width:none;">
+  <div style="max-width:1100px;margin:0 auto;width:100%;display:flex;">
+    <div class="step active" style="padding:14px 24px 14px 0;">
+      <div class="step-num" style="background:var(--blue);color:white;">1</div>
+      <span class="step-label" style="color:var(--blue);">Asset Details</span>
+    </div>
+    <span class="step-divider">›</span>
+    <div class="step idle" style="padding:14px 24px;">
+      <div class="step-num" style="background:var(--border);color:var(--t3);">2</div>
+      <span class="step-label" style="color:var(--t3);">Economic Benefits</span>
+    </div>
+    <span class="step-divider">›</span>
+    <div class="step idle" style="padding:14px 0;">
+      <div class="step-num" style="background:var(--border);color:var(--t3);">3</div>
+      <span class="step-label" style="color:var(--t3);">Results</span>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- LEFT: BRIEFING NOTES -->
+  <aside class="briefing-col">
+    <p class="briefing-header">Briefing Notes</p>
+
+    <div class="briefing-card">
+      <div class="briefing-item">
+        <div class="briefing-icon">
+          <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" stroke="var(--blue)" stroke-width="1.5" fill="none"/><line x1="6" y1="5" x2="6" y2="9" stroke="var(--blue)" stroke-width="1.5"/><circle cx="6" cy="3.5" r="0.7" fill="var(--blue)"/></svg>
+        </div>
+        <span class="briefing-q">What is included in the cost of the asset?</span>
+        <span class="briefing-chevron">›</span>
+      </div>
+      <div class="briefing-item">
+        <div class="briefing-icon">
+          <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" stroke="var(--blue)" stroke-width="1.5" fill="none"/><line x1="6" y1="5" x2="6" y2="9" stroke="var(--blue)" stroke-width="1.5"/><circle cx="6" cy="3.5" r="0.7" fill="var(--blue)"/></svg>
+        </div>
+        <span class="briefing-q">How do I know if my project is eligible for ITC?</span>
+        <span class="briefing-chevron">›</span>
+      </div>
+      <div class="briefing-item">
+        <div class="briefing-icon">
+          <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" stroke="var(--blue)" stroke-width="1.5" fill="none"/><line x1="6" y1="5" x2="6" y2="9" stroke="var(--blue)" stroke-width="1.5"/><circle cx="6" cy="3.5" r="0.7" fill="var(--blue)"/></svg>
+        </div>
+        <span class="briefing-q">How do I estimate economic life and salvage value?</span>
+        <span class="briefing-chevron">›</span>
+      </div>
+      <div class="briefing-item">
+        <div class="briefing-icon">
+          <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" stroke="var(--blue)" stroke-width="1.5" fill="none"/><line x1="6" y1="5" x2="6" y2="9" stroke="var(--blue)" stroke-width="1.5"/><circle cx="6" cy="3.5" r="0.7" fill="var(--blue)"/></svg>
+        </div>
+        <span class="briefing-q">What depreciation method should I use and what is the half-year rule?</span>
+        <span class="briefing-chevron">›</span>
+      </div>
+      <div class="briefing-item">
+        <div class="briefing-icon">
+          <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" stroke="var(--blue)" stroke-width="1.5" fill="none"/><line x1="6" y1="5" x2="6" y2="9" stroke="var(--blue)" stroke-width="1.5"/><circle cx="6" cy="3.5" r="0.7" fill="var(--blue)"/></svg>
+        </div>
+        <span class="briefing-q">How do I calculate the required rate of return?</span>
+        <span class="briefing-chevron">›</span>
+      </div>
+    </div>
+
+    <!-- Cost of Capital Calculator link -->
+    <div style="margin-bottom:10px;">
+      <p class="briefing-header" style="margin-bottom:12px;">Tools</p>
+      <a class="coc-link" href="#">
+        <div class="coc-icon">
+          <svg viewBox="0 0 18 18"><path d="M9 2v4M9 12v4M2 9h4M12 9h4" stroke-linecap="round"/><circle cx="9" cy="9" r="3"/></svg>
+        </div>
+        <div class="coc-text-block">
+          <p class="coc-label">Cost of Capital Calculator</p>
+          <p class="coc-sub">WACC · Capital Asset Pricing Model</p>
+        </div>
+        <span style="color:var(--t3);margin-left:auto;font-size:16px;">›</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- RIGHT: INPUT FORM -->
+  <main class="inputs-col">
+
+    <!-- Asset Information -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-head-dot"></div>
+        <span class="section-title">Asset Information</span>
+      </div>
+      <div class="field-grid">
+        <div class="field-item">
+          <div class="field-label">Cost of Asset <span class="help-dot">?</span></div>
+          <div class="field-input">
+            <span class="field-prefix">$</span>
+            <input type="text" value="80,000">
+          </div>
+        </div>
+        <div class="field-item">
+          <div class="field-label">Investment Tax Credit <span class="help-dot">?</span></div>
+          <div class="field-input">
+            <input type="text" value="20">
+            <span class="field-prefix">%</span>
+          </div>
+        </div>
+        <div class="field-item">
+          <div class="field-label">Economic Life <span class="help-dot">?</span></div>
+          <div class="field-input">
+            <input type="text" value="10">
+            <span class="field-prefix">years</span>
+          </div>
+        </div>
+        <div class="field-item">
+          <div class="field-label">Salvage Value <span class="help-dot">?</span></div>
+          <div class="field-input">
+            <span class="field-prefix">$</span>
+            <input type="text" value="8,000">
+          </div>
+        </div>
+        <div class="field-item">
+          <div class="field-label">Working Capital Required <span class="help-dot">?</span></div>
+          <div class="field-input">
+            <span class="field-prefix">$</span>
+            <input type="text" value="5,000">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Depreciation -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-head-dot" style="background:var(--green);"></div>
+        <span class="section-title">Depreciation</span>
+      </div>
+      <div class="field-grid">
+        <div class="field-item">
+          <div class="field-label">Method</div>
+          <div class="field-input">
+            <select>
+              <option>Double-declining</option>
+              <option>Straight-line</option>
+              <option>Sum-of-years-digits</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-item">
+          <div class="field-label">Depreciation Rate <span class="help-dot">?</span></div>
+          <div class="field-input">
+            <input type="text" value="30">
+            <span class="field-prefix">%</span>
+          </div>
+        </div>
+        <div class="field-item full-width" style="border-bottom:none;">
+          <div class="field-label">Half-Year Rule <span class="help-dot">?</span></div>
+          <div class="radio-group" style="margin-top:4px;">
+            <label class="radio-pill selected"><input type="radio" name="hyr" checked><span class="radio-dot"></span> Yes</label>
+            <label class="radio-pill"><input type="radio" name="hyr"><span class="radio-dot"></span> No</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firm Data -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-head-dot" style="background:var(--t3);"></div>
+        <span class="section-title">Firm Data</span>
+      </div>
+      <div class="field-grid">
+        <div class="field-item" style="border-bottom:none;">
+          <div class="field-label">Tax Rate <span class="help-dot">?</span></div>
+          <div class="field-input">
+            <input type="text" value="35">
+            <span class="field-prefix">%</span>
+          </div>
+        </div>
+        <div class="field-item" style="border-bottom:none;">
+          <div class="field-label">Required Rate of Return <span class="help-dot">?</span></div>
+          <div class="field-input">
+            <input type="text" value="10">
+            <span class="field-prefix">%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action -->
+    <div class="action-row">
+      <button class="btn-ghost">Clear</button>
+      <button class="btn-primary">
+        Next: Economic Benefits
+        <svg viewBox="0 0 14 14"><polyline points="4,2 10,7 4,12"/></svg>
+      </button>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
