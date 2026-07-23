@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan — Equipment Purchase Analysis</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; background: #F7F8FA; color: #0F1D2E; font-size: 14px; }
+input, select, button { font-family: inherit; font-size: 14px; }
+button { cursor: pointer; }
+
+#masthead {
+  background: #1B3F6E;
+  height: 80px;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+#masthead .logo { display: flex; align-items: center; gap: 12px; }
+#masthead .logo-icon {
+  width: 34px; height: 34px; background: #2E7D52;
+  border-radius: 6px; display: flex; align-items: center; justify-content: center;
+}
+#masthead .logo-text { font-family: Georgia, serif; font-size: 22px; color: white; }
+#masthead .logo-text span { color: #A8C5E8; }
+#masthead .module-name { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.85); }
+#masthead .cur-btn {
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 6px; padding: 6px 12px; color: white; font-size: 12px;
+  font-weight: 600; cursor: pointer; position: relative;
+}
+#cur-dropdown {
+  position: absolute; right: 0; top: 110%; background: white;
+  border: 1px solid #E2E6EC; border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12); min-width: 200px;
+  z-index: 200; display: none;
+}
+#cur-dropdown.open { display: block; }
+#cur-dropdown button {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 10px 14px; background: none; border: none;
+  border-bottom: 1px solid #E2E6EC; text-align: left; cursor: pointer;
+}
+#cur-dropdown button:hover { background: #F7F8FA; }
+#cur-dropdown button .sym { font-family: monospace; font-weight: 700; color: #1B3F6E; width: 36px; }
+
+#stepper {
+  background: white; border-bottom: 1px solid #E2E6EC;
+  display: flex; align-items: center; padding: 0 28px;
+}
+.step { display: flex; align-items: center; gap: 8px; padding: 14px 4px; border-bottom: 2px solid transparent; }
+.step.active { border-bottom-color: #1B3F6E; }
+.step-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+  background: #E2E6EC; color: #8A96A6;
+}
+.step.active .step-num { background: #1B3F6E; color: white; }
+.step.done .step-num { background: #2E7D52; color: white; }
+.step-label { font-size: 13px; font-weight: 500; color: #8A96A6; white-space: nowrap; }
+.step.active .step-label { color: #1B3F6E; }
+.step.done .step-label { color: #2E7D52; }
+.step-sep { color: #E2E6EC; margin: 0 8px; font-size: 16px; }
+
+.page { max-width: 1080px; margin: 0 auto; padding: 24px 22px; }
+.page-grid { display: grid; grid-template-columns: 310px 1fr; gap: 22px; }
+
+.panel { background: white; border: 1px solid #E2E6EC; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+.panel-head { padding: 12px 18px; border-bottom: 1px solid #E2E6EC; display: flex; align-items: center; gap: 10px; }
+.panel-dot { width: 8px; height: 8px; border-radius: 50%; background: #1B3F6E; flex-shrink: 0; }
+.panel-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #4A5568; }
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; }
+.field { padding: 14px 18px; border-bottom: 1px solid #E2E6EC; border-right: 1px solid #E2E6EC; }
+.field.full { grid-column: 1 / -1; border-right: none; }
+.field.last { border-bottom: none; }
+.field-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #8A96A6; margin-bottom: 7px; }
+.field-note { font-size: 10px; color: #8A96A6; margin-top: 5px; }
+.field-error { font-size: 10px; color: #C84B31; margin-top: 5px; }
+
+.underline-input { display: flex; align-items: center; gap: 6px; }
+.underline-input .pfx { font-family: monospace; font-size: 13px; color: #8A96A6; flex-shrink: 0; }
+.underline-input input {
+  font-family: monospace; font-size: 15px; font-weight: 600; color: #0F1D2E;
+  border: none; border-bottom: 2px solid #E2E6EC; background: transparent;
+  width: 100%; padding: 2px 0; outline: none;
+}
+.underline-input input:focus { border-bottom-color: #1B3F6E; }
+.underline-input input:disabled { color: #8A96A6; opacity: 0.6; }
+.underline-input .sfx { font-size: 13px; color: #8A96A6; flex-shrink: 0; }
+.underline-input select {
+  font-family: monospace; font-size: 14px; font-weight: 600; color: #0F1D2E;
+  border: none; border-bottom: 2px solid #E2E6EC; background: transparent;
+  width: 100%; padding: 2px 0; outline: none; cursor: pointer; appearance: none;
+}
+.underline-input select:focus { border-bottom-color: #1B3F6E; }
+
+.pills { display: flex; gap: 10px; margin-top: 4px; }
+.pill {
+  display: flex; align-items: center; gap: 7px; padding: 6px 14px;
+  border: 1.5px solid #E2E6EC; border-radius: 20px; font-size: 13px;
+  font-weight: 500; color: #4A5568; cursor: pointer; user-select: none;
+  background: transparent;
+}
+.pill.active { border-color: #1B3F6E; background: rgba(27,63,110,0.07); color: #1B3F6E; }
+.pill-dot { width: 13px; height: 13px; border-radius: 50%; border: 2px solid #8A96A6; flex-shrink: 0; }
+.pill.active .pill-dot { border-color: #1B3F6E; background: #1B3F6E; }
+
+.section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #8A96A6; margin-bottom: 12px; }
+.briefing-list { background: white; border: 1px solid #E2E6EC; border-radius: 8px; overflow: hidden; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.bn-head { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; cursor: pointer; background: transparent; }
+.bn-head:hover { background: #F7F8FA; }
+.bn-qmark {
+  width: 22px; height: 22px; border-radius: 50%; background: rgba(27,63,110,0.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: #1B3F6E;
+  flex-shrink: 0; margin-top: 1px; margin-right: 6px;
+}
+.bn-q { font-size: 13px; line-height: 1.5; color: #1B3F6E; flex: 1; }
+.bn-arr { color: #8A96A6; font-size: 15px; flex-shrink: 0; margin-top: 1px; transition: transform 0.2s; }
+.bn-body { padding: 10px 14px 12px 46px; font-size: 12.5px; line-height: 1.7; color: #4A5568; background: #F7F8FA; border-top: 1px solid #E2E6EC; display: none; }
+.bn-body.open { display: block; }
+.bn-item { border-bottom: 1px solid #E2E6EC; }
+.bn-item:last-child { border-bottom: none; }
+.watch-btn {
+  margin-top: 10px; display: flex; width: fit-content; align-items: center; gap: 5px;
+  border: 1px solid #1B3F6E; border-radius: 5px; padding: 5px 12px;
+  font-size: 11px; font-weight: 700; color: #1B3F6E; background: none; cursor: pointer;
+}
+
+.tools-box { background: white; border: 1px solid #E2E6EC; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.coc-trigger { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border: none; background: none; cursor: pointer; text-align: left; border-radius: 8px; }
+.coc-trigger:hover { background: #F7F8FA; }
+.coc-icon { width: 34px; height: 34px; background: rgba(46,125,82,0.09); border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.coc-open { border: 1px solid #1B3F6E; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 16px rgba(27,63,110,0.12); }
+.coc-head { background: #1B3F6E; padding: 11px 14px; display: flex; align-items: center; justify-content: space-between; }
+.coc-head span { font-size: 12px; font-weight: 700; color: white; }
+.coc-head button { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 20px; cursor: pointer; line-height: 1; }
+.coc-tabs { display: flex; gap: 8px; padding: 12px 14px 0; }
+.coc-tab { flex: 1; padding: 9px 10px; border-radius: 7px; border: 1.5px solid #E2E6EC; background: transparent; cursor: pointer; text-align: left; }
+.coc-tab.active { border-color: #1B3F6E; background: rgba(27,63,110,0.07); }
+.coc-tab .tab-name { font-size: 12px; font-weight: 700; color: #4A5568; }
+.coc-tab.active .tab-name { color: #1B3F6E; }
+.coc-tab .tab-sub { font-size: 10px; color: #8A96A6; margin-top: 2px; }
+.coc-body { padding: 14px; }
+.coc-row { margin-bottom: 12px; }
+.coc-row-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #8A96A6; margin-bottom: 5px; }
+.coc-hint { font-size: 10px; color: #8A96A6; margin-top: 3px; }
+.coc-formula { background: #F7F8FA; border-radius: 5px; padding: 9px 10px; font-size: 11px; color: #4A5568; margin-top: 4px; }
+.coc-result { margin-top: 12px; padding: 12px 14px; background: rgba(46,125,82,0.09); border: 1px solid #2E7D52; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; }
+.coc-result-val { font-family: monospace; font-size: 24px; font-weight: 700; color: #2E7D52; }
+.use-btn { background: #2E7D52; color: white; border: none; border-radius: 7px; padding: 9px 14px; font-size: 12px; font-weight: 700; cursor: pointer; }
+
+.action-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+.btn-primary { background: #1B3F6E; color: white; border: none; border-radius: 8px; padding: 11px 22px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.btn-primary:hover { background: #163357; }
+.btn-ghost { background: transparent; color: #4A5568; border: 1.5px solid #E2E6EC; border-radius: 8px; padding: 11px 22px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+/* Page 2 */
+.p2-box { background: white; border: 1px solid #E2E6EC; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 18px; max-width: 800px; margin-left: auto; margin-right: auto; }
+.p2-head { padding: 16px 22px; border-bottom: 1px solid #E2E6EC; }
+.p2-title { font-family: Georgia, serif; font-size: 20px; color: #0F1D2E; margin-bottom: 5px; }
+.p2-sub { font-size: 13px; color: #4A5568; line-height: 1.6; }
+.p2-toggle { padding: 18px 22px; border-bottom: 1px solid #E2E6EC; }
+.p2-annuity { padding: 18px 22px; border-bottom: 1px solid #E2E6EC; }
+.var-head { display: grid; grid-template-columns: 72px 1fr 1fr; gap: 0 14px; padding: 10px 22px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #8A96A6; border-bottom: 1px solid #E2E6EC; }
+.var-row { display: grid; grid-template-columns: 72px 1fr 1fr; gap: 0 14px; padding: 9px 22px; align-items: center; border-bottom: 1px solid #E2E6EC; }
+.var-row:nth-child(odd) { background: #F7F8FA; }
+.var-yr { font-size: 12px; font-weight: 600; color: #4A5568; }
+.var-at { font-family: monospace; font-size: 13px; color: #2E7D52; }
+.var-list { max-height: 360px; overflow-y: auto; }
+.p2-actions { display: flex; justify-content: space-between; gap: 10px; max-width: 800px; margin: 0 auto; }
+
+/* Page 3 */
+.p3-grid { display: grid; grid-template-columns: 272px 1fr; gap: 22px; }
+.banner { border-radius: 10px; padding: 18px 22px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; }
+.banner.positive { background: rgba(46,125,82,0.09); border: 1.5px solid #2E7D52; }
+.banner.negative { background: rgba(200,75,49,0.07); border: 1.5px solid #C84B31; }
+.banner-headline { font-family: Georgia, serif; font-size: 22px; line-height: 1.2; }
+.banner.positive .banner-headline { color: #2E7D52; }
+.banner.negative .banner-headline { color: #C84B31; }
+.banner-sub { font-size: 13px; color: #4A5568; margin-top: 6px; line-height: 1.6; }
+.banner-npv { text-align: right; flex-shrink: 0; margin-left: 20px; }
+.banner-npv-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #8A96A6; }
+.banner-npv-val { font-family: monospace; font-size: 30px; font-weight: 700; margin-top: 3px; }
+.banner.positive .banner-npv-val { color: #2E7D52; }
+.banner.negative .banner-npv-val { color: #C84B31; }
+.metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 18px; }
+.metric { background: white; border: 1px solid #E2E6EC; border-radius: 8px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.metric-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #8A96A6; margin-bottom: 7px; }
+.metric-val { font-family: monospace; font-size: 18px; font-weight: 700; }
+.metric-val.ok { color: #2E7D52; }
+.metric-val.bad { color: #C84B31; }
+.metric-sub { font-size: 10px; color: #8A96A6; margin-top: 3px; }
+.charts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+.chart-box { background: white; border: 1px solid #E2E6EC; border-radius: 8px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.chart-title { font-size: 14px; font-weight: 700; color: #4A5568; margin-bottom: 10px; }
+.collapsible { background: white; border: 1px solid #E2E6EC; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 14px; overflow: hidden; }
+.coll-head { padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+.coll-head:hover { background: #F7F8FA; }
+.coll-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #4A5568; }
+.coll-arr { color: #8A96A6; font-size: 15px; transition: transform 0.2s; }
+.coll-body { display: none; border-top: 1px solid #E2E6EC; }
+.coll-body.open { display: block; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+th { padding: 8px 14px; text-align: right; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #8A96A6; border-bottom: 1px solid #E2E6EC; white-space: nowrap; background: #F7F8FA; }
+td { padding: 8px 14px; text-align: right; font-family: monospace; color: #0F1D2E; border-bottom: 1px solid #E2E6EC; }
+td.label-cell { text-align: left; font-family: inherit; color: #0F1D2E; }
+td.sub-cell { text-align: left; font-family: inherit; color: #8A96A6; font-size: 11px; }
+td.neg { color: #C84B31; }
+tr.total-row td { font-weight: 700; background: #F7F8FA; }
+tr.npv-row td { font-size: 15px; font-weight: 800; border-top: 2px solid #1B3F6E; }
+tr.npv-row.ok td { background: rgba(46,125,82,0.09); color: #2E7D52; }
+tr.npv-row.bad td { background: rgba(200,75,49,0.06); color: #C84B31; }
+tr:nth-child(even) { background: #F7F8FA; }
+.overflow-x { overflow-x: auto; }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(15,29,46,0.82); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+.modal-box { background: white; border-radius: 10px; overflow: hidden; width: min(820px, 95vw); }
+.modal-head { padding: 11px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2E6EC; }
+.modal-head span { font-size: 13px; font-weight: 700; color: #4A5568; }
+.modal-close { background: none; border: none; font-size: 22px; color: #8A96A6; cursor: pointer; line-height: 1; }
+.video-wrap { position: relative; padding-bottom: 56.25%; height: 0; }
+.video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+/* Test Panel */
+
+/* ── PRINT ───────────────────────────────────────────────────────────────── */
+.print-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: transparent; color: #4A5568; border: 1.5px solid #E2E6EC;
+  border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.print-btn:hover { border-color: #1B3F6E; color: #1B3F6E; }
+
+
+/* wizard CSS now in .helper-* classes above */
+/* ── SENSITIVITY INDICATOR ──────────────────────────────────────────────── */
+.sens-indicator{border-radius:8px;padding:14px 18px;margin-bottom:18px;border:1.5px solid transparent}
+.si-positive{background:var(--green-soft);border-color:var(--green)}
+.si-negative{background:rgba(200,75,49,.07);border-color:var(--warn)}
+.si-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.si-positive .si-title{color:var(--green)}
+.si-negative .si-title{color:var(--warn)}
+.si-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.si-item{display:flex;flex-direction:column;gap:3px}
+.si-label{font-size:11px;color:var(--t2)}
+.si-val{font-family:monospace;font-size:20px;font-weight:800}
+.si-val.ok{color:var(--green)}.si-val.bad{color:var(--warn)}
+.si-sub{font-size:10px;color:var(--t3)}
+
+/* ── HELPER / GUIDANCE ELEMENTS (amber) ──────────────────────────────────── */
+:root { --amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7; }
+.helper-card{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.helper-head{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--amber-mid)}
+.helper-head:hover{background:#fde68a}
+.helper-icon{font-size:18px;flex-shrink:0}
+.helper-title{font-size:13px;font-weight:700;color:var(--amber-dark);flex:1}
+.helper-toggle{font-size:11px;font-weight:600;color:var(--amber-dark);opacity:.7}
+.helper-body{padding:16px;border-top:1.5px solid var(--amber);display:flex;flex-direction:column;gap:14px}
+.helper-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dark)}
+.helper-result{background:var(--green-soft);border:1.5px solid var(--green);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.helper-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.asset-picker{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;padding:14px 16px;margin-bottom:18px}
+.asset-picker-label{font-size:12px;font-weight:700;color:var(--amber-dark);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+
+@media print {
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { height: auto !important; margin: 0 !important; padding: 0 !important; background: white !important; }
+  #masthead { position: static !important; top: auto !important; height: auto !important; min-height: 0 !important; padding: 8px 0 !important; margin: 0 !important; box-shadow: none !important; }
+  #masthead .cur-btn { display: none !important; }
+  #stepper { display: none !important; }
+  .print-btn, .action-row .btn-ghost { display: none !important; }
+  .coll-arr { display: none !important; }
+  .coll-head { cursor: default !important; break-after: avoid !important; break-inside: avoid !important; }
+  .page-grid, .p3-grid { display: block !important; }
+  aside { display: none !important; }
+  .coll-body { display: block !important; }
+  .banner, .metric, .chart-box { box-shadow: none !important; border: 1px solid #ccc !important; break-inside: avoid; }
+  .collapsible { box-shadow: none !important; border: 1px solid #ccc !important; break-inside: auto !important; }
+  #dcf-section { break-before: always !important; }
+  .charts-grid { grid-template-columns: 1fr 1fr; }
+  .page { max-width: 100% !important; padding: 8px !important; margin: 0 !important; }
+  table { width: 100% !important; font-size: 8.5px !important; table-layout: fixed !important; }
+  th, td { padding: 3px 4px !important; white-space: normal !important; word-break: break-word; overflow-wrap: anywhere; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  .overflow-x { overflow-x: visible !important; overflow: visible !important; }
+  @page { margin: 0.5in; size: landscape; }
+}
+</style>
+</head>
+<body>
+
+<div id="masthead">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg>
+    </div>
+    <div class="logo-text">Cap<span>Plan</span></div>
+  </div>
+  <div class="module-name">Original Equipment Purchase Analysis</div>
+  <div style="position:relative">
+    <button class="cur-btn" onclick="toggleCur()">
+      <span id="cur-label">$ USD</span> ▾
+    </button>
+    <div id="cur-dropdown"></div>
+  </div>
+</div>
+
+<div id="stepper">
+  <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Asset Details</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step2"><div class="step-num" id="sn2">2</div><div class="step-label">Economic Benefits</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step3"><div class="step-num" id="sn3">3</div><div class="step-label">Results</div></div>
+</div>
+
+<div id="main-content"></div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────────────────────────
+var S = {
+  page: 1,
+  currency: "USD",
+  cur_open: false,
+  coc_open: false,
+  coc_mode: "wacc",
+  coc_kd: 6, coc_ke: 12, coc_wd: 40,
+  coc_rf: 4.5, coc_beta: 1.0, coc_mrp: 5.5,
+  show_dcf: false,
+  show_table: false,
+  res: null,
+  // inputs — blank by default; user fills these in
+  cost: "", itcPct: "", life: "", salvage: "",
+  method: "Double-declining", hyr: true, ddbRate: "",
+  workingCapital: "", annuity: true, annuityAmount: "",
+  yearlyBenefits: [],
+  taxRate: "", coc: "",
+  // benefit wizard state
+  bw_open: false, bw_type: "cost_saving", bw_current: "", bw_improvement: "",
+  show_reverse: false
+};
+
+var CURRENCIES = [
+  {code:"USD",symbol:"$",label:"US Dollar"},
+  {code:"EUR",symbol:"€",label:"Euro"},
+  {code:"JPY",symbol:"¥",label:"Japanese Yen"},
+  {code:"GBP",symbol:"£",label:"British Pound"},
+  {code:"INR",symbol:"₹",label:"Indian Rupee"},
+  {code:"CHF",symbol:"CHF",label:"Swiss Franc"},
+  {code:"CAD",symbol:"CA$",label:"Canadian Dollar"},
+  {code:"AUD",symbol:"AU$",label:"Australian Dollar"},
+  {code:"NZD",symbol:"NZ$",label:"New Zealand Dollar"}
+];
+
+function getSym() {
+  var c = CURRENCIES.find(function(c){return c.code===S.currency;});
+  return c ? c.symbol : "$";
+}
+
+// ── FORMAT ───────────────────────────────────────────────────────────────────
+function fmt(n, d) {
+  if (n == null || isNaN(n)) return "--";
+  d = d || 0;
+  return n.toLocaleString("en-US", {minimumFractionDigits:d, maximumFractionDigits:d});
+}
+function fmtM(n) {
+  if (n == null || isNaN(n)) return "--";
+  var s = getSym();
+  return n < 0 ? "-" + s + fmt(Math.abs(n)) : s + fmt(n);
+}
+function fmtPct(n) { return isNaN(n) ? "--" : fmt(n * 100, 2) + "%"; }
+
+// ── CALC ─────────────────────────────────────────────────────────────────────
+function calcDepr(cost, itcPct, life, method, hyr, ddbRate) {
+  var base = cost - cost * itcPct / 100;
+  var d = [];
+  if (method === "Double-declining") {
+    var rate = ddbRate / 100;
+    d.push(base * rate * (hyr ? 0.5 : 1));
+    for (var y = 2; y <= life; y++) {
+      var prev = d.reduce(function(s,v){return s+v;}, 0);
+      d.push((base - prev) * rate);
+    }
+  } else if (method === "Straight-line") {
+    var y1 = base / life * (hyr ? 0.5 : 1);
+    d.push(y1);
+    for (var y = 2; y <= life; y++) d.push(hyr ? (base - y1) / (life - 1) : base / life);
+  } else {
+    var y1 = hyr ? base/(life+1) : 2*base/(life+1);
+    d.push(y1);
+    if (hyr) for (var y=2;y<=life;y++) d.push(2*base*(life-y+1)/((life+1)*(life-1)));
+    else      for (var y=2;y<=life;y++) d.push(base*(life-y+1)*2/(life*(life+1)));
+  }
+  return d;
+}
+
+function calcAll() {
+  var cost=+S.cost, itcPct=+S.itcPct, life=+S.life||10, salvage=+S.salvage,
+      ddbRate=+S.ddbRate, tx=S.taxRate/100, r=S.coc/100, wc=+S.workingCapital;
+  var itc = cost * itcPct / 100;
+  var ben = [];
+  for (var i = 0; i < life; i++)
+    ben.push(S.annuity ? (S.annuityAmount||0) : (S.yearlyBenefits[i]||0));
+  var depr = calcDepr(cost, itcPct, life, S.method, S.hyr, ddbRate);
+  var rows = [];
+  for (var i = 0; i < life; i++) {
+    var yr=i+1, btBen=ben[i], atBen=btBen*(1-tx),
+        btDepr=depr[i], atShield=btDepr*tx,
+        itcYr=(yr===1?itc:0),
+        totalAT=atBen+atShield+itcYr, pvAtBen=atBen/Math.pow(1+r,yr);
+    rows.push({yr:yr,btBen:btBen,atBen:atBen,btDepr:btDepr,atShield:atShield,itcYr:itcYr,totalAT:totalAT,pvAtBen:pvAtBen});
+  }
+  var pvOut=cost+wc, pvBen=rows.reduce(function(s,row){return s+row.pvAtBen;},0);
+  var pvITC=itc/(1+r), pvS1=depr.length>0?depr[0]*tx/(1+r):0;
+  var pvS2=0; for(var i=1;i<rows.length;i++) pvS2+=rows[i].atShield/Math.pow(1+r,i+1);
+  var pvShield=pvS1+pvS2, pvSalv=salvage/Math.pow(1+r,life);
+  var pvLoss=-(salvage*tx)/Math.pow(1+r,life), pvWC=wc/Math.pow(1+r,life);
+  var pvIn=pvBen+pvITC+pvShield+pvSalv+pvLoss+pvWC, npv=pvIn-pvOut;
+  var af=r>0?(1-Math.pow(1+r,-life))/r:life, anpv=af>0?npv/af:0, bc=pvOut>0?pvIn/pvOut:0;
+
+  function npvR(rate) {
+    var cfs=[-pvOut];
+    for(var i=0;i<life;i++){
+      var yr=i+1,cf=ben[i]*(1-tx)+depr[i]*tx;
+      if(yr===1)cf+=itc; if(yr===life)cf+=salvage*(1-tx)+wc; cfs.push(cf);
+    }
+    return cfs.reduce(function(s,cf,i){return s+cf/Math.pow(1+rate,i);},0);
+  }
+  var irr=0.1;
+  for(var i=0;i<100;i++){
+    var f=npvR(irr),df=(npvR(irr+0.0001)-f)/0.0001;
+    if(Math.abs(df)<1e-10)break;
+    var nx=irr-f/df; if(Math.abs(nx-irr)<1e-8){irr=nx;break;}
+    irr=nx; if(irr<-0.99||irr>100){irr=NaN;break;}
+  }
+  var payback=null,cum=-pvOut;
+  for(var i=0;i<rows.length;i++){
+    var prev=cum; cum+=rows[i].totalAT;
+    if(cum>=0&&prev<0){payback=i+(Math.abs(prev)/(Math.abs(prev)+cum));break;}
+  }
+  var pcts=[-30,-20,-10,0,10,20,30];
+  var cocSens=pcts.map(function(p){
+    var tc=S.coc*(1+p/100),tr=tc/100,taf=tr>0?(1-Math.pow(1+tr,-life))/tr:life;
+    var tpb=S.annuity?(S.annuityAmount*(1-tx)*taf):rows.reduce(function(s,row,i){return s+row.atBen/Math.pow(1+tr,i+1);},0);
+    var tps=rows.reduce(function(s,row,i){return s+row.atShield/Math.pow(1+tr,i+1);},0);
+    return{label:tc.toFixed(1)+"%",npv:tpb+itc/(1+tr)+tps+salvage*(1-tx)/Math.pow(1+tr,life)+wc/Math.pow(1+tr,life)-pvOut};
+  });
+  var base2=S.annuity?S.annuityAmount:(ben.reduce(function(s,b){return s+b;},0)/Math.max(life,1));
+  var benSens=pcts.map(function(p){
+    var tb=base2*(1+p/100);
+    var tpb=S.annuity?tb*(1-tx)*af:rows.reduce(function(s,_,i){return s+(ben[i]*(1+p/100)*(1-tx))/Math.pow(1+r,i+1);},0);
+    return{label:"$"+Math.round(tb/1000)+"k",npv:tpb+pvITC+pvShield+pvSalv+pvLoss+pvWC-pvOut};
+  });
+  return{rows:rows,depr:depr,pvOut:pvOut,pvBen:pvBen,pvITC:pvITC,pvS1:pvS1,pvS2:pvS2,
+    pvShield:pvShield,pvSalv:pvSalv,pvLoss:pvLoss,pvWC:pvWC,pvIn:pvIn,
+    npv:npv,anpv:anpv,bc:bc,irr:irr,payback:payback,af:af,cocSens:cocSens,benSens:benSens,
+    itc:itc,annAmt:S.annuity?S.annuityAmount:null};
+}
+
+
+// ── BREAK-EVEN BENEFIT ────────────────────────────────────────────────────────
+function calcBreakEven() {
+  // Solve for the constant annual benefit where NPV = 0
+  // NPV = pvBen + pvFixed - pvOut = 0
+  // pvBen = benefit*(1-tx)*AF
+  // => benefit = (pvOut - pvFixed) / ((1-tx)*AF)
+  var cost=+S.cost, itcPct=+S.itcPct, life=+S.life||1, salvage=+S.salvage,
+      ddbRate=+S.ddbRate, tx=S.taxRate/100, r=S.coc/100, wc=+S.workingCapital;
+  var itc=cost*itcPct/100;
+  var depr=calcDepr(cost,itcPct,life,S.method,S.hyr,ddbRate);
+  var pvOut=cost+wc;
+  var pvITC=itc/(1+r);
+  var pvS1=depr.length>0?depr[0]*tx/(1+r):0;
+  var pvS2=0; for(var i=1;i<depr.length;i++) pvS2+=depr[i]*tx/Math.pow(1+r,i+1);
+  var pvSalv=salvage/Math.pow(1+r,life);
+  var pvLoss=-(salvage*tx)/Math.pow(1+r,life);
+  var pvWC=wc/Math.pow(1+r,life);
+  var pvFixed=pvITC+pvS1+pvS2+pvSalv+pvLoss+pvWC;
+  var af=r>0?(1-Math.pow(1+r,-life))/r:life;
+  return (pvOut-pvFixed)/((1-tx)*af);
+}
+
+// ── CURRENCY ─────────────────────────────────────────────────────────────────
+function toggleCur() {
+  S.cur_open = !S.cur_open;
+  var dd = document.getElementById("cur-dropdown");
+  if (S.cur_open) {
+    dd.innerHTML = "";
+    CURRENCIES.forEach(function(c) {
+      var b = document.createElement("button");
+      b.innerHTML = '<span class="sym">'+c.symbol+'</span>'+c.label;
+      b.onclick = function(){ S.currency=c.code; S.cur_open=false; render(); };
+      dd.appendChild(b);
+    });
+    dd.classList.add("open");
+  } else {
+    dd.classList.remove("open");
+  }
+}
+
+// ── STEPPER ───────────────────────────────────────────────────────────────────
+function updateStepper() {
+  for (var i = 1; i <= 3; i++) {
+    var step = document.getElementById("step"+i);
+    var sn = document.getElementById("sn"+i);
+    step.className = "step";
+    if (i < S.page) { step.classList.add("done"); sn.textContent = "✓"; }
+    else if (i === S.page) { step.classList.add("active"); sn.textContent = String(i); }
+    else { sn.textContent = String(i); }
+  }
+  for (var i = 1; i <= 3; i++) {
+    var step = document.getElementById("step"+i);
+    var n = i;
+    step.style.cursor = (n < S.page || (n===3&&S.res)) ? "pointer" : "default";
+    (function(n,step){ step.onclick = function(){
+      if(n < S.page || (n===3&&S.res)){ S.page=n; render(); }
+    };})(n,step);
+  }
+}
+
+// ── CANVAS CHART ─────────────────────────────────────────────────────────────
+function drawChart(canvasId, data, xLabel) {
+  var canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  var ctx = canvas.getContext("2d");
+  var W=canvas.width, H=canvas.height;
+  var pad={top:10,bottom:46,left:52,right:8};
+  var cw=W-pad.left-pad.right, ch=H-pad.top-pad.bottom;
+  ctx.clearRect(0,0,W,H);
+  var vals=data.map(function(d){return d.npv;});
+  var maxV=Math.max.apply(null,vals.map(Math.abs))||1;
+  var rng=maxV*1.2;
+  var hasNeg=vals.some(function(v){return v<0;});
+  var zY=hasNeg?pad.top+ch/2:pad.top+ch;
+  ctx.strokeStyle="#E2E6EC"; ctx.lineWidth=1;
+  var steps=4;
+  for(var i=0;i<=steps;i++){
+    var y=pad.top+(ch/steps)*i;
+    ctx.beginPath(); ctx.moveTo(pad.left,y); ctx.lineTo(pad.left+cw,y); ctx.stroke();
+    var v=hasNeg?(rng-rng*2*(i/steps)):(rng*(1-i/steps));
+    ctx.fillStyle="#8A96A6"; ctx.font="10px system-ui"; ctx.textAlign="right";
+    ctx.fillText(Math.round(v/1000)+"k",pad.left-3,y+3);
+  }
+  ctx.strokeStyle="#4A5568"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(pad.left,zY); ctx.lineTo(pad.left+cw,zY); ctx.stroke();
+  var bw=Math.floor(cw/data.length*0.6), gap=cw/data.length;
+  data.forEach(function(d,i){
+    var x=pad.left+gap*i+(gap-bw)/2;
+    var bh=Math.abs(d.npv)/rng*(hasNeg?ch/2:ch);
+    var y=d.npv>=0?zY-bh:zY;
+    ctx.fillStyle=d.npv>=0?"#2E7D52":"#C84B31";
+    ctx.fillRect(x,y,bw,Math.max(bh,1));
+    ctx.fillStyle="#8A96A6"; ctx.font="10px system-ui"; ctx.textAlign="center";
+    ctx.fillText(d.label,x+bw/2,H-pad.bottom+12);
+  });
+  ctx.fillStyle="#4A5568"; ctx.font="bold 12px system-ui"; ctx.textAlign="center";
+  ctx.fillText(xLabel,pad.left+cw/2,H-4);
+}
+
+// ── BRIEFING NOTES ────────────────────────────────────────────────────────────
+var NOTES1 = [
+  {q:"What is included in the cost of the asset?",
+   a:"The cost includes the purchase price plus any delivery, installation, or setup costs required to make the asset ready for use. Does not include ongoing operating costs.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"How do I know if my project is eligible for an Investment Tax Credit?",
+   a:"ITC eligibility depends on your jurisdiction and the type of asset. In Canada, certain clean energy and R&D equipment qualify. If you're unsure, leave this at 0%.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"How do I estimate economic life and salvage value?",
+   a:"Economic life is how long the asset will be useful to your business. Salvage value is what you expect to sell it for at the end. Conservative estimates are recommended.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"What depreciation method should I use and what is the half-year rule?",
+   a:"Double-declining gives the largest early deductions. Straight-line spreads them evenly. Sum-of-years-digits is in between. The half-year rule halves the first year's deduction.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"How do I calculate the required rate of return?",
+   a:"This is your cost of capital — the minimum return needed to justify the investment. Use the Cost of Capital Calculator below to estimate it using WACC or CAPM.",
+   v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+];
+
+var NOTES3 = [
+  {q:"What does NPV tell me?",a:"Net Present Value is the total value created by the investment in today's dollars. A positive NPV means the investment earns more than your required return. A negative NPV means it doesn't.",v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"What is IRR and how does it compare to my required rate of return?",a:"The Internal Rate of Return is the actual return this investment earns. If it exceeds your required rate of return, the project is financially worthwhile.",v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"What is the payback period and why does it matter?",a:"Payback is how long it takes to recover your initial investment from after-tax cash flows. The longer the payback, the longer your capital is at risk.",v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"What does the Benefit/Cost ratio mean?",a:"A ratio above 1.0 means the present value of inflows exceeds outflows. Below 1.0 means you lose value in present-value terms.",v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {q:"Why do the two sensitivity charts matter?",a:"They show how robust the decision is. If NPV stays positive across a wide range of scenarios, the decision is solid. If it turns negative with small changes, the decision carries more risk.",v:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+];
+
+function makeBriefingList(notes, containerId) {
+  var list = document.getElementById(containerId);
+  if (!list) return;
+  list.innerHTML = "";
+  notes.forEach(function(n, i) {
+    var item = document.createElement("div");
+    item.className = "bn-item";
+    var head = document.createElement("div");
+    head.className = "bn-head";
+    head.innerHTML = '<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+containerId+i+'">›</div>';
+    var body = document.createElement("div");
+    body.className = "bn-body";
+    body.id = "body"+containerId+i;
+    body.textContent = n.a;
+    if (n.v) {
+      var vbtn = document.createElement("button");
+      vbtn.className = "watch-btn";
+      vbtn.textContent = "▶ Learn More";
+      vbtn.onclick = function(e){ e.stopPropagation(); openVideo(n.v); };
+      body.appendChild(vbtn);
+    }
+    head.onclick = function(){
+      var isOpen = body.classList.contains("open");
+      body.classList.toggle("open");
+      document.getElementById("arr"+containerId+i).style.transform = isOpen ? "rotate(0deg)" : "rotate(90deg)";
+      head.style.background = isOpen ? "" : "#F7F8FA";
+    };
+    item.appendChild(head); item.appendChild(body);
+    list.appendChild(item);
+  });
+}
+
+function openVideo(url) {
+  var id = url.split(/[/?=v]/).filter(function(s){return s.length>5;}).pop()||"";
+  var overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = '<div class="modal-box"><div class="modal-head"><span>Learn More</span><button class="modal-close">×</button></div><div class="video-wrap"><iframe src="https://www.youtube.com/embed/'+id+'" allowfullscreen frameborder="0"></iframe></div></div>';
+  overlay.querySelector(".modal-close").onclick = function(){ overlay.remove(); };
+  overlay.onclick = function(e){ if(e.target===overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+}
+
+// ── CoC CALCULATOR ────────────────────────────────────────────────────────────
+function renderCoC() {
+  var box = document.getElementById("coc-box");
+  if (!box) return;
+  box.innerHTML = "";
+  var tx=35, we=100-S.coc_wd;
+  var wacc = +(S.coc_kd*(1-tx/100)*S.coc_wd/100+S.coc_ke*we/100).toFixed(2);
+  var capm = +(S.coc_rf+S.coc_beta*S.coc_mrp).toFixed(2);
+  var result = S.coc_mode==="wacc" ? wacc : capm;
+
+  if (!S.coc_open) {
+    box.innerHTML = '<button class="coc-trigger" onclick="S.coc_open=true;renderCoC()"><div class="coc-icon"><svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="#2E7D52" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="9" r="3"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2"/></svg></div><div><div style="font-size:13px;font-weight:700;color:#1B3F6E">Cost of Capital Calculator</div><div style="font-size:11px;color:#8A96A6;margin-top:2px">WACC · Capital Asset Pricing Model</div></div><span style="margin-left:auto;color:#8A96A6;font-size:15px">›</span></button>';
+    return;
+  }
+
+  var html = '<div class="coc-open">';
+  html += '<div class="coc-head"><span>Cost of Capital Calculator</span><button onclick="S.coc_open=false;renderCoC()">×</button></div>';
+  html += '<div class="coc-tabs">';
+  html += '<button class="coc-tab'+(S.coc_mode==="wacc"?" active":"")+ '" onclick="S.coc_mode=\'wacc\';renderCoC()"><div class="tab-name">WACC</div><div class="tab-sub">I know my borrowing rate and equity mix</div></button>';
+  html += '<button class="coc-tab'+(S.coc_mode==="capm"?" active":"")+ '" onclick="S.coc_mode=\'capm\';renderCoC()"><div class="tab-name">CAPM</div><div class="tab-sub">Estimate from market risk</div></button>';
+  html += '</div><div class="coc-body">';
+
+  if (S.coc_mode==="wacc") {
+    html += cocRow("Cost of Debt (pre-tax)","coc_kd",S.coc_kd,"%","");
+    html += cocRow("Cost of Equity","coc_ke",S.coc_ke,"%","");
+    html += cocRow("Debt Weighting (% of financing)","coc_wd",S.coc_wd,"%","");
+    html += '<div class="coc-formula">WACC = <strong style="color:#2E7D52">'+wacc+'%</strong></div>';
+  } else {
+    html += cocRow("Risk-Free Rate","coc_rf",S.coc_rf,"%","Typical: 3.5–5.5%");
+    html += cocRow("Beta","coc_beta",S.coc_beta,"","Retail ≈ 0.7 · Manufacturing ≈ 1.0 · Tech ≈ 1.3");
+    html += cocRow("Market Risk Premium","coc_mrp",S.coc_mrp,"%","Long-run average: 5–6%");
+    html += '<div class="coc-formula">Ke = '+S.coc_rf+'% + '+S.coc_beta+' × '+S.coc_mrp+'% = <strong style="color:#2E7D52">'+capm+'%</strong></div>';
+  }
+  html += '<div class="coc-result"><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#2E7D52">Calculated Rate</div><div class="coc-result-val">'+result+'%</div></div>';
+  html += '<button class="use-btn" onclick="S.coc='+result+';renderCoC();document.getElementById(\'inp-coc\').value='+result+'">Use this rate →</button></div>';
+  html += '</div></div>';
+  box.innerHTML = html;
+}
+
+function cocRow(label, key, val, suffix, hint) {
+  return '<div class="coc-row"><div class="coc-row-label">'+label+'</div>'
+    + '<div class="underline-input"><input type="text" value="'+val+'" style="font-family:monospace;font-size:15px;font-weight:600;border:none;border-bottom:2px solid #E2E6EC;background:transparent;padding:2px 0;outline:none;width:100%" '
+    + 'onchange="S.'+key+'=+this.value||0;renderCoC()" onfocus="this.style.borderBottomColor=\'#1B3F6E\'" onblur="this.style.borderBottomColor=\'#E2E6EC\'">'
+    + (suffix?'<span style="font-size:13px;color:#8A96A6;flex-shrink:0">'+suffix+'</span>':'')
+    + '</div>'
+    + (hint?'<div class="coc-hint">'+hint+'</div>':'')
+    + '</div>';
+}
+
+// ── PAGE 1 ────────────────────────────────────────────────────────────────────
+function renderPage1() {
+  var isDDB = S.method === "Double-declining";
+  var sym = getSym();
+  var html = '<div class="page"><div class="page-grid">';
+
+  // LEFT
+  html += '<aside>';
+  html += '<div class="section-label">Briefing Notes</div>';
+  html += '<div class="briefing-list" id="bn-list1"></div>';
+  html += '<div class="section-label">Tools</div>';
+  html += '<div class="tools-box"><div id="coc-box"></div></div>';
+  html += '</aside>';
+
+  // RIGHT
+  html += '<main>';
+
+  // Asset Info
+  html += '<div class="panel" style="margin-bottom:18px">';
+  html += '<div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Information</div></div>';
+  html += '<div class="field-grid">';
+  html += field("Cost of Asset", uInput(sym, S.cost, "inp-cost", "cost", ""));
+  html += field("Investment Tax Credit", uInput("", S.itcPct, "inp-itc", "itcPct", "%"));
+  html += field("Economic Life", uInput("", S.life, "inp-life", "life", "years"));
+  html += field("Salvage Value", uInput(sym, S.salvage, "inp-salv", "salvage", ""));
+  html += field("Working Capital Required", uInput(sym, S.workingCapital, "inp-wc", "workingCapital", ""), true, true);
+  html += '</div></div>';
+
+  // Depreciation
+  html += '<div class="panel" style="margin-bottom:18px">';
+  html += '<div class="panel-head"><div class="panel-dot" style="background:#2E7D52"></div><div class="panel-title">Depreciation</div></div>';
+  html += '<div class="field-grid">';
+  html += '<div class="field"><div class="field-label">Method</div>';
+  html += '<div class="underline-input"><select id="inp-method" onchange="S.method=this.value;render()">';
+  ["Double-declining","Straight-line","Sum-of-years-digits"].forEach(function(m){
+    html += '<option'+(m===S.method?" selected":"")+'>'+m+'</option>';
+  });
+  html += '</select></div></div>';
+  html += '<div class="field"><div class="field-label">Depreciation Rate</div>';
+  if (isDDB) {
+    html += uInput("", S.ddbRate, "inp-rate", "ddbRate", "%");
+  } else {
+    html += '<div class="underline-input"><input type="text" value="N/A" disabled style="font-family:monospace;font-size:15px;font-weight:600;border:none;border-bottom:2px solid #E2E6EC;background:transparent;padding:2px 0;color:#8A96A6;opacity:0.6;width:100%"></div>';
+    html += '<div class="field-note">Not applicable — rate is defined by the '+S.method+' formula</div>';
+  }
+  html += '</div>';
+  html += '<div class="field full last"><div class="field-label">Half-Year Rule</div>';
+  html += '<div class="pills">';
+  html += '<div class="pill'+(S.hyr?' active':'')+'" onclick="S.hyr=true;render()"><div class="pill-dot"></div>Yes</div>';
+  html += '<div class="pill'+(!S.hyr?' active':'')+'" onclick="S.hyr=false;render()"><div class="pill-dot"></div>No</div>';
+  html += '</div></div>';
+  html += '</div></div>';
+
+  // Firm Data
+  html += '<div class="panel" style="margin-bottom:18px">';
+  html += '<div class="panel-head"><div class="panel-dot" style="background:#8A96A6"></div><div class="panel-title">Firm Data</div></div>';
+  html += '<div class="field-grid">';
+  html += field("Tax Rate", uInput("", S.taxRate, "inp-tax", "taxRate", "%"));
+  html += field("Required Rate of Return", uInput("", S.coc, "inp-coc", "coc", "%"), false, true);
+  html += '</div></div>';
+
+  if (S.missingFields && S.missingFields.length > 0) {
+    html += '<div style="background:rgba(200,75,49,0.07);border:1.5px solid #C84B31;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#C84B31">';
+    html += '<strong>Please complete the following before continuing:</strong> ' + S.missingFields.join(", ") + '.';
+    html += '</div>';
+  }
+
+  html += '<div class="action-row" style="justify-content:space-between;align-items:center">';
+  html += '<span style="font-size:11.5px;color:#8A96A6">New here? Try <strong style="color:#4A5568">Load Example</strong> to see how it works.</span>';
+  html += '<div style="display:flex;gap:10px">';
+  html += '<button class="btn-ghost" onclick="loadExample()">Load Example</button>';
+  html += '<button class="btn-ghost" onclick="resetInputs()">Reset</button>';
+  html += '<button class="btn-primary" onclick="goToPage2()">Next: Economic Benefits ›</button>';
+  html += '</div></div>';
+  html += '</main></div></div>';
+
+  document.getElementById("main-content").innerHTML = html;
+  makeBriefingList(NOTES1, "bn-list1");
+  renderCoC();
+
+  document.getElementById("cur-label").textContent = getSym()+" "+S.currency;
+}
+
+function field(label, inputHtml, fullWidth, last) {
+  var cls = "field" + (fullWidth?" full":"") + (last?" last":"");
+  return '<div class="'+cls+'"><div class="field-label">'+label+'</div>'+inputHtml+'</div>';
+}
+
+function uInput(prefix, value, id, stateKey, suffix) {
+  var html = '<div class="underline-input">';
+  if (prefix) html += '<span class="pfx">'+prefix+'</span>';
+  html += '<input type="text" id="'+id+'" value="'+value+'" '
+    + 'onblur="S.'+stateKey+'=isNaN(+this.value)?S.'+stateKey+':(+this.value);document.getElementById(\'cur-label\').textContent=getSym()+\' \'+S.currency" '
+    + 'onfocus="this.style.borderBottomColor=\'#1B3F6E\'" '
+    + 'onblur2="this.style.borderBottomColor=\'#E2E6EC\'">';
+  if (suffix) html += '<span class="sfx">'+suffix+'</span>';
+  html += '</div>';
+  return html;
+}
+
+function goToPage2() {
+  var missing = [];
+  if (S.cost === "" || S.cost == null) missing.push("Cost of Asset");
+  if (S.itcPct === "" || S.itcPct == null) missing.push("Investment Tax Credit");
+  if (S.life === "" || S.life == null) missing.push("Economic Life");
+  if (S.salvage === "" || S.salvage == null) missing.push("Salvage Value");
+  if (S.workingCapital === "" || S.workingCapital == null) missing.push("Working Capital Required");
+  if (S.method === "Double-declining" && (S.ddbRate === "" || S.ddbRate == null)) missing.push("Depreciation Rate");
+  if (S.taxRate === "" || S.taxRate == null) missing.push("Tax Rate");
+  if (S.coc === "" || S.coc == null) missing.push("Required Rate of Return");
+
+  if (missing.length > 0) {
+    S.missingFields = missing;
+    render();
+    return;
+  }
+  S.missingFields = null;
+  S.page = 2;
+  render();
+}
+
+function resetInputs() {
+  S.cost=""; S.itcPct=""; S.life=""; S.salvage="";
+  S.method="Double-declining"; S.hyr=true; S.ddbRate="";
+  S.workingCapital=""; S.annuity=true; S.annuityAmount="";
+  S.yearlyBenefits=[]; S.taxRate=""; S.coc="";
+  S.missingFields = null;
+  render();
+}
+
+function loadExample() {
+  S.cost=80000; S.itcPct=20; S.life=10; S.salvage=8000;
+  S.method="Double-declining"; S.hyr=true; S.ddbRate=30;
+  S.workingCapital=5000; S.annuity=true; S.annuityAmount=25000;
+  S.yearlyBenefits=[]; S.taxRate=35; S.coc=10;
+  S.missingFields = null;
+  render();
+}
+
+// ── PAGE 2 ────────────────────────────────────────────────────────────────────
+function renderPage2() {
+  var sym = getSym();
+  var life = Math.max(+S.life||10, 1);
+  while (S.yearlyBenefits.length < life) S.yearlyBenefits.push(0);
+
+  var html = '<div class="page">';
+  html += '<div class="p2-box">';
+  html += '<div class="p2-head"><div class="p2-title">Economic Benefits</div>';
+  html += '<div class="p2-sub">Economic benefits are the cash inflows the asset is expected to generate each year — cost savings, revenue increases, or productivity gains attributable to this investment.</div></div>';
+
+
+  // Benefit estimation wizard
+  html += '<div class="helper-card">';
+  html += '<div class="helper-head" onclick="S.bw_open=!S.bw_open;render()">';
+  html += '<span class="helper-icon">💡</span><span class="helper-title">Help me estimate benefits</span>';
+  html += '<span class="helper-toggle">'+(S.bw_open?'▲ hide':'▼ show')+'</span>';
+  html += '</div>';
+  if(S.bw_open){
+    html += '<div class="helper-body">';
+    html += '<div class="wizard-row"><div class="wizard-label">What type of benefit?</div>';
+    html += '<div class="pills" style="margin-top:6px">';
+    html += '<div class="pill'+(S.bw_type==="cost_saving"?" active":"")+'" onclick="S.bw_type=\'cost_saving\';render()"><div class="pill-dot"></div>Cost saving</div>';
+    html += '<div class="pill'+(S.bw_type==="revenue"?" active":"")+'" onclick="S.bw_type=\'revenue\';render()"><div class="pill-dot"></div>Revenue increase</div>';
+    html += '<div class="pill'+(S.bw_type==="both"?" active":"")+'" onclick="S.bw_type=\'both\';render()"><div class="pill-dot"></div>Both</div>';
+    html += '</div></div>';
+    var lbl = S.bw_type==="cost_saving" ? "Current annual cost of this activity" :
+              S.bw_type==="revenue" ? "Current annual revenue from this activity" :
+              "Combined current annual cost + revenue base";
+    html += '<div class="wizard-row"><div class="wizard-label">'+lbl+'</div>';
+    html += '<div class="ui" style="max-width:200px"><span class="pfx">'+sym+'</span>';
+    html += '<input type="text" value="'+(S.bw_current||"")+'" placeholder="0" onblur="S.bw_current=+this.value||0" onfocus="this.style.borderBottomColor=\'var(--blue)\'"></div></div>';
+    html += '<div class="wizard-row"><div class="wizard-label">Expected improvement from new asset</div>';
+    html += '<div class="ui" style="max-width:200px"><input type="text" value="'+(S.bw_improvement||"")+'" placeholder="0" onblur="S.bw_improvement=+this.value||0" onfocus="this.style.borderBottomColor=\'var(--blue)\'"><span class="sfx">%</span></div></div>';
+    if(S.bw_current && S.bw_improvement){
+      var suggested = Math.round(S.bw_current * S.bw_improvement / 100);
+      html += '<div class="helper-result">';
+      html += '<div style="font-size:13px;color:var(--t2)">Suggested annual benefit: <strong style="color:var(--green)">'+fmtM(suggested)+'</strong></div>';
+      html += '<button class="helper-use" onclick="S.annuity=true;S.annuityAmount='+suggested+';S.bw_open=false;render()">Use this estimate ›</button>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+
+  html += '<div class="p2-toggle"><div class="field-label">Are the economic benefits the same each year?</div>';
+  html += '<div class="pills" style="margin-top:8px">';
+  html += '<div class="pill'+(S.annuity?' active':'')+'" onclick="S.annuity=true;render()"><div class="pill-dot"></div>Yes — enter a single annual amount</div>';
+  html += '<div class="pill'+(!S.annuity?' active':'')+'" onclick="S.annuity=false;render()"><div class="pill-dot"></div>No — enter each year separately</div>';
+  html += '</div></div>';
+
+  if (S.annuity) {
+    html += '<div class="p2-annuity"><div class="field-label">Annual Economic Benefit (before tax)</div>';
+    html += '<div style="max-width:220px"><div class="underline-input"><span class="pfx">'+sym+'</span>';
+    html += '<input type="text" id="inp-ann" value="'+S.annuityAmount+'" ';
+    html += 'onblur="S.annuityAmount=+this.value||0" ';
+    html += 'onfocus="this.style.borderBottomColor=\'#1B3F6E\'" >';
+    html += '</div></div>';
+    html += '<div class="field-note">After-tax = '+sym+fmt(S.annuityAmount*(1-S.taxRate/100))+' per year for '+life+' years</div>';
+    html += '</div>';
+  } else {
+    html += '<div class="var-head"><span>Year</span><span>Before-Tax Benefit</span><span>After-Tax (×'+(1-S.taxRate/100).toFixed(2)+')</span></div>';
+    html += '<div class="var-list">';
+    for (var i = 0; i < life; i++) {
+      var at = S.yearlyBenefits[i] ? sym+fmt(S.yearlyBenefits[i]*(1-S.taxRate/100)) : "--";
+      html += '<div class="var-row">';
+      html += '<div class="var-yr">Year '+(i+1)+'</div>';
+      html += '<div class="underline-input"><span class="pfx">'+sym+'</span>';
+      html += '<input type="text" value="'+(S.yearlyBenefits[i]||'')+'" placeholder="0" ';
+      html += 'data-idx="'+i+'" onblur="updateYB(+this.dataset.idx,+this.value||0)" ';
+      html += 'onfocus="this.style.borderBottomColor=\'#1B3F6E\'">';
+      html += '</div>';
+      html += '<div class="var-at">'+at+'</div>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+
+  html += '<div class="p2-actions">';
+  html += '<button class="btn-ghost" onclick="S.page=1;render()">‹ Back</button>';
+  html += '<button class="btn-primary" onclick="runCalc()">Calculate Results ›</button>';
+  html += '</div></div>';
+
+  document.getElementById("main-content").innerHTML = html;
+}
+
+function updateYB(idx, val) {
+  while (S.yearlyBenefits.length <= idx) S.yearlyBenefits.push(0);
+  S.yearlyBenefits[idx] = val;
+}
+
+function validateInputs(){
+  var errs=[];
+  if(+S.cost<=0) errs.push("Asset cost must be greater than zero");
+  if(+S.life<=0) errs.push("Asset life must be greater than zero");
+  if(S.salvage!==undefined&&+S.salvage<0) errs.push("Salvage value cannot be negative");
+  if(S.salvage!==undefined&&S.cost&&+S.salvage>=+S.cost) errs.push("Salvage cannot equal or exceed the cost");
+  if(S.method==="Double-declining"&&!(+S.ddbRate>0)) errs.push("Depreciation rate must be greater than zero for double-declining method");
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.coc<=0) errs.push("Required return must be greater than zero");
+  return errs;
+}
+function runCalc() {
+  var valErrs=validateInputs();if(valErrs.length>0){S.missing=valErrs;render();return;}
+  try { S.res = calcAll(); S.page = 3; render(); }
+  catch(e) { console.error(e); alert("Calculation error: "+e.message); }
+}
+
+// ── PAGE 3 ────────────────────────────────────────────────────────────────────
+function renderPage3() {
+  var res = S.res, sym = getSym();
+  var ok = res.npv >= 0;
+
+  var html = '<div class="page"><div class="p3-grid">';
+
+  // Aside
+  html += '<aside>';
+  html += '<div class="section-label">Understanding Results</div>';
+  html += '<div class="briefing-list" id="bn-list3"></div>';
+  html += '<div style="margin-top:14px;display:flex;flex-direction:column;gap:10px"><button class="btn-ghost" onclick="S.page=1;render()">‹ Edit Inputs</button><button class="print-btn" onclick="printSummary()">🖶 Print Summary</button></div>';
+  html += '</aside>';
+
+  // Main
+  html += '<main>';
+
+  // Banner
+  html += '<div class="banner '+(ok?"positive":"negative")+'">';
+  html += '<div><div class="banner-headline">'+(ok?"This investment creates value.":"This investment does not clear your hurdle rate.")+'</div>';
+  html += '<div class="banner-sub">'+(ok?"The NPV is positive at "+fmtM(res.npv)+", exceeding your "+S.coc+"% required return.":"The NPV is "+fmtM(res.npv)+". Consider renegotiating cost or improving expected benefits.")+'</div></div>';
+  html += '<div class="banner-npv"><div class="banner-npv-label">Net Present Value</div><div class="banner-npv-val">'+fmtM(res.npv)+'</div></div>';
+  html += '</div>';
+
+  // Metrics
+  var metrics = [
+    {l:"IRR",v:isNaN(res.irr)?"--":fmtPct(res.irr),s:"vs "+S.coc+"% required",ok:!isNaN(res.irr)&&res.irr*100>=S.coc},
+    {l:"Payback Period",v:res.payback?res.payback.toFixed(2)+" yrs":"Beyond life",s:S.life+"-year economic life",ok:res.payback!==null},
+    {l:"Benefit / Cost",v:res.bc.toFixed(3),s:"PV inflows / PV outflows",ok:res.bc>=1},
+    {l:"Annualized NPV",v:fmtM(res.anpv),s:"per year equivalent",ok:res.anpv>=0}
+  ];
+  html += '<div class="metrics">';
+  metrics.forEach(function(m){
+    html += '<div class="metric"><div class="metric-label">'+m.l+'</div>';
+    html += '<div class="metric-val '+(m.ok?"ok":"bad")+'">'+m.v+'</div>';
+    html += '<div class="metric-sub">'+m.s+'</div></div>';
+  });
+  html += '</div>';
+
+
+  // ── Sensitivity to decision indicator ──────────────────────────────────────
+  var be=calcBreakEven();
+  var currentBen=S.annuity?(+S.annuityAmount):(res.rows.reduce(function(s,r){return s+r.btBen;},0)/Math.max(+S.life,1));
+  var margin=currentBen>0?((currentBen-be)/currentBen*100):0;
+  var irrPct=isNaN(res.irr)?null:+(res.irr*100).toFixed(2);
+  var cocN=+S.coc;
+  html += '<div class="sens-indicator '+(ok?"si-positive":"si-negative")+'">';
+  html += '<div class="si-title">Decision Robustness</div>';
+  html += '<div class="si-grid">';
+  if(ok){
+    html += '<div class="si-item"><div class="si-label">Benefits can fall by</div><div class="si-val ok">'+fmt(margin,1)+'%</div><div class="si-sub">before NPV turns negative (from '+fmtM(currentBen)+' to '+fmtM(be)+')</div></div>';
+    if(irrPct!==null){
+      html += '<div class="si-item"><div class="si-label">Decision holds unless true cost of capital exceeds</div><div class="si-val ok">'+fmtPct(res.irr)+'</div><div class="si-sub">current cost of capital is '+cocN+'%</div></div>';
+    }
+  } else {
+    html += '<div class="si-item"><div class="si-label">Benefits must increase by</div><div class="si-val bad">'+fmt(Math.abs(margin),1)+'%</div><div class="si-sub">to achieve positive NPV (from '+fmtM(currentBen)+' to '+fmtM(be)+')</div></div>';
+    if(irrPct!==null){
+      html += '<div class="si-item"><div class="si-label">Decision would reverse if cost of capital fell to</div><div class="si-val bad">'+fmtPct(res.irr)+'</div><div class="si-sub">current cost of capital is '+cocN+'%</div></div>';
+    }
+  }
+  html += '</div></div>';
+
+  // ── Reverse calculator ──────────────────────────────────────────────────────
+  html += '<div class="collapsible" id="reverse-calc">';
+  html += '<div class="coll-head" onclick="S.show_reverse=!S.show_reverse;renderPage3()"><span class="coll-title">What Would It Take?</span><span class="coll-arr" style="transform:'+(S.show_reverse?"rotate(90deg)":"rotate(0deg)")+'">›</span></div>';
+  if(S.show_reverse){
+    html += '<div class="coll-body open" style="padding:16px 20px">';
+    html += '<div style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:14px">';
+    html += 'To earn your required return of <strong>'+S.coc+'%</strong>, this investment needs at least:';
+    html += '</div>';
+    html += '<div style="background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between">';
+    html += '<div><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3)">Minimum Annual Benefit (before tax)</div>';
+    html += '<div style="font-family:monospace;font-size:28px;font-weight:800;color:var(--blue);margin-top:4px">'+fmtM(be)+'</div>';
+    html += '<div style="font-size:11px;color:var(--t3);margin-top:3px">After-tax equivalent: '+fmtM(be*(1-S.taxRate/100))+' per year</div></div>';
+    if(currentBen>0){
+      html += '<div style="text-align:right"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3)">Your current estimate</div>';
+      html += '<div style="font-family:monospace;font-size:22px;font-weight:700;color:'+(currentBen>=be?"var(--green)":"var(--warn)")+';margin-top:4px">'+fmtM(currentBen)+'</div>';
+      html += '<div style="font-size:11px;color:var(--t3);margin-top:3px">'+(currentBen>=be?fmt(margin,1)+"% above break-even":fmt(Math.abs(margin),1)+"% below break-even")+'</div></div>';
+    }
+    html += '</div></div>';
+  }
+  html += '</div>';
+
+  // Charts
+  html += '<div class="charts">';
+  html += '<div class="chart-box"><div class="chart-title">NPV by Cost of Capital</div><canvas id="chart1" width="320" height="190" style="width:100%;height:auto;display:block"></canvas></div>';
+  html += '<div class="chart-box"><div class="chart-title">NPV by Average Annual Economic Benefits</div><canvas id="chart2" width="320" height="190" style="width:100%;height:auto;display:block"></canvas></div>';
+  html += '</div>';
+
+  // DCF
+  html += '<div class="collapsible" id="dcf-section">';
+  html += '<div class="coll-head" onclick="S.show_dcf=!S.show_dcf;renderPage3()"><span class="coll-title">DCF Summary</span><span class="coll-arr" style="transform:'+(S.show_dcf?"rotate(90deg)":"rotate(0deg)")+'">›</span></div>';
+  html += '<div class="coll-body'+(S.show_dcf?" open":"")+'"><table><tbody>';
+  html += '<tr class="total-row"><td class="label-cell" colspan="2">Present Value of Outflows</td><td>'+fmtM(res.pvOut)+'</td></tr>';
+  var dcfRows=[
+    ["Economic Benefits",S.annuity?sym+fmt(res.annAmt||0)+" × "+S.taxRate+"% × "+S.life+" yrs":"Variable",res.pvBen],
+    ["Investment Tax Credit","Year 1 — "+sym+fmt(res.itc),res.pvITC],
+    ["Tax Shield – Year 1",sym+fmt(res.depr[0]||0)+" × "+S.taxRate+"%",res.pvS1],
+    ["Tax Shield – Years 2+","Sum of remaining years",res.pvS2],
+    ["Salvage Value","Year "+S.life,res.pvSalv],
+    ["Less: Tax Shield Lost on Salvage","Year "+S.life,res.pvLoss],
+    ["Return of Working Capital","Year "+S.life,res.pvWC]
+  ];
+  dcfRows.forEach(function(r){
+    html += '<tr><td class="label-cell">'+r[0]+'</td><td class="sub-cell">'+r[1]+'</td><td class="'+(r[2]<0?"neg":"")+'">'+fmtM(r[2])+'</td></tr>';
+  });
+  html += '<tr class="total-row"><td class="label-cell" colspan="2">Present Value of Inflows</td><td>'+fmtM(res.pvIn)+'</td></tr>';
+  html += '<tr class="npv-row '+(ok?"ok":"bad")+'"><td class="label-cell" colspan="2">Net Present Value</td><td>'+fmtM(res.npv)+'</td></tr>';
+  html += '</tbody></table></div></div>';
+
+  // Year table
+  html += '<div class="collapsible">';
+  html += '<div class="coll-head" onclick="S.show_table=!S.show_table;renderPage3()"><span class="coll-title">Year-by-Year Cash Flows</span><span class="coll-arr" style="transform:'+(S.show_table?"rotate(90deg)":"rotate(0deg)")+'">›</span></div>';
+  html += '<div class="coll-body'+(S.show_table?" open":"")+'"><div class="overflow-x"><table>';
+  html += '<thead><tr><th>Year</th><th>BT Benefit</th><th>AT Benefit</th><th>BT Depr</th><th>AT Shield</th><th>ITC</th><th>Total AT</th><th>PV AT Ben</th></tr></thead><tbody>';
+  res.rows.forEach(function(row){
+    var itcCell = row.itcYr>0?fmtM(row.itcYr):'--';
+    html += '<tr><td>'+row.yr+'</td><td>'+fmtM(row.btBen)+'</td><td>'+fmtM(row.atBen)+'</td><td>'+fmtM(row.btDepr)+'</td><td>'+fmtM(row.atShield)+'</td><td>'+itcCell+'</td><td>'+fmtM(row.totalAT)+'</td><td>'+fmtM(row.pvAtBen)+'</td></tr>';
+  });
+  html += '</tbody></table></div></div></div>';
+
+  html += '</main></div></div>';
+  document.getElementById("main-content").innerHTML = html;
+
+  makeBriefingList(NOTES3, "bn-list3");
+  setTimeout(function(){
+    drawChart("chart1", res.cocSens, "Cost of Capital (%)");
+    drawChart("chart2", res.benSens, "Annual Benefits ("+sym+"000s)");
+  }, 50);
+}
+
+// ── PRINT ─────────────────────────────────────────────────────────────────────
+function printSummary() {
+  var prevDcf = S.show_dcf, prevTable = S.show_table;
+  S.show_dcf = true;
+  S.show_table = true;
+  renderPage3();
+  setTimeout(function() {
+    window.print();
+    S.show_dcf = prevDcf;
+    S.show_table = prevTable;
+    renderPage3();
+  }, 350);
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render() {
+  updateStepper();
+  if (S.page === 1) renderPage1();
+  else if (S.page === 2) renderPage2();
+  else if (S.page === 3 && S.res) renderPage3();
+  document.getElementById("cur-label").textContent = getSym()+" "+S.currency;
+}
+
+render();
+</script>
+</body>
+</html>
