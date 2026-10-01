@@ -1,263 +1,318 @@
 /**
  * capplan-auth.js
- * Shared auth + access-control library for all CapPlan model pages.
+ * Auth0 + Stripe Checkout integration for CapPlan
  *
- * Usage (add near top of each model HTML, after the Auth0 SPA SDK):
+ * Auth0:  dev-74uhps8oq6hjgk8o.us.auth0.com
+ * App:    CapPlan Web (client 1oCZLeLb8rcdIPvQKHOplADLcdFX87T0)
  *
- *   <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
- *   <script src="/capplan-auth.js"></script>
- *   <script>
- *     // In your model's init code:
- *     CapPlanAuth.init('model3').then(ok => {
- *       if (ok) startModel(); // user has access
- *     });
- *   </script>
+ * Usage (from any suite page):
+ *   CapPlanAuth.startCheckout('business_us', 'monthly')
+ *   CapPlanAuth.startCheckout('business_intl', 'annual')
+ *   CapPlanAuth.startCheckout('personal', 'monthly')
+ *   CapPlanAuth.init('UM3')   // called at top of a model page to gate access
+ *
+ * Two values still need filling in before going live:
+ *   STRIPE_PUBLISHABLE_KEY  — your pk_live_... key from Stripe dashboard
+ *   CHECKOUT_WORKER_URL     — URL of your deployed Cloudflare Worker
  */
 
-const CapPlanAuth = (() => {
+(function (window) {
+  'use strict';
 
-  const AUTH0_DOMAIN   = 'dev-74uhps8oq6hjgk8o.us.auth0.com';
-  const AUTH0_CLIENT_ID = '1oCZLeLb8rcdIPvQKHOplADLcdFX87T0';
-  const AUTH0_AUDIENCE  = 'https://api.capplan.online';
-  const API_BASE        = 'https://capplan.online/api';
+  /* ── CONFIGURATION ──────────────────────────────────────────────────────── */
 
-  let auth0Client = null;
-  let accessCache = null; // { models_allowed: [...], business: {...}, personal: {...} }
+  var AUTH0_DOMAIN    = 'dev-74uhps8oq6hjgk8o.us.auth0.com';
+  var AUTH0_CLIENT_ID = '1oCZLeLb8rcdIPvQKHOplADLcdFX87T0';
 
-  // -------------------------------------------------------------------------
-  // Auth0 client
-  // -------------------------------------------------------------------------
-  async function getAuth0Client() {
-    if (auth0Client) return auth0Client;
-    auth0Client = await window.auth0.createAuth0Client({
-      domain:   AUTH0_DOMAIN,
-      clientId: AUTH0_CLIENT_ID,
-      authorizationParams: {
-        redirect_uri: window.location.origin + window.location.pathname,
-        audience: AUTH0_AUDIENCE,
-      },
-      cacheLocation: 'localstorage',
-      useRefreshTokens: true,
-    });
-    return auth0Client;
-  }
+  // Replace with your Stripe publishable key (pk_test_... for testing, pk_live_... for production)
+  var STRIPE_PUBLISHABLE_KEY = 'YOUR_STRIPE_PUBLISHABLE_KEY';
 
-  // -------------------------------------------------------------------------
-  // Check if returning from Auth0 redirect (handle the callback)
-  // -------------------------------------------------------------------------
-  async function handleRedirectIfNeeded(client) {
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('code') && params.has('state')) {
-      await client.handleRedirectCallback();
-      // Clean URL
-      window.history.replaceState({}, document.title, window.location.pathname);
+  // Replace with the URL of your deployed Cloudflare Worker that creates Stripe sessions
+  var CHECKOUT_WORKER_URL = 'YOUR_CHECKOUT_WORKER_URL';
+
+  /* ── PRICE IDs ──────────────────────────────────────────────────────────── */
+
+  var PRICES = {
+    business_us: {
+      monthly: 'price_1UL2ltPnu63aqS4gdLs4kz3w',
+      annual:  'price_1UL2nYPnu63aqS4gXOgVpPz3'
+    },
+    business_intl: {
+      monthly: 'price_1UKhNfPnu63aqS4gZvZ17R2H',
+      annual:  'price_1UKhSRPnu63aqS4g6qEq3TzI'
+    },
+    personal: {
+      monthly: 'price_1UKhUGPnu63aqS4gHy7YIjBj',
+      annual:  'price_1UKhWDPnu63aqS4gukWsbyY4'
     }
-  }
-
-  // -------------------------------------------------------------------------
-  // Fetch access from our API
-  // -------------------------------------------------------------------------
-  async function fetchAccess(client) {
-    if (accessCache) return accessCache;
-    try {
-      const token = await client.getTokenSilently();
-      const res = await fetch(`${API_BASE}/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error(`API ${res.status}`);
-      const data = await res.json();
-      accessCache = data.access;
-      return accessCache;
-    } catch (e) {
-      console.warn('CapPlanAuth: could not fetch access', e);
-      return null;
-    }
-  }
-
-  // -------------------------------------------------------------------------
-  // Show upgrade overlay
-  // -------------------------------------------------------------------------
-  function showUpgradeOverlay(modelId) {
-    // Determine suite from model ID
-    // personal* → Personal
-    // us_model* → Business US
-    // model*    → Business International
-    const isPersonal  = modelId.startsWith('personal');
-    const isBusinessUS = modelId.startsWith('us_model');
-    const suite = isPersonal ? 'personal' : isBusinessUS ? 'business_us' : 'business_intl';
-    const price = isPersonal ? '$12/month' : '$37/month';
-    const suiteName = isPersonal ? 'Personal'
-                    : isBusinessUS ? 'Business — US Edition'
-                    : 'Business — International Edition';
-
-    // Blur the page content behind the overlay
-    document.body.style.overflow = 'hidden';
-    const mainContent = document.getElementById('main-content');
-    if (mainContent) mainContent.style.filter = 'blur(4px)';
-
-    const overlay = document.createElement('div');
-    overlay.id = 'capplan-upgrade-overlay';
-    overlay.style.cssText = `
-      position:fixed;inset:0;background:rgba(0,0,0,.45);
-      display:flex;align-items:center;justify-content:center;z-index:9999;
-    `;
-    overlay.innerHTML = `
-      <div style="background:#fff;border-radius:12px;padding:40px 36px;max-width:440px;
-                  width:90%;box-shadow:0 8px 40px rgba(0,0,0,.18);text-align:center">
-        <div style="font-size:2rem;margin-bottom:12px">🔒</div>
-        <h2 style="margin:0 0 12px;font-size:1.3rem;color:#111">
-          CapPlan ${suiteName} Full Suite
-        </h2>
-        <p style="margin:0 0 24px;color:#555;line-height:1.6">
-          This model is included in the Full Suite. Start a free 14-day trial
-          — no credit card required until the trial ends.
-        </p>
-        <p style="font-weight:700;font-size:1.1rem;margin:0 0 24px;color:#111">
-          ${price} &nbsp;·&nbsp; cancel anytime
-        </p>
-        <button onclick="CapPlanAuth.startCheckout('${suite}','monthly')"
-          style="background:#0057ff;color:#fff;border:none;border-radius:8px;
-                 padding:14px 32px;font-size:1rem;cursor:pointer;width:100%;margin-bottom:12px">
-          Start free trial
-        </button>
-        <button onclick="window.location.href='capplan_landing.html#pricing'"
-          style="background:none;border:none;color:#888;cursor:pointer;font-size:.9rem">
-          See all plans
-        </button>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-  }
-
-  // -------------------------------------------------------------------------
-  // Show login prompt
-  // -------------------------------------------------------------------------
-  function showLoginPrompt() {
-    const overlay = document.createElement('div');
-    overlay.id = 'capplan-login-overlay';
-    overlay.style.cssText = `
-      position:fixed;inset:0;background:rgba(0,0,0,.55);
-      display:flex;align-items:center;justify-content:center;z-index:9999;
-    `;
-    overlay.innerHTML = `
-      <div style="background:#fff;border-radius:12px;padding:40px 36px;max-width:400px;
-                  width:90%;box-shadow:0 8px 40px rgba(0,0,0,.18);text-align:center">
-        <h2 style="margin:0 0 12px;font-size:1.3rem;color:#111">Sign in to CapPlan</h2>
-        <p style="margin:0 0 24px;color:#555;line-height:1.6">
-          Create a free account to use this model and save your analyses.
-        </p>
-        <button onclick="CapPlanAuth.login()"
-          style="background:#0057ff;color:#fff;border:none;border-radius:8px;
-                 padding:14px 32px;font-size:1rem;cursor:pointer;width:100%;margin-bottom:12px">
-          Sign in / Create account
-        </button>
-        <a href="/" style="color:#888;font-size:.9rem;text-decoration:none">Back to home</a>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-  }
-
-  // -------------------------------------------------------------------------
-  // Public API
-  // -------------------------------------------------------------------------
-  return {
-
-    /**
-     * Call this on model page load.
-     * Returns true if the user has access to modelId, false otherwise.
-     * Handles login redirect, token refresh, and upgrade overlay.
-     */
-    async init(modelId) {
-      const client = await getAuth0Client();
-      await handleRedirectIfNeeded(client);
-
-      const isAuthenticated = await client.isAuthenticated();
-
-      if (!isAuthenticated) {
-        showLoginPrompt();
-        return false;
-      }
-
-      const access = await fetchAccess(client);
-      if (!access) {
-        // API error — allow access rather than blocking (fail open)
-        console.warn('CapPlanAuth: access check failed, allowing through');
-        return true;
-      }
-
-      if (!access.models_allowed.includes(modelId)) {
-        showUpgradeOverlay(modelId);
-        return false;
-      }
-
-      return true;
-    },
-
-    /** Redirect to Auth0 login */
-    async login() {
-      const client = await getAuth0Client();
-      await client.loginWithRedirect();
-    },
-
-    /** Redirect to Auth0 logout */
-    async logout() {
-      const client = await getAuth0Client();
-      accessCache = null;
-      await client.logout({ logoutParams: { returnTo: window.location.origin } });
-    },
-
-    /** Get the current user's email (or null) */
-    async getEmail() {
-      try {
-        const client = await getAuth0Client();
-        const user = await client.getUser();
-        return user?.email || null;
-      } catch { return null; }
-    },
-
-    /** Start Stripe Checkout for a suite */
-    async startCheckout(suite, period = 'monthly') {
-      try {
-        const client = await getAuth0Client();
-        const token = await client.getTokenSilently();
-        const res = await fetch(`${API_BASE}/stripe/create-checkout`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ suite, period }),
-        });
-        const { url } = await res.json();
-        if (url) window.location.href = url;
-      } catch (e) {
-        alert('Could not start checkout. Please try again.');
-        console.error(e);
-      }
-    },
-
-    /** Open Stripe Customer Portal */
-    async openPortal() {
-      try {
-        const client = await getAuth0Client();
-        const token = await client.getTokenSilently();
-        const res = await fetch(`${API_BASE}/stripe/create-portal`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        const { url } = await res.json();
-        if (url) window.location.href = url;
-      } catch (e) {
-        alert('Could not open billing portal. Please try again.');
-        console.error(e);
-      }
-    },
-
-    /** Get raw access object (for UI display) */
-    getAccess() { return accessCache; },
   };
 
-})();
+  /* ── FREE MODELS ────────────────────────────────────────────────────────── */
+  // These model IDs are always accessible — no login or subscription required
+
+  var FREE_MODELS = ['UM1', 'M1', 'P1'];
+
+  /* ── SUITE → MODEL PREFIX MAP ───────────────────────────────────────────── */
+
+  var SUITE_PREFIXES = {
+    business_us:   'UM',
+    business_intl: 'M',
+    personal:      'P'
+  };
+
+  /* ── SUITE INDEX PAGE PATHS (relative from a model file) ────────────────── */
+
+  var SUITE_PAGES = {
+    business_us:   '../../business/us/index.html',
+    business_intl: '../../business/international/index.html',
+    personal:      '../personal/index.html'
+  };
+
+  /* ── AUTH0 SDK LOADER ───────────────────────────────────────────────────── */
+
+  var _auth0Client = null;
+  var _auth0Ready  = false;
+  var _readyQueue  = [];
+
+  function _loadAuth0SDK(callback) {
+    if (_auth0Ready) { callback(); return; }
+    _readyQueue.push(callback);
+    if (document.getElementById('auth0-spa-js')) return; // already loading
+
+    var script    = document.createElement('script');
+    script.id     = 'auth0-spa-js';
+    script.src    = 'https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js';
+    script.onload = function () {
+      window.auth0.createAuth0Client({
+        domain:   AUTH0_DOMAIN,
+        clientId: AUTH0_CLIENT_ID,
+        authorizationParams: {
+          redirect_uri: window.location.origin + window.location.pathname
+        },
+        cacheLocation:    'localstorage',
+        useRefreshTokens: true
+      }).then(function (client) {
+        _auth0Client = client;
+        _auth0Ready  = true;
+        _readyQueue.forEach(function (fn) { fn(); });
+        _readyQueue = [];
+      }).catch(function (err) {
+        console.error('[CapPlanAuth] Auth0 init failed:', err);
+      });
+    };
+    script.onerror = function () {
+      console.error('[CapPlanAuth] Failed to load Auth0 SDK');
+    };
+    document.head.appendChild(script);
+  }
+
+  /* ── AUTH HELPERS ───────────────────────────────────────────────────────── */
+
+  function _isAuthenticated(callback) {
+    _loadAuth0SDK(function () {
+      _auth0Client.isAuthenticated().then(callback);
+    });
+  }
+
+  function _getUser(callback) {
+    _loadAuth0SDK(function () {
+      _auth0Client.getUser().then(callback);
+    });
+  }
+
+  function _login(options) {
+    _loadAuth0SDK(function () {
+      _auth0Client.loginWithRedirect(options || {});
+    });
+  }
+
+  function _logout() {
+    _loadAuth0SDK(function () {
+      _auth0Client.logout({
+        logoutParams: { returnTo: window.location.origin }
+      });
+    });
+  }
+
+  /* ── SUBSCRIPTION CHECK ─────────────────────────────────────────────────── */
+  // Reads active_suites from Auth0 app_metadata.
+  // Populate this via an Auth0 Action that fires on Stripe webhook events:
+  //   customer.subscription.created  → add suite to active_suites
+  //   customer.subscription.deleted  → remove suite from active_suites
+
+  function _hasActiveSuite(user, suiteId) {
+    if (!user) return false;
+    var meta = user['https://capplan.app/app_metadata'] || {};
+    var subs = meta.active_suites || [];
+    return subs.indexOf(suiteId) !== -1;
+  }
+
+  /* ── STRIPE CHECKOUT ────────────────────────────────────────────────────── */
+
+  function _redirectToCheckout(priceId, userEmail) {
+    if (!CHECKOUT_WORKER_URL || CHECKOUT_WORKER_URL === 'YOUR_CHECKOUT_WORKER_URL') {
+      alert('Checkout is not yet configured. Please contact support@capplan.app.');
+      return;
+    }
+
+    fetch(CHECKOUT_WORKER_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        priceId:    priceId,
+        email:      userEmail || '',
+        successUrl: window.location.href + '?checkout=success',
+        cancelUrl:  window.location.href + '?checkout=cancelled'
+      })
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error('[CapPlanAuth] No checkout URL:', data);
+        alert('Could not start checkout. Please try again.');
+      }
+    })
+    .catch(function (err) {
+      console.error('[CapPlanAuth] Checkout error:', err);
+      alert('Could not start checkout. Please try again.');
+    });
+  }
+
+  /* ── RESUME PENDING CHECKOUT ────────────────────────────────────────────── */
+  // After a login redirect, pick up where the user left off
+
+  function _resumeCheckout() {
+    var suiteId, billing;
+    try {
+      suiteId = sessionStorage.getItem('capplan_checkout_suite');
+      billing = sessionStorage.getItem('capplan_checkout_billing');
+      sessionStorage.removeItem('capplan_checkout_suite');
+      sessionStorage.removeItem('capplan_checkout_billing');
+    } catch (e) {}
+    if (suiteId && billing) {
+      CapPlanAuth.startCheckout(suiteId, billing);
+    }
+  }
+
+  /* ── PUBLIC API ─────────────────────────────────────────────────────────── */
+
+  var CapPlanAuth = {};
+
+  /**
+   * startCheckout(suiteId, billing)
+   * Called by the Subscribe button on suite index pages.
+   * Logs the user in first if needed, then opens Stripe Checkout.
+   *
+   * @param {string} suiteId  'business_us' | 'business_intl' | 'personal'
+   * @param {string} billing  'monthly' | 'annual'
+   */
+  CapPlanAuth.startCheckout = function (suiteId, billing) {
+    var priceId = (PRICES[suiteId] || {})[billing];
+    if (!priceId) {
+      console.error('[CapPlanAuth] Unknown suite/billing:', suiteId, billing);
+      return;
+    }
+
+    _isAuthenticated(function (authenticated) {
+      if (!authenticated) {
+        try {
+          sessionStorage.setItem('capplan_checkout_suite',   suiteId);
+          sessionStorage.setItem('capplan_checkout_billing', billing);
+        } catch (e) {}
+        _login({
+          authorizationParams: {
+            redirect_uri: window.location.origin + window.location.pathname,
+            screen_hint:  'signup'
+          }
+        });
+        return;
+      }
+      _getUser(function (user) {
+        _redirectToCheckout(priceId, user ? user.email : '');
+      });
+    });
+  };
+
+  /**
+   * init(modelId)
+   * Call at the top of every gated model page.
+   * Free models (UM1, M1, P1) pass through immediately.
+   * Paid models verify login + active subscription; redirect to suite page if not.
+   *
+   * @param {string} modelId  e.g. 'UM3', 'M7', 'P4'
+   */
+  CapPlanAuth.init = function (modelId) {
+    // Free models — open to everyone, no check needed
+    if (FREE_MODELS.indexOf(modelId) !== -1) return;
+
+    // Determine suite from model ID prefix
+    var suiteId = null;
+    var keys = Object.keys(SUITE_PREFIXES);
+    for (var i = 0; i < keys.length; i++) {
+      if (modelId.indexOf(SUITE_PREFIXES[keys[i]]) === 0) {
+        suiteId = keys[i];
+        break;
+      }
+    }
+    if (!suiteId) {
+      console.warn('[CapPlanAuth] Unknown model prefix:', modelId);
+      return;
+    }
+
+    _loadAuth0SDK(function () {
+      // Handle Auth0 redirect callback (code= in URL after login)
+      if (window.location.search.indexOf('code=') !== -1 ||
+          window.location.search.indexOf('error=') !== -1) {
+        _auth0Client.handleRedirectCallback().then(function () {
+          window.history.replaceState({}, document.title, window.location.pathname);
+          _resumeCheckout();
+        }).catch(function (err) {
+          console.error('[CapPlanAuth] Redirect callback error:', err);
+        });
+        return;
+      }
+
+      _isAuthenticated(function (authenticated) {
+        if (!authenticated) {
+          window.location.href = SUITE_PAGES[suiteId] || '../index.html';
+          return;
+        }
+        _getUser(function (user) {
+          if (!_hasActiveSuite(user, suiteId)) {
+            window.location.href = SUITE_PAGES[suiteId] || '../index.html';
+          }
+          // Active subscription confirmed — model page loads normally
+        });
+      });
+    });
+  };
+
+  /**
+   * signOut()
+   * Attach to a sign-out button anywhere on the site.
+   */
+  CapPlanAuth.signOut = function () {
+    _logout();
+  };
+
+  /**
+   * getUser(callback)
+   * Returns the Auth0 user profile object, or null if not logged in.
+   * Use to show the user's email or subscription status in the UI.
+   *
+   * @param {function} callback  called with user object or null
+   */
+  CapPlanAuth.getUser = function (callback) {
+    _isAuthenticated(function (authenticated) {
+      if (!authenticated) { callback(null); return; }
+      _getUser(callback);
+    });
+  };
+
+  /* ── EXPOSE ─────────────────────────────────────────────────────────────── */
+
+  window.CapPlanAuth = CapPlanAuth;
+
+}(window));
