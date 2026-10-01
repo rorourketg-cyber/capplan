@@ -1,0 +1,495 @@
+<title>CapPlan Business</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap">
+<style>
+/* Layout: centred single column, two-card fork, light throughout */
+:root {
+  --navy: #0F1D2E;
+  --blue: #1B3F6E;
+  --blue-mid: #2A5298;
+  --blue-soft: rgba(27,63,110,0.08);
+  --blue-chip: rgba(27,63,110,0.10);
+  --green: #2E7D52;
+  --green-warm: #3D8B5A;
+  --green-soft: rgba(46,125,82,0.09);
+  --gold: #C9A84C;
+  --surface: #F7F8FA;
+  --border: #E2E6EC;
+  --t1: #0F1D2E;
+  --t2: #4A5568;
+  --t3: #8A96A6;
+  --white: #ffffff;
+
+  --bg: var(--white);
+  --bg-surface: var(--surface);
+  --fg: var(--t1);
+  --fg2: var(--t2);
+  --fg3: var(--t3);
+  --card-border: var(--border);
+  --nav-bg: var(--white);
+  --nav-border: var(--border);
+  --nav-fg: var(--t2);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1520;
+    --bg-surface: #111c2b;
+    --fg: #e8edf4;
+    --fg2: #9aaabb;
+    --fg3: #5a6a7a;
+    --card-border: rgba(255,255,255,0.10);
+    --nav-bg: #0d1520;
+    --nav-border: rgba(255,255,255,0.08);
+    --nav-fg: rgba(255,255,255,0.65);
+    --blue-soft: rgba(27,63,110,0.25);
+    --blue-chip: rgba(168,197,232,0.12);
+    --green-soft: rgba(46,125,82,0.20);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1520;
+  --bg-surface: #111c2b;
+  --fg: #e8edf4;
+  --fg2: #9aaabb;
+  --fg3: #5a6a7a;
+  --card-border: rgba(255,255,255,0.10);
+  --nav-bg: #0d1520;
+  --nav-border: rgba(255,255,255,0.08);
+  --nav-fg: rgba(255,255,255,0.65);
+  --blue-soft: rgba(27,63,110,0.25);
+  --blue-chip: rgba(168,197,232,0.12);
+  --green-soft: rgba(46,125,82,0.20);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  padding-inline: 24px;
+  padding-block: 0;
+}
+h1, h2, h3, h4 {
+  font-family: 'Source Serif 4', Georgia, serif;
+  line-height: 1.2;
+}
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; }
+
+/* ── NAV ─────────────────────────────────────────────────── */
+#nav {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  left: 0; right: 0;
+  z-index: 200;
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--nav-border);
+  margin-inline: -24px;
+  padding-inline: 24px;
+}
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; }
+.nav-logo-mark {
+  width: 32px; height: 32px;
+  background: var(--green);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.nav-logo-text {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 20px;
+  color: var(--fg);
+  font-weight: 600;
+}
+.nav-logo-text span { color: var(--blue-mid); }
+.nav-links { display: flex; align-items: center; gap: 28px; }
+.nav-links a {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fg2);
+  transition: color .15s;
+}
+.nav-links a:hover { color: var(--fg); }
+.nav-links a.active { color: var(--blue-mid); font-weight: 600; }
+.nav-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg3);
+  transition: color .15s;
+}
+.nav-back:hover { color: var(--fg2); }
+.nav-back svg { transition: transform .15s; }
+.nav-back:hover svg { transform: translateX(-3px); }
+@media (max-width: 600px) {
+  .nav-links { display: none; }
+}
+
+/* ── PAGE SHELL ──────────────────────────────────────────── */
+.page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding-block: 72px 96px;
+}
+
+/* ── BREADCRUMB ──────────────────────────────────────────── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--fg3);
+  margin-bottom: 40px;
+}
+.breadcrumb a { color: var(--fg3); transition: color .15s; }
+.breadcrumb a:hover { color: var(--fg2); }
+.breadcrumb-sep { color: var(--fg3); opacity: 0.5; }
+
+/* ── HEADER ──────────────────────────────────────────────── */
+.page-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--blue-mid);
+  margin-bottom: 14px;
+}
+.page-headline {
+  font-size: clamp(30px, 4vw, 46px);
+  color: var(--fg);
+  margin-bottom: 16px;
+  text-wrap: balance;
+}
+.page-sub {
+  font-size: 17px;
+  color: var(--fg2);
+  max-width: 580px;
+  line-height: 1.7;
+  margin-bottom: 56px;
+}
+
+/* ── CHOICE CARDS ────────────────────────────────────────── */
+.choice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+@media (max-width: 640px) {
+  .choice-grid { grid-template-columns: 1fr; }
+}
+
+.choice-card {
+  border: 2px solid var(--card-border);
+  border-radius: 16px;
+  padding: 36px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+  cursor: pointer;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+.choice-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  border-radius: 16px 16px 0 0;
+}
+.choice-card.us::before { background: var(--blue-mid); }
+.choice-card.intl::before { background: var(--green); }
+
+.choice-card:hover {
+  border-color: transparent;
+  transform: translateY(-3px);
+}
+.choice-card.us:hover { box-shadow: 0 12px 40px rgba(27,63,110,0.18); border-color: var(--blue-mid); }
+.choice-card.intl:hover { box-shadow: 0 12px 40px rgba(46,125,82,0.18); border-color: var(--green); }
+
+.card-flag {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  line-height: 1;
+}
+.card-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.choice-card.us .card-label { color: var(--blue-mid); }
+.choice-card.intl .card-label { color: var(--green); }
+
+.card-title {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 14px;
+  line-height: 1.25;
+}
+.card-desc {
+  font-size: 14px;
+  color: var(--fg2);
+  line-height: 1.65;
+  margin-bottom: 24px;
+  flex: 1;
+}
+
+/* Depreciation tag */
+.depr-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 28px;
+  line-height: 1.3;
+}
+.choice-card.us .depr-tag {
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+.choice-card.intl .depr-tag {
+  background: var(--green-soft);
+  color: var(--green);
+}
+.depr-tag svg { flex-shrink: 0; }
+
+.card-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 28px;
+}
+.card-method {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  color: var(--fg2);
+}
+.card-method-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.choice-card.us .card-method-dot { background: var(--blue-mid); }
+.choice-card.intl .card-method-dot { background: var(--green); }
+
+.card-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: opacity .15s, transform .15s;
+  margin-top: auto;
+}
+.card-btn:hover { opacity: 0.9; transform: translateX(2px); }
+.choice-card.us .card-btn { background: var(--blue-mid); color: var(--white); }
+.choice-card.intl .card-btn { background: var(--green); color: var(--white); }
+.btn-arrow { font-size: 16px; }
+
+/* ── CURRENCY NOTE ───────────────────────────────────────── */
+.currency-note {
+  margin-top: 40px;
+  padding: 20px 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-size: 14px;
+  color: var(--fg2);
+  line-height: 1.6;
+}
+.currency-note-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── BOTTOM LINK ─────────────────────────────────────────── */
+.back-to-personal {
+  margin-top: 56px;
+  padding-top: 40px;
+  border-top: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.back-personal-text {
+  font-size: 14px;
+  color: var(--fg3);
+}
+.back-personal-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: gap .15s;
+}
+.back-personal-link:hover { gap: 10px; }
+</style>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3,10 7,14 15,4"/>
+        </svg>
+      </div>
+      <div class="nav-logo-text">Cap<span>Plan</span></div>
+    </a>
+    <div class="nav-links">
+      <a href="../index.html#how">How it works</a>
+      <a href="../index.html#decisions">Models</a>
+      <a href="../index.html#pricing">Pricing</a>
+      <a href="#" style="color:var(--fg2)">Sign in</a>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE CONTENT -->
+<div class="page">
+
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="../index.html">CapPlan</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>Business Suite</span>
+  </nav>
+
+  <!-- Header -->
+  <div class="page-eyebrow">CapPlan Business</div>
+  <h1 class="page-headline">Which edition is right<br>for your business?</h1>
+  <p class="page-sub">Both editions include all 13 capital planning models. The difference is in how each handles tax depreciation — which depends on where your business files its taxes.</p>
+
+  <!-- Choice cards -->
+  <div class="choice-grid">
+
+    <!-- US Edition -->
+    <div class="choice-card us" onclick="window.location.href='us/index.html'" role="button" tabindex="0"
+         onkeydown="if(event.key==='Enter'||event.key===' ')window.location.href='us/index.html'">
+      <div class="card-flag">🇺🇸</div>
+      <div class="card-label">US Edition</div>
+      <h2 class="card-title">CapPlan Business<br>United States</h2>
+      <p class="card-desc">Built for businesses that file US federal taxes. Uses the depreciation system mandated by the IRS, including first-year bonus depreciation elections.</p>
+
+      <div class="depr-tag">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M1 6h14" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        US tax depreciation
+      </div>
+
+      <div class="card-methods">
+        <div class="card-method">
+          <div class="card-method-dot"></div>
+          MACRS — Modified Accelerated Cost Recovery System
+        </div>
+        <div class="card-method">
+          <div class="card-method-dot"></div>
+          Bonus depreciation (IRC §168(k))
+        </div>
+        <div class="card-method">
+          <div class="card-method-dot"></div>
+          All analysis in US dollars
+        </div>
+      </div>
+
+      <button class="card-btn">
+        Go to US Edition <span class="btn-arrow">→</span>
+      </button>
+    </div>
+
+    <!-- International Edition -->
+    <div class="choice-card intl" onclick="window.location.href='international/index.html'" role="button" tabindex="0"
+         onkeydown="if(event.key==='Enter'||event.key===' ')window.location.href='international/index.html'">
+      <div class="card-flag">🌍</div>
+      <div class="card-label">International Edition</div>
+      <h2 class="card-title">CapPlan Business<br>International</h2>
+      <p class="card-desc">For businesses outside the US, or any jurisdiction that follows classical accounting depreciation methods rather than MACRS. Supports nine currencies.</p>
+
+      <div class="depr-tag">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 1.5C8 1.5 5.5 4.5 5.5 8s2.5 6.5 2.5 6.5M8 1.5C8 1.5 10.5 4.5 10.5 8S8 14.5 8 14.5M1.5 8h13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Classical depreciation methods
+      </div>
+
+      <div class="card-methods">
+        <div class="card-method">
+          <div class="card-method-dot"></div>
+          Straight-line
+        </div>
+        <div class="card-method">
+          <div class="card-method-dot"></div>
+          Double declining balance
+        </div>
+        <div class="card-method">
+          <div class="card-method-dot"></div>
+          Sum-of-years digits
+        </div>
+      </div>
+
+      <button class="card-btn">
+        Go to International Edition <span class="btn-arrow">→</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Currency note -->
+  <div class="currency-note">
+    <div class="currency-note-icon">💱</div>
+    <div>
+      <strong>Currency selector:</strong> The International Edition supports nine currencies — USD, CAD, GBP, EUR, AUD, NZD, CHF, JPY, and SGD — selectable within each model. The US Edition uses US dollars throughout.
+    </div>
+  </div>
+
+  <!-- Back to personal -->
+  <div class="back-to-personal">
+    <span class="back-personal-text">Looking for personal finance models instead?</span>
+    <a href="../personal/index.html" class="back-personal-link">
+      CapPlan Personal <span>→</span>
+    </a>
+  </div>
+
+</div>
