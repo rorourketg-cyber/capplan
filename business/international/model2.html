@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan — Asset Purchase With Alternatives</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#F7F8FA;color:#0F1D2E;font-size:14px}
+input,select,button{font-family:inherit;font-size:14px}
+button{cursor:pointer;background:none;border:none}
+select{-webkit-appearance:none;appearance:none}
+
+/* ── TOKENS ── */
+:root{
+  --blue:#1B3F6E;--green:#2E7D52;--surface:#F7F8FA;--panel:#fff;
+  --border:#E2E6EC;--t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;--warn:#C84B31;
+  --blue-soft:rgba(27,63,110,0.08);--green-soft:rgba(46,125,82,0.09);
+}
+
+/* ── MASTHEAD ── */
+#masthead{background:var(--blue);min-height:80px;display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 16px;position:sticky;top:0;z-index:100;gap:0}
+.mast-title-block{display:flex;flex-direction:column;justify-content:center;gap:3px;flex:1;min-width:0;padding-right:16px}
+.mast-title{font-size:17px;font-weight:800;color:white;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mast-question{font-size:12px;font-weight:700;font-style:italic;color:rgba(255,255,255,.82);font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+.logo{display:flex;align-items:center;gap:12px;margin-right:20px;flex-shrink:0}
+.logo-icon{width:34px;height:34px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:Georgia,serif;font-size:22px;color:white}
+.logo-text span{color:#A8C5E8}
+
+
+/* ── STEPPER ── */
+#stepper{background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px}
+.step{display:flex;align-items:center;gap:8px;padding:13px 4px;border-bottom:2px solid transparent}
+.step.active{border-bottom-color:var(--blue)}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--border);color:var(--t3)}
+.step.active .step-num{background:var(--blue);color:white}
+.step.done .step-num{background:var(--green);color:white}
+.step-label{font-size:13px;font-weight:500;color:var(--t3);white-space:nowrap}
+.step.active .step-label{color:var(--blue)}
+.step.done .step-label{color:var(--green)}
+.step-sep{color:var(--border);margin:0 8px;font-size:16px}
+
+/* ── LAYOUT ── */
+.page{max-width:1100px;margin:0 auto;padding:24px 22px}
+.page-grid{display:grid;grid-template-columns:300px 1fr;gap:22px}
+
+/* ── PANELS ── */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;margin-bottom:18px}
+.panel-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr}
+.field{padding:13px 18px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.field.full{grid-column:1/-1;border-right:none}
+.field.last{border-bottom:none}
+.field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:6px}
+.field-note{font-size:10px;color:var(--t3);margin-top:4px}
+
+/* ── INPUTS ── */
+.ui{display:flex;align-items:center;gap:6px}
+.ui .pfx,.ui .sfx{font-family:monospace;font-size:12px;color:var(--t3);flex-shrink:0}
+.ui input{font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none}
+.underline-input{display:flex;align-items:center;gap:6px}
+.underline-input input{font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none}
+.underline-input input:focus{border-bottom-color:var(--amber)}
+.ui input:focus{border-bottom-color:var(--blue)}
+.ui input:disabled{color:var(--t3);opacity:.6}
+.ui select{font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none;cursor:pointer}
+.ui select:focus{border-bottom-color:var(--blue)}
+.pills{display:flex;gap:8px;margin-top:4px}
+.pill{display:flex;align-items:center;gap:6px;padding:6px 13px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;user-select:none}
+.pill.active{border-color:var(--blue);background:var(--blue-soft);color:var(--blue)}
+.pill-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--t3);flex-shrink:0}
+.pill.active .pill-dot{border-color:var(--blue);background:var(--blue)}
+
+/* ── TABS ── */
+.alt-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:0;background:var(--surface)}
+.alt-tab{padding:10px 18px;font-size:13px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.alt-tab:hover{color:var(--t2)}
+.alt-remove{margin-left:6px;font-size:14px;color:var(--t3);line-height:1}
+.alt-remove:hover{color:var(--warn)}
+.alt-add{background:none;border:1.5px dashed var(--border);border-radius:8px 8px 0 0;padding:9px 16px;cursor:pointer;font-size:13px;color:var(--t3)}
+.alt-add:hover{border-color:var(--blue);color:var(--blue)}
+.alt-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* ── BUTTONS ── */
+.btn-primary{background:var(--blue);color:white;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-primary:hover{background:#163357}
+.btn-ghost{background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-sm{background:var(--blue);color:white;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-sm.ghost{background:transparent;color:var(--t2);border:1.5px solid var(--border)}
+.action-row{display:flex;justify-content:flex-end;gap:10px;margin-top:4px}
+
+/* ── BRIEFING NOTES ── */
+.bn-item{border-bottom:1px solid var(--border)}
+.bn-item:last-child{border-bottom:none}
+.bn-head{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;cursor:pointer}
+.bn-head:hover{background:var(--surface)}
+.bn-qmark{width:21px;height:21px;border-radius:50%;background:var(--blue-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--blue);flex-shrink:0;margin-top:1px;margin-right:5px}
+.bn-q{font-size:13px;line-height:1.5;color:var(--blue);flex:1}
+.bn-arr{color:var(--t3);font-size:14px;flex-shrink:0;margin-top:2px;transition:transform .2s}
+.bn-body{padding:10px 13px 12px 44px;font-size:12.5px;line-height:1.7;color:var(--t2);background:var(--surface);border-top:1px solid var(--border);display:none}
+.bn-body.open{display:block}
+
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:11px}
+
+/* ── PAGE 2 ── */
+.p2-box{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;margin-bottom:18px}
+
+/* ── PAGE 3 RESULTS ── */
+
+
+
+
+.banner-headline{font-family:Georgia,serif;font-size:22px;line-height:1.2;font-weight:400}
+.banner.positive .banner-headline{color:var(--green)}
+.banner.negative .banner-headline{color:var(--warn)}
+.banner.mixed .banner-headline{color:var(--blue)}
+.decision-box{background:white;border:1px solid var(--border);border-radius:8px;padding:18px 22px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.decision-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:12px}
+.decision-type{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.d-pill{display:flex;align-items:center;gap:6px;padding:7px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;user-select:none}
+.d-pill.active{border-color:var(--blue);background:var(--blue-soft);color:var(--blue)}
+.results-grid{display:grid;gap:14px;margin-bottom:18px}
+.alt-card{background:var(--panel);border:2px solid var(--border);border-radius:10px;overflow:hidden}
+.alt-card.winner{border-color:var(--green)}
+.alt-card.loser{border-color:var(--border);opacity:.85}
+.alt-card.rejected{border-color:var(--warn);opacity:.8}
+.alt-card-head{padding:12px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.alt-card.winner .alt-card-head{background:var(--green-soft)}
+.alt-card.rejected .alt-card-head{background:rgba(200,75,49,.06)}
+.alt-name{font-size:14px;font-weight:700}
+.alt-card.winner .alt-name{color:var(--green)}
+.alt-card.rejected .alt-name{color:var(--warn)}
+.alt-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:3px 10px;border-radius:12px}
+.badge-accept{background:rgba(46,125,82,.15);color:var(--green)}
+.badge-select{background:rgba(27,63,110,.12);color:var(--blue)}
+.badge-reject{background:rgba(200,75,49,.12);color:var(--warn)}
+.metrics-row{display:grid;padding:14px 18px;gap:8px}
+.m-item{display:flex;justify-content:space-between;align-items:baseline;font-size:13px}
+.m-label{color:var(--t3);font-size:12px}
+.m-val{font-family:monospace;font-weight:700;color:var(--t1)}
+.m-val.ok{color:var(--green)}
+.m-val.bad{color:var(--warn)}
+.collapsible{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:14px;overflow:hidden}
+.coll-head{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.coll-head:hover{background:var(--surface)}
+.coll-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.coll-arr{color:var(--t3);font-size:14px;transition:transform .2s}
+.coll-body{display:none;border-top:1px solid var(--border)}
+.coll-body.open{display:block}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{padding:8px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}
+th.left{text-align:left}
+td{padding:8px 14px;text-align:right;font-family:monospace;border-bottom:1px solid var(--border)}
+td.left{text-align:left;font-family:inherit;color:var(--t1)}
+td.sub{text-align:left;font-family:inherit;color:var(--t3);font-size:11px}
+td.neg{color:var(--warn)}
+tr.total-row td{font-weight:700;background:var(--surface)}
+tr.npv-row td{font-size:15px;font-weight:800;border-top:2px solid var(--blue)}
+tr.npv-row.ok td{background:rgba(46,125,82,.09);color:var(--green)}
+tr.npv-row.bad td{background:rgba(200,75,49,.06);color:var(--warn)}
+tr:nth-child(even){background:var(--surface)}
+.overflow-x{overflow-x:auto}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.chart-box{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.chart-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:10px}
+
+
+
+
+
+
+.ok{color:var(--green);font-weight:700}
+.bad{color:var(--warn);font-weight:700}
+.print-btn{display:flex;align-items:center;gap:6px;background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+/* wizard CSS now in .helper-* classes */
+.sens-indicator{border-radius:8px;padding:14px 18px;border:1.5px solid transparent}
+.si-positive{background:var(--green-soft);border-color:var(--green)}
+.si-negative{background:rgba(200,75,49,.07);border-color:var(--warn)}
+.si-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.si-positive .si-title{color:var(--green)}.si-negative .si-title{color:var(--warn)}
+.si-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.si-item{display:flex;flex-direction:column;gap:3px}
+.si-label{font-size:11px;color:var(--t2)}
+.si-val{font-family:monospace;font-size:20px;font-weight:800}
+.si-val.ok{color:var(--green)}.si-val.bad{color:var(--warn)}
+.si-sub{font-size:10px;color:var(--t3)}
+
+/* ── HELPER / GUIDANCE ELEMENTS (amber) ──────────────────────────────────── */
+:root { --amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7; }
+.wizard-row{display:flex;flex-direction:column;gap:6px}
+.wizard-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3)}
+.wizard-result{background:var(--green-soft);border:1px solid var(--green);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.wizard-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.helper-card{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.helper-head{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--amber-mid)}
+.helper-head:hover{background:#fde68a}
+.helper-icon{font-size:18px;flex-shrink:0}
+.helper-title{font-size:13px;font-weight:700;color:var(--amber-dark);flex:1}
+.helper-toggle{font-size:11px;font-weight:600;color:var(--amber-dark);opacity:.7}
+.helper-body{padding:16px;border-top:1.5px solid var(--amber);display:flex;flex-direction:column;gap:14px}
+.helper-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dark)}
+.helper-result{background:var(--green-soft);border:1.5px solid var(--green);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.helper-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.asset-picker{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;padding:14px 16px;margin-bottom:18px}
+.asset-picker-label{font-size:12px;font-weight:700;color:var(--amber-dark);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{height:auto!important;margin:0!important;padding:0!important;background:white!important}
+  #masthead{position:static!important;top:auto!important;height:auto!important;min-height:0!important;padding:8px 0!important;margin:0!important;box-shadow:none!important}
+  .btn-ghost,#stepper,.print-btn{display:none!important}
+  .coll-arr{display:none!important}
+  .coll-head{cursor:default!important;break-after:avoid!important;break-inside:avoid!important}
+  .page-grid{display:block!important}
+  aside{display:none!important}
+  .coll-body{display:block!important}
+  .banner,.metric,.chart-box,.alt-card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid}
+  .collapsible{box-shadow:none!important;border:1px solid #ccc!important;break-inside:auto!important}
+  .charts-grid{grid-template-columns:1fr 1fr}
+  .page{max-width:100%!important;padding:8px!important;margin:0!important}
+  table{width:100%!important;font-size:8.5px!important;table-layout:fixed!important}
+  th,td{padding:3px 4px!important;white-space:normal!important;word-break:break-word;overflow-wrap:anywhere}
+  thead{display:table-header-group}
+  tr{break-inside:avoid}
+  .overflow-x{overflow-x:visible!important;overflow:visible!important}
+  @page{margin:0.5in;size:landscape}
+}
+
+
+
+.model-overview {
+  background: var(--amber-soft);
+  border: 1.5px solid var(--amber);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--amber-dark);
+  line-height: 1.6;
+}
+.model-overview strong { color: var(--amber-dark); }
+
+
+
+
+
+.banner{border-radius:10px;padding:18px 22px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;border:1.5px solid transparent}.banner.positive{background:rgba(46,125,82,0.09);border-color:#2E7D52}.banner.negative{background:rgba(200,75,49,0.07);border-color:#C84B31}.banner-headline{font-family:Georgia,serif;font-size:22px;line-height:1.2}.banner.positive .banner-headline{color:#2E7D52}.banner.negative .banner-headline{color:#C84B31}.banner-sub{font-size:13px;color:#4A5568;margin-top:6px;line-height:1.6}.banner-npv{text-align:right;flex-shrink:0;margin-left:20px}.banner-npv-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8A96A6}.banner-npv-val{font-family:monospace;font-size:30px;font-weight:700;margin-top:3px}.banner.positive .banner-npv-val{color:#2E7D52}.banner.negative .banner-npv-val{color:#C84B31}
+
+.sl-btn{display:flex;align-items:center;gap:5px;background:none;border:1px solid rgba(255,255,255,.35);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;color:white;cursor:pointer;white-space:nowrap;transition:background .15s}
+.sl-btn:hover{background:rgba(255,255,255,.15)}
+.sl-btn svg{flex-shrink:0;pointer-events:none}
+.sl-group{display:flex;align-items:center;gap:6px;margin-left:20px}
+.sl-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#8a96a6;margin-bottom:4px}
+#save-label-input{width:100%;font-size:13px;padding:6px 8px;border:1px solid #d1d9e0;border-radius:6px;background:#f8f9fa;color:#1a2332;margin-bottom:10px;box-sizing:border-box}
+.sl-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px);cursor:default}
+.sl-modal{background:#ffffff;border-radius:12px;padding:24px;width:340px;max-width:90vw;box-shadow:0 4px 6px rgba(0,0,0,.07),0 16px 48px rgba(0,0,0,.22);border:1px solid rgba(0,0,0,.08)}
+.sl-modal-title{font-size:15px;font-weight:700;color:#1a2332;margin-bottom:16px}
+.sl-modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.sl-modal-btn{padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none}
+.sl-modal-btn.primary{background:var(--blue);color:white}
+.sl-modal-btn.secondary{background:#f8f9fa;color:#4a5568;border:1px solid #d1d9e0}
+.sl-auto-badge{font-size:10px;background:var(--green-soft);color:var(--green);border-radius:4px;padding:2px 6px;font-weight:700}
+.sl-help-btn{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;border:1.5px solid rgba(255,255,255,.5);background:none;color:white;font-size:12px;font-weight:700;cursor:pointer;line-height:1;flex-shrink:0;transition:background .15s}
+.sl-help-btn:hover{background:rgba(255,255,255,.2)}
+.sl-help-panel{font-size:13px;color:#2d3748;line-height:1.6}
+.sl-help-panel h3{font-size:14px;font-weight:700;color:#1a2332;margin:0 0 12px}
+.sl-help-panel ul{margin:0;padding:0 0 0 18px}
+.sl-help-panel li{margin-bottom:8px}
+.sl-help-panel li strong{color:#1a2332}
+.sl-help-panel .sl-help-note{margin-top:14px;padding:10px 12px;background:#f0f4ff;border-left:3px solid #3b82f6;border-radius:0 6px 6px 0;font-size:12px;color:#4a5568}
+
+.sl-list-row{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border)}
+@media screen{#print-container{display:none}}
+@media print{body:not(.printing){display:none!important}}
+</style>
+</head>
+<body>
+
+<div id="masthead">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg>
+    </div>
+    <div class="logo-text">Cap<span>Plan</span></div>
+  </div>
+  <div class="mast-title-block">
+    <div class="mast-title">Asset Purchase With Alternatives</div>
+    <div class="mast-question">Which asset option delivers the best return on investment?</div>
+  </div>
+  <div style="position:relative" id="cur-wrap">
+    <button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600;cursor:pointer" id="cur-btn" onclick="toggleCur()">
+      <span id="cur-label">$ USD</span> ▾
+    </button>
+    <div id="cur-dropdown" style="display:none;position:absolute;right:0;top:110%;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,29,46,.16);min-width:200px;z-index:300;overflow:hidden"></div>
+  </div>
+  <div class="sl-group">
+    <button class="sl-help-btn" id="sl-help-btn" title="Save &amp; Load help">?</button>
+    <button class="sl-btn" id="sl-save-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Save
+    </button>
+    <button class="sl-btn" id="sl-load-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Load
+    </button>
+  </div>
+</div>
+
+<div id="stepper">
+  <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Asset Details</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step2"><div class="step-num" id="sn2">2</div><div class="step-label">Economic Benefits</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step3"><div class="step-num" id="sn3">3</div><div class="step-label">Results</div></div>
+</div>
+
+<div id="main-content"></div>
+<!-- Auth0 SPA SDK + CapPlan auth library -->
+<script src="../../capplan-auth.js"></script>
+
+<script>
+var CURRENCIES=[
+  {code:"USD",symbol:"$",label:"US Dollar"},
+  {code:"EUR",symbol:"€",label:"Euro"},
+  {code:"JPY",symbol:"¥",label:"Japanese Yen"},
+  {code:"GBP",symbol:"£",label:"British Pound"},
+  {code:"INR",symbol:"₹",label:"Indian Rupee"},
+  {code:"CHF",symbol:"CHF",label:"Swiss Franc"},
+  {code:"CAD",symbol:"CA$",label:"Canadian Dollar"},
+  {code:"AUD",symbol:"AU$",label:"Australian Dollar"},
+  {code:"NZD",symbol:"NZ$",label:"New Zealand Dollar"}
+];
+function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
+function toggleCur(){
+  S.cur_open=!S.cur_open;
+  var dd=document.getElementById("cur-dropdown");
+  dd.style.display=S.cur_open?"block":"none";
+  if(S.cur_open){
+    dd.innerHTML="";
+    CURRENCIES.forEach(function(c){
+      var b=document.createElement("button");
+      b.style.cssText="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:"+(c.code===S.currency?"var(--blue-soft)":"transparent")+";border:none;border-bottom:1px solid var(--border);cursor:pointer;text-align:left";
+      b.innerHTML='<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--blue);width:36px;flex-shrink:0">'+c.symbol+'</span><span style="font-size:13px;color:var(--t1)">'+c.label+'</span>';
+      b.onclick=function(){S.currency=c.code;S.cur_open=false;var dd=document.getElementById('cur-dropdown');if(dd)dd.style.display='none';render();};
+      dd.appendChild(b);
+    });
+  }
+}
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+function emptyAlt(label){return{label:label,cost:"",itcPct:"",life:"",salvage:"",method:"Double-declining",hyr:true,ddbRate:"",wc:"",annuity:true,annuityAmount:"",yearlyBenefits:[],riskPremium:0};}
+function addAlt(){if(S.alts.length>=5)return;var letter=String.fromCharCode(65+S.alts.length);S.alts.push(emptyAlt("Alternative "+letter));S.activeTab=S.alts.length-1;S.res=null;S.page=1;render();}
+function removeAlt(i){if(S.alts.length<=2)return;S.alts.splice(i,1);if(S.activeTab>=S.alts.length)S.activeTab=S.alts.length-1;S.res=null;S.page=1;render();}
+var S = {
+  page: 1,
+  currency:"USD",cur_open:false,
+  activeTab: 0,
+  coc_open:false,coc_eq_mode:"gordon",coc_kd:6,coc_tax:35,coc_div:0,coc_price:0,coc_g:5,coc_rf:4.5,coc_beta:1.0,coc_mrp:5.5,coc_wd:50,
+  bw_open:false,rp_open:false,res_tab:0,show_all:false,bw_type:"cost_saving",bw_current:"",bw_improvement:"",bw_alt:0,
+  investType: "mutually_exclusive",
+  capitalType: "adequate",
+  res: null,
+  show_dcf:{},show_table:{},
+  missingFields: null,
+  // Firm data (shared) — blank by default
+  taxRate: "", coc: "",
+  // Alternatives array — blank by default
+  alts:[
+    {label:"Alternative A",cost:"",itcPct:"",life:"",salvage:"",method:"Double-declining",hyr:true,ddbRate:"",wc:"",annuity:true,annuityAmount:"",yearlyBenefits:[],riskPremium:0},
+    {label:"Alternative B",cost:"",itcPct:"",life:"",salvage:"",method:"Double-declining",hyr:true,ddbRate:"",wc:"",annuity:true,annuityAmount:"",yearlyBenefits:[],riskPremium:0}
+  ]
+};
+
+function loadExample(){
+  S.activeTab=0;
+  S.alts=[
+    {label:"Alternative A",cost:500000,itcPct:10,life:20,salvage:20000,method:"Double-declining",hyr:true,ddbRate:20,wc:20000,annuity:true,annuityAmount:95000,yearlyBenefits:[],riskPremium:0},
+    {label:"Alternative B",cost:850000,itcPct:10,life:20,salvage:75000,method:"Double-declining",hyr:true,ddbRate:20,wc:35000,annuity:true,annuityAmount:160000,yearlyBenefits:[],riskPremium:0}
+  ];
+  S.activeTab=0;S.taxRate=40;S.coc=14;
+  S.page=1;
+  S.investType="mutually_exclusive";S.capitalType="adequate";
+  S.missingFields=null;S.res=null;
+  render();
+}
+
+function resetAll(){
+  S.alts=[emptyAlt('Alternative A'),emptyAlt('Alternative B')];
+  S.activeTab=0;S.taxRate="";S.coc="";
+  S.page=1;
+  S.investType="mutually_exclusive";S.capitalType="adequate";
+  S.missingFields=null;S.res=null;
+  render();
+}
+
+function getAlt(i){ return S.alts[i]; }
+
+function ensureAlts() {
+  while (S.alts.length < 2) {
+    var letter=String.fromCharCode(65+S.alts.length);
+    S.alts.push(emptyAlt('Alternative '+letter));
+  }
+}
+
+// ── CALC ─────────────────────────────────────────────────────────────────────
+function calcDepr(cost,itcPct,life,method,hyr,ddbRate){
+  var base=cost-cost*itcPct/100, d=[];
+  if(method==="Double-declining"){
+    var rate=ddbRate/100;
+    d.push(base*rate*(hyr?0.5:1));
+    for(var y=2;y<=life;y++) d.push((base-d.reduce(function(s,v){return s+v},0))*rate);
+  } else if(method==="Straight-line"){
+    var y1=base/life*(hyr?0.5:1); d.push(y1);
+    for(var y=2;y<=life;y++) d.push(hyr?(base-y1)/(life-1):base/life);
+  } else {
+    var y1=hyr?base/(life+1):2*base/(life+1); d.push(y1);
+    if(hyr) for(var y=2;y<=life;y++) d.push(2*base*(life-y+1)/((life+1)*(life-1)));
+    else     for(var y=2;y<=life;y++) d.push(base*(life-y+1)*2/(life*(life+1)));
+  }
+  return d;
+}
+
+function calcAsset(alt, taxRate, coc) {
+  var tx=taxRate/100, r=(coc+(+alt.riskPremium||0))/100, life=+alt.life||10;
+  var itc=alt.cost*alt.itcPct/100;
+  var ben=alt.annuity?Array(life).fill(+alt.annuityAmount||0):(alt.yearlyBenefits||[]);
+  while(ben.length<life) ben.push(0);
+  var depr=calcDepr(+alt.cost,+alt.itcPct,life,alt.method,alt.hyr,+alt.ddbRate);
+  var rows=[];
+  for(var i=0;i<life;i++){
+    var yr=i+1,atBen=ben[i]*(1-tx),atShield=depr[i]*tx,
+        itcYr=(yr===1?itc:0),totalAT=atBen+atShield+itcYr,
+        pvAtBen=atBen/Math.pow(1+r,yr);
+    rows.push({yr:yr,btBen:ben[i],atBen:atBen,btDepr:depr[i],atShield:atShield,
+               itcYr:itcYr,totalAT:totalAT,pvAtBen:pvAtBen});
+  }
+  var pvOut=+alt.cost + +alt.wc;
+  var pvBen=rows.reduce(function(s,row){return s+row.pvAtBen},0);
+  var pvITC=itc/(1+r);
+  var pvS1=depr.length>0?depr[0]*tx/(1+r):0;
+  var pvS2=0; for(var i=1;i<rows.length;i++) pvS2+=rows[i].atShield/Math.pow(1+r,i+1);
+  var pvSalv=alt.salvage/Math.pow(1+r,life);
+  var pvLoss=-(alt.salvage*tx)/Math.pow(1+r,life);
+  var pvWC=alt.wc/Math.pow(1+r,life);
+  var pvIn=pvBen+pvITC+pvS1+pvS2+pvSalv+pvLoss+pvWC;
+  var npv=pvIn-pvOut;
+  var af=r>0?(1-Math.pow(1+r,-life))/r:life;
+  var anpv=af>0?npv/af:0, bc=pvOut>0?pvIn/pvOut:0;
+
+  function npvR(rate){
+    var cfs=[-pvOut];
+    for(var i=0;i<life;i++){
+      var yr=i+1,cf=ben[i]*(1-tx)+depr[i]*tx;
+      if(yr===1)cf+=itc; if(yr===life)cf+=alt.salvage*(1-tx)+(+alt.wc);
+      cfs.push(cf);
+    }
+    return cfs.reduce(function(s,cf,i){return s+cf/Math.pow(1+rate,i)},0);
+  }
+  var irr=r; for(var i=0;i<200;i++){
+    var f=npvR(irr),df=(npvR(irr+0.0001)-f)/0.0001;
+    if(Math.abs(df)<1e-12)break;
+    var nx=irr-f/df; if(Math.abs(nx-irr)<1e-8){irr=nx;break;}
+    irr=nx; if(irr<-0.99||irr>100){irr=NaN;break;}
+  }
+  var payback=null,cum=-pvOut;
+  for(var i=0;i<rows.length;i++){
+    var prev=cum; cum+=rows[i].totalAT;
+    if(cum>=0&&prev<0){payback=i+Math.abs(prev)/(Math.abs(prev)+cum);break;}
+  }
+  return{npv:npv,irr:irr,payback:payback,anpv:anpv,bc:bc,af:af,
+         pvOut:pvOut,pvBen:pvBen,pvITC:pvITC,pvS1:pvS1,pvS2:pvS2,
+         pvSalv:pvSalv,pvLoss:pvLoss,pvWC:pvWC,pvIn:pvIn,
+         depr:depr,rows:rows,itc:itc,annAmt:alt.annuity?(+alt.annuityAmount):null};
+}
+
+function calcDecision(results) {
+  var type=S.investType, cap=S.capitalType;
+  var decisions=[];
+  if(type==="independent"){
+    results.forEach(function(r,i){
+      decisions.push({i:i,accept:r.npv>0,reason:r.npv>0?"NPV > 0":"NPV ≤ 0",role:r.npv>0?"accept":"reject"});
+    });
+  } else {
+    // mutually exclusive
+    var anyPositive=results.some(function(r){return r.npv>0});
+    if(!anyPositive){
+      results.forEach(function(_,i){decisions.push({i:i,accept:false,reason:"All NPVs ≤ 0",role:"reject"})});
+    } else if(cap==="adequate"){
+      // largest NPV
+      var best=-Infinity,bestIdx=-1;
+      results.forEach(function(r,i){if(r.npv>0&&r.npv>best){best=r.npv;bestIdx=i}});
+      results.forEach(function(r,i){
+        decisions.push({i:i,accept:i===bestIdx,
+          reason:i===bestIdx?"Largest NPV ("+fmtM(r.npv)+")":"Not selected — lower NPV",
+          role:i===bestIdx?"winner":"reject"});
+      });
+    } else {
+      // capital rationing - largest B/C
+      var best=-Infinity,bestIdx=-1;
+      results.forEach(function(r,i){if(r.npv>0&&r.bc>best){best=r.bc;bestIdx=i}});
+      results.forEach(function(r,i){
+        decisions.push({i:i,accept:i===bestIdx,
+          reason:i===bestIdx?"Largest B/C ratio ("+r.bc.toFixed(4)+")":"Not selected — lower B/C",
+          role:i===bestIdx?"winner":"reject"});
+      });
+    }
+  }
+  return decisions;
+}
+
+// ── FORMAT ───────────────────────────────────────────────────────────────────
+function fmt(n,d){if(n==null||isNaN(n))return"--";d=d||0;return n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmtM(n){if(n==null||isNaN(n))return"--";return n<0?"-$"+fmt(Math.abs(n)):"$"+fmt(n)}
+function fmtPct(n){return isNaN(n)?"--":fmt(n*100,2)+"%"}
+
+// ── STEPPER ──────────────────────────────────────────────────────────────────
+function updateStepper(){
+  for(var i=1;i<=3;i++){
+    var step=document.getElementById("step"+i);
+    var sn=document.getElementById("sn"+i);
+    step.className="step";
+    if(i<S.page){step.classList.add("done");sn.textContent="✓"}
+    else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}
+    else sn.textContent=String(i);
+    var n=i;
+    (function(n,step){step.onclick=function(){
+      if(n<S.page||(n===3&&S.res)){S.page=n;render()}
+    }})(n,step);
+    step.style.cursor=(i<S.page||(i===3&&S.res))?"pointer":"default";
+  }
+}
+
+// ── BRIEFING NOTES ────────────────────────────────────────────────────────────
+var NOTES1=[
+  {q:"What is the Investment Tax Credit (ITC)?",a:"A direct reduction in the tax you owe, calculated as a percentage of the asset's cost. If your jurisdiction offers an ITC, enter the percentage here. It reduces the effective cost of the asset."},
+  {q:"How do I estimate salvage value?",a:"Salvage value is what you expect to sell or scrap the asset for at the end of its useful life. Use market data, vendor estimates, or industry benchmarks. Be conservative — overestimating salvage value overstates the NPV."},
+  {q:"What is working capital and why does it matter?",a:"Working capital is the additional cash your business needs to support the new asset — for example, extra inventory or receivables. It is an upfront outflow that is recovered at the end of the asset's life."},
+  {q:"Which depreciation method should I use?",a:"Double-declining balance accelerates deductions to early years, improving NPV. Straight-line spreads deductions evenly. Use the method your tax authority permits. The half-year rule assumes the asset is placed in service mid-year, which is common in many jurisdictions."},
+  {q:"What is the half-year rule?",a:"A tax convention that treats all assets as if acquired at the mid-point of the year, regardless of when they were actually purchased. This halves the depreciation deduction in the first year and adds a half-year of deductions at the end of the asset's life."},
+  {q:"What does the Cost of Capital Calculator do?",a:"The Cost of Capital Calculator (in the sidebar) helps you work out the right discount rate. Section 1 calculates your after-tax cost of borrowing. Section 2 estimates your cost of equity using the Dividend Growth Model or CAPM. Section 3 combines them into a weighted average cost of capital (WACC). Click 'Use this rate' to apply it. If alternatives carry different levels of risk, use the Risk Premium field on each alternative's tab to adjust the discount rate up or down."}
+];
+var NOTES2=[
+  {q:"What are economic benefits and how do I estimate them?",a:"Economic benefits are the before-tax cash inflows the asset generates — cost savings, revenue increases, or efficiency gains. Estimate conservatively based on historical data, vendor claims, or comparable projects. Only include benefits that are directly attributable to the asset."},
+  {q:"Can I average annual benefits to simplify data entry, and what problems might that create?",a:"Using a single average annual benefit is simpler and works well when benefits are relatively stable over time. However, if benefits are significantly higher in early years (e.g. cost savings from replacing an old asset) or grow over time (e.g. a new product ramping up), averaging understates the true NPV. The present value of a dollar earned early is worth more than one earned later, so front-loaded benefits have a higher NPV than an average suggests. Use year-by-year entry when the benefit profile is uneven."}
+];
+var NOTES_ALTB=[
+  {q:"What is the Investment Tax Credit (ITC)?",a:"A direct reduction in the tax you owe, calculated as a percentage of the asset's cost. If your jurisdiction offers an ITC, enter the percentage here. It reduces the effective cost of the asset."},
+  {q:"How do I estimate salvage value?",a:"Salvage value is what you expect to sell or scrap the asset for at the end of its useful life. Use market data, vendor estimates, or industry benchmarks. Be conservative — overestimating salvage value overstates the NPV."},
+  {q:"What is working capital and why does it matter?",a:"Working capital is the additional cash your business needs to support the new asset — for example, extra inventory or receivables. It is an upfront outflow that is recovered at the end of the asset's life."},
+  {q:"Which depreciation method should I use?",a:"Double-declining balance accelerates deductions to early years, improving NPV. Straight-line spreads deductions evenly. Use the method your tax authority permits."},
+  {q:"Why is the Cost of Capital Calculator not available on this page?",a:"The Tax Rate and Required Return (Cost of Capital) were set on Alternative A's page and apply equally to all alternatives — they are firm-wide inputs, not specific to any single alternative. If you need to adjust them, return to Alternative A's asset details page. You can still set a Risk Premium for this alternative to adjust its discount rate up or down relative to the firm's base rate."}
+];
+var NOTES3=[
+  {q:"What does the DCF analysis tell me?",a:"The NPV of each alternative in present value terms. The highest NPV is the best financial choice when alternatives are mutually exclusive. A positive NPV means the alternative earns at least your required return."},
+  {q:"Why does capital rationing point to a different alternative than NPV alone?",a:"NPV measures total value; benefit-cost ratio measures value per dollar invested. When funds are limited, maximising value per dollar gives the best portfolio."},
+  {q:"What if the gap between alternatives is small?",a:"A small NPV difference means they are financially close. Non-financial factors — reliability, features, strategic fit — can reasonably tip the decision."}
+];
+
+function makeBNList(notes, containerId){
+  var list=document.getElementById(containerId);
+  if(!list)return;
+  list.innerHTML="";
+  notes.forEach(function(n,i){
+    var item=document.createElement("div");item.className="bn-item";
+    var head=document.createElement("div");head.className="bn-head";
+    head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+containerId+i+'">›</div>';
+    var body=document.createElement("div");body.className="bn-body";body.id="body"+containerId+i;
+    body.textContent=n.a;
+
+    head.onclick=function(){
+      var open=body.classList.contains("open");
+      body.classList.toggle("open");
+      document.getElementById("arr"+containerId+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";
+      head.style.background=open?"":"var(--surface)";
+    };
+    item.appendChild(head);item.appendChild(body);list.appendChild(item);
+  });
+}
+
+
+// ── CANVAS CHART ─────────────────────────────────────────────────────────────
+function drawChart(canvasId, data, xLabel) {
+  var canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  var fresh=canvas.cloneNode(true);canvas.parentNode.replaceChild(fresh,canvas);canvas=fresh;
+  var ctx = canvas.getContext('2d');
+  var W=canvas.width, H=canvas.height;
+  var pad={top:16,bottom:50,left:64,right:8};
+  var cw=W-pad.left-pad.right, ch=H-pad.top-pad.bottom;
+  var yKey=data[0]&&data[0].npv!==undefined?'npv':'rate';
+  var vals=data.map(function(d){return d[yKey];});
+  var maxV=Math.max.apply(null,vals.map(Math.abs))||1;
+  var hasNeg=vals.some(function(v){return v<0;});
+  var lo=hasNeg?-maxV*1.2:0, hi=maxV*1.2;
+  var rng=hi-lo;
+  var gap=cw/data.length, bw=Math.floor(gap*0.6);
+  var midIdx=Math.floor(data.length/2);
+  function toY(v){return pad.top+ch*(hi-v)/rng;}
+  var zeroY=toY(0);
+  function drawBase(){
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='#E2E6EC'; ctx.lineWidth=1;
+    for(var i=0;i<=4;i++){
+      var y=pad.top+(ch/4)*i;
+      ctx.beginPath(); ctx.moveTo(pad.left,y); ctx.lineTo(pad.left+cw,y); ctx.stroke();
+      var v=hi-rng*(i/4);
+      ctx.fillStyle='#8A96A6'; ctx.font='10px system-ui'; ctx.textAlign='right';
+      ctx.fillText(Math.round(v/1000)+'k',pad.left-3,y+3);
+    }
+    ctx.strokeStyle='#C8D0DA'; ctx.lineWidth=1.5; ctx.setLineDash([5,3]);
+    ctx.beginPath(); ctx.moveTo(pad.left,zeroY); ctx.lineTo(pad.left+cw,zeroY); ctx.stroke();
+    ctx.setLineDash([]);
+    data.forEach(function(d,i){
+      var yv=d[yKey];
+      var x=pad.left+gap*i+(gap-bw)/2;
+      var y0=zeroY, y1=toY(yv), barH=Math.abs(y1-y0), top=Math.min(y0,y1);
+      ctx.fillStyle=yv>=0?(i===midIdx?'#2E7D52':'#6DBF8A'):(i===midIdx?'#C84B31':'#E88A8A');
+      ctx.fillRect(x,top,bw,Math.max(barH,1));
+      ctx.fillStyle=i===midIdx?'#1B3F6E':'#8A96A6';
+      ctx.font=(i===midIdx?'bold ':'')+'10px system-ui'; ctx.textAlign='center';
+      ctx.fillText(d.label||String(i),x+bw/2,H-pad.bottom+14);
+    });
+    ctx.strokeStyle='#4A5568'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(pad.left,pad.top); ctx.lineTo(pad.left,pad.top+ch); ctx.lineTo(pad.left+cw,pad.top+ch); ctx.stroke();
+    ctx.fillStyle='#4A5568'; ctx.font='bold 11px system-ui'; ctx.textAlign='center';
+    ctx.fillText(xLabel,pad.left+cw/2,H-4);
+  }
+  function drawTooltip(i){
+    var d=data[i], yv=d[yKey];
+    var x=pad.left+gap*i+(gap-bw)/2+bw/2, y=toY(yv);
+    ctx.strokeStyle='rgba(27,63,110,0.3)'; ctx.lineWidth=1; ctx.setLineDash([3,2]);
+    ctx.beginPath(); ctx.moveTo(x,pad.top); ctx.lineTo(x,pad.top+ch); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='#1B3F6E'; ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='white'; ctx.beginPath(); ctx.arc(x,y,2,0,Math.PI*2); ctx.fill();
+    var xLbl=d.label||String(i);
+    var yLbl=(yv>=0?'':'-')+'$'+Math.round(Math.abs(yv)/1000)+'k';
+    var text=xLbl+' \u2192 '+yLbl;
+    ctx.font='bold 11px system-ui';
+    var tw=ctx.measureText(text).width+16, th=22, r2=4;
+    var tx=Math.min(Math.max(x-tw/2,pad.left),pad.left+cw-tw);
+    var ty=y-th-8; if(ty<pad.top)ty=y+8;
+    ctx.fillStyle='rgba(15,29,46,0.88)';
+    ctx.beginPath(); ctx.moveTo(tx+r2,ty); ctx.lineTo(tx+tw-r2,ty); ctx.arcTo(tx+tw,ty,tx+tw,ty+r2,r2);
+    ctx.lineTo(tx+tw,ty+th-r2); ctx.arcTo(tx+tw,ty+th,tx+tw-r2,ty+th,r2);
+    ctx.lineTo(tx+r2,ty+th); ctx.arcTo(tx,ty+th,tx,ty+th-r2,r2);
+    ctx.lineTo(tx,ty+r2); ctx.arcTo(tx,ty,tx+r2,ty,r2); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='white'; ctx.textAlign='left'; ctx.fillText(text,tx+8,ty+15);
+  }
+  function hitIdx(cx){
+    var rect=canvas.getBoundingClientRect(), scaleX=canvas.width/rect.width;
+    var px=(cx-rect.left)*scaleX;
+    if(px<pad.left||px>pad.left+cw)return -1;
+    return Math.max(0,Math.min(data.length-1,Math.floor((px-pad.left)/gap)));
+  }
+  canvas.addEventListener('mousemove',function(e){drawBase();var i=hitIdx(e.clientX);if(i>=0)drawTooltip(i);});
+  canvas.addEventListener('mouseleave',function(){drawBase();});
+  canvas.addEventListener('touchstart',function(e){e.preventDefault();},{passive:false});
+  canvas.addEventListener('touchmove',function(e){e.preventDefault();var t=e.touches[0];drawBase();var i=hitIdx(t.clientX);if(i>=0)drawTooltip(i);},{passive:false});
+  canvas.addEventListener('touchend',function(){drawBase();});
+  drawBase();
+}
+
+function field(label,inputHtml,fullWidth,last){
+  var cls="field"+(fullWidth?" full":"")+(last?" last":"");
+  return '<div class="'+cls+'"><div class="field-label">'+label+'</div>'+inputHtml+'</div>';
+}
+function uInput(prefix,value,onblur,suffix,disabled){
+  var h='<div class="ui">';
+  if(prefix)h+='<span class="pfx">'+prefix+'</span>';
+  h+='<input type="text" value="'+(value==null?"":value)+'" '+(disabled?'disabled ':'')+
+     'onblur="'+onblur+'" onfocus="this.style.borderBottomColor=\'var(--blue)\'" >';
+  if(suffix)h+='<span class="sfx">'+suffix+'</span>';
+  return h+'</div>';
+}
+function uSelect(value,opts,onchange){
+  var h='<div class="ui"><select onchange="'+onchange+'">';
+  opts.forEach(function(o){h+='<option'+(o===value?" selected":"")+'>'+o+'</option>'});
+  return h+'</select></div>';
+}
+
+// ── PAGE 1 ───────────────────────────────────────────────────────────────────
+
+// ── BREAK-EVEN BENEFIT ────────────────────────────────────────────────────────
+function calcBreakEvenAlt(a,effRate){
+  var cost=+a.cost,itcPct=+a.itcPct,life=+a.life||1,salvage=+a.salvageNew||+a.salvage||0;
+  var tx=+S.taxRate/100,r=effRate!==undefined?effRate/100:(+S.coc+(+a.riskPremium||0))/100,wc=+a.wc;
+  var itc=cost*itcPct/100;
+  var depr=calcDeprM2(a);
+  var pvOut=cost+wc;
+  var pvITC=itc/(1+r);
+  var pvS1=depr.length>0?depr[0]*tx/(1+r):0;
+  var pvS2=0;for(var i=1;i<depr.length;i++)pvS2+=depr[i]*tx/Math.pow(1+r,i+1);
+  var pvSalv=salvage/Math.pow(1+r,life);
+  var pvLoss=-(salvage*tx)/Math.pow(1+r,life);
+  var pvWC=wc/Math.pow(1+r,life);
+  var pvFixed=pvITC+pvS1+pvS2+pvSalv+pvLoss+pvWC;
+  var af=r>0?(1-Math.pow(1+r,-life))/r:life;
+  return(pvOut-pvFixed)/((1-tx)*af);
+}
+
+function calcDeprM2(a){
+  var cost=+a.cost,itcPct=+a.itcPct,life=+a.life||1,ddbRate=+a.ddbRate;
+  var method=a.method,hyr=a.hyr;
+  var itc=cost*itcPct/100,base=cost-itc,d=[];
+  if(method==="Double-declining"){
+    var rate=ddbRate/100;d.push(base*rate*(hyr?0.5:1));
+    for(var y=2;y<=life;y++)d.push((base-d.reduce(function(s,v){return s+v},0))*rate);
+  }else if(method==="Straight-line"){
+    var y1=base/life*(hyr?0.5:1);d.push(y1);
+    for(var y=2;y<=life;y++)d.push(hyr?(base-y1)/(life-1):base/life);
+  }else{
+    var y1=hyr?base/(life+1):2*base/(life+1);d.push(y1);
+    if(hyr)for(var y=2;y<=life;y++)d.push(2*base*(life-y+1)/((life+1)*(life-1)));
+    else    for(var y=2;y<=life;y++)d.push(base*(life-y+1)*2/(life*(life+1)));
+  }
+  return d;
+}
+
+function renderPage1(){
+  ensureAlts();
+  var a=S.alts[S.activeTab];
+  var isDDB=a.method==="Double-declining";
+  var isAltA=S.activeTab===0;
+  var html='<div class="page"><div class="page-grid">';
+
+  html+='<aside>';
+  html+='<div class="section-label">Briefing Notes</div>';
+  if(isAltA){
+    html+='<div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div>';
+    html+='<div class="section-label">Tools</div>';
+    html+='<div class="panel" style="margin-bottom:0"><div id="coc-box"></div></div>';
+  } else {
+    html+='<div class="panel"><div id="bn-list-altb"></div></div>';
+  }
+  html+='</aside>';
+  html+='<main>';
+
+  if(isAltA){
+  // How this works
+  html += '<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:10px">';
+  html += '<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What it does.</strong> Compares two or more asset options on a like-for-like NPV basis, accounting for price, annual benefits, depreciation tax shields, and resale.</div></div>';
+  html += '<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you need.</strong> For each option: cost, useful life, annual benefit, expected resale, and depreciation method. Plus your tax rate and required return.</div></div>';
+  html += '<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Adding alternatives.</strong> Start with two alternatives (A and B). Click <strong>+ Add Alternative</strong> to add up to five. Use the × on any tab to remove one. Switch between alternatives using the lettered tabs.</div></div><div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you get.</strong> A ranked comparison showing which option delivers the best net present value — and by how much.</div></div>';
+  html += '<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">5</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Try the example.</strong> To see how the program works, click the <strong>Load Example</strong> button at the bottom of this page.</div></div></div></div>';
+  }
+
+
+
+  // Alt tabs
+  html+='<div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:18px;overflow:hidden">';
+  html+='<div class="alt-tabs">';
+  S.alts.forEach(function(a,i){
+    html+='<div class="alt-tab'+(S.activeTab===i?' active':'')+'" onclick="S.activeTab='+i+';render()">'+a.label+(S.alts.length>2?'<span class="alt-remove" onclick="event.stopPropagation();removeAlt('+i+')">×</span>':'')+'</div>';
+  });
+  if(S.alts.length<5)html+='<div class="alt-add" onclick="addAlt()">+ Add Alternative</div>';
+  html+='</div>';
+
+
+
+  // Active alt inputs
+  html+='<div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Information — '+(S.alts[S.activeTab]?S.alts[S.activeTab].label:'')+'</div></div>';
+  html+='<div class="field-grid">';
+  html+=field("Cost of Asset",uInput("$",a.cost,"S.alts["+S.activeTab+"].cost=+this.value||0","",false));
+  html+=field("Investment Tax Credit",uInput("",a.itcPct,"S.alts["+S.activeTab+"].itcPct=+this.value||0","%",false));
+  html+=field("Economic Life",uInput("",a.life,"S.alts["+S.activeTab+"].life=+this.value||1","years",false));
+  html+=field("Salvage Value",uInput("$",a.salvage,"S.alts["+S.activeTab+"].salvage=+this.value||0","",false));
+  html+=field("Working Capital",uInput("$",a.wc,"S.alts["+S.activeTab+"].wc=+this.value||0","",false),false,true);
+  html+='</div>';
+
+  html+='<div class="panel-head" style="border-top:1px solid var(--border)"><div class="panel-dot" style="background:var(--green)"></div><div class="panel-title">Depreciation</div></div>';
+  html+='<div class="field-grid">';
+  html+=field("Method",'<div class="ui"><select onchange="S.alts['+S.activeTab+'].method=this.value;render()">'+
+    ["Double-declining","Straight-line","Sum-of-years-digits"].map(function(m){
+      return'<option'+(m===a.method?" selected":"")+'>'+m+'</option>'
+    }).join("")+'</select></div>');
+  html+=field(isDDB?"Depreciation Rate":"Depreciation Rate — N/A",
+    uInput("",isDDB?a.ddbRate:"N/A","if("+isDDB+")S.alts["+S.activeTab+"].ddbRate=+this.value||0","%",!isDDB)+
+    (isDDB?"":"<div class='field-note'>Not applicable — defined by method formula</div>"));
+  html+=field("Half-Year Rule",'<div class="pills" style="margin-top:4px">'+
+    '<div class="pill'+(a.hyr?" active":'')+'" onclick="S.alts['+S.activeTab+'].hyr=true;render()"><div class="pill-dot"></div>Yes</div>'+
+    '<div class="pill'+(!a.hyr?" active":'')+'" onclick="S.alts['+S.activeTab+'].hyr=false;render()"><div class="pill-dot"></div>No</div>'+
+    '</div>',true,true);
+
+
+  // Firm Data panel — Tax Rate + Required Return (Alt A only)
+  html+='</div>';
+
+  if(isAltA){
+    html+='<div class="panel" style="margin-bottom:14px">';
+    html+='<div class="panel-head"><div class="panel-dot" style="background:var(--t3)"></div><div class="panel-title">Firm Data (all alternatives)</div></div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px 16px">';
+    html+=field("Tax Rate",uInput("",S.taxRate,"S.taxRate=+this.value||0","%",false),false,false,"Applies to all alternatives");
+    html+=field("Required Return (Cost of Capital)",uInput("",S.coc,"S.coc=+this.value||0","%",false),false,false,"Applies to all alternatives");
+    html+='</div>';
+    html+='</div>';
+  }
+
+  // Risk Premium panel — Risk Premium input + Effective Discount Rate read-only (every alt)
+  html+='<div class="helper-card" style="margin-bottom:14px">';
+  html+='<div class="helper-head" onclick="S.rp_open=!S.rp_open;render()">';
+  html+='<span class="helper-icon">💡</span><span class="helper-title">Why use a risk premium?</span>';
+  html+='<span class="helper-toggle">'+(S.rp_open?'▲ hide':'▼ show')+'</span></div>';
+  if(S.rp_open){
+    html+='<div class="helper-body">';
+    html+='<div class="wizard-row"><div class="wizard-label">What is it?</div><p style="margin:4px 0 10px;font-size:12px;line-height:1.6;color:var(--t2)">Your base cost of capital reflects your firm\'s overall required return. If one alternative is riskier than your typical investment, you should discount it at a higher rate — otherwise you may overstate its value.</p></div>';
+    html+='<div class="wizard-row"><div class="wizard-label">If you used CAPM</div><p style="margin:4px 0 10px;font-size:12px;line-height:1.6;color:var(--t2)">Your Beta already captures your firm\'s market risk. Add a premium here only for <em>project-specific</em> risks — such as unproven technology, unusual regulatory hurdles, or a project much larger than your normal operations.</p></div>';
+    html+='<div class="wizard-row"><div class="wizard-label">If you used the Growth Model</div><p style="margin:4px 0 10px;font-size:12px;line-height:1.6;color:var(--t2)">The same principle applies — add a premium if this alternative carries extra risk beyond your firm\'s typical profile. Use a negative value if it is <em>less</em> risky.</p></div>';
+    html+='<div class="wizard-row"><div class="wizard-label">Suggested ranges</div><div style="background:var(--surface);border-radius:6px;padding:10px 12px;font-size:11px;color:var(--t2);line-height:1.9">0% — similar risk to your norm<br>1–2% — modest extra risk (new supplier, minor process change)<br>3–5% — significant uncertainty (new technology, major expansion)<br>Negative — <em>less</em> risky than your typical investment</div></div>';
+    html+='</div>';
+  }
+  html+='</div>';
+  var _effRate=+(+S.coc+(+a.riskPremium||0)).toFixed(2);
+  html+='<div class="panel" style="margin-bottom:14px">';
+  html+='<div class="panel-head"><div class="panel-dot" style="background:var(--blue)"></div><div class="panel-title">Risk Premium for this Alternative</div></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px 16px">';
+  html+=field("Risk Premium (%)",'<div class="ui"><input type="text" value="'+(a.riskPremium||0)+'" oninput="S.alts['+S.activeTab+'].riskPremium=+(this.value)||0;renderPage1()" onblur="S.alts['+S.activeTab+'].riskPremium=+(this.value)||0;renderPage1()" onfocus="this.style.borderBottomColor=\'var(--blue)\'"><span class="sfx">%</span></div>',false,false,"Positive = riskier than normal, negative = safer. Default 0.");
+  html+='<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:6px">Effective Discount Rate</div><div style="font-family:monospace;font-size:20px;font-weight:700;color:var(--blue)">'+_effRate+'%</div><div style="font-size:11px;color:var(--t3);margin-top:4px">'+(Math.abs(+a.riskPremium||0)>0?'Base '+S.coc+'% '+(+a.riskPremium>=0?'+':'')+' '+a.riskPremium+'% premium':'Same as base rate')+'</div></div>';
+  html+='</div>';
+  html+='</div>';
+  html+='</div></div>';
+
+    if(S.missingFields&&S.missingFields.length>0){
+    html+='<div style="background:rgba(200,75,49,.07);border:1.5px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)"><strong>Please complete the following:</strong> '+S.missingFields.join(', ')+'.</div>';
+  }
+
+  html+='<div class="action-row" style="justify-content:space-between;align-items:center">';
+  html+='<span style="font-size:11.5px;color:var(--t3)">New here? Try <strong style="color:var(--t2)">Load Example</strong> to see how it works.</span>';
+  html+='<div style="display:flex;gap:10px">';
+  html+='<button class="btn-ghost" onclick="loadExample()">Load Example</button>';
+  html+='<button class="btn-ghost" onclick="resetAll()">Reset</button>';
+  html+='<button class="btn-primary" onclick="var e=validateInputs();if(e.length){S.missingFields=e;render();}else{S.missingFields=null;S.page=2;render();}" style="min-width:260px">Next: Economic Benefits ›</button>';
+  html+='</div></div>';
+  html+='</main></div></div>';
+  document.getElementById('main-content').innerHTML=html;
+  if(isAltA){
+    makeBNList(NOTES1,'bn-list1');
+    renderCoC();
+  } else {
+    makeBNList(NOTES_ALTB,'bn-list-altb');
+  }
+}
+
+function updateWizard(){
+  var res=document.getElementById('bw-result');
+  if(!res)return;
+  var suggested=S.bw_type==='both'
+    ?(S.bw_current?Math.round(S.bw_current):0)
+    :(S.bw_current&&S.bw_improvement?Math.round(S.bw_current*S.bw_improvement/100):0);
+  if(suggested>0){
+    res.style.display='flex';
+    var lbl=res.querySelector('#bw-lbl');
+    if(lbl)lbl.textContent=getSym()+fmt(suggested,0);
+    var ai=S.activeTab;
+    var btn=res.querySelector('.wizard-use');
+    if(btn)btn.onclick=function(){
+      if(!S.alts[ai].annuity&&S.alts[ai].annuityAmount>0){S.alts[ai].yearlyBenefits[0]=suggested;}
+      S.alts[ai].annuity=true;S.alts[ai].annuityAmount=suggested;S.bw_open=false;render();
+    };
+  }else{
+    res.style.display='none';
+  }
+}
+
+function renderPage2(){
+  var sym=getSym();
+  var a=S.alts[S.activeTab];
+  var isLast=S.activeTab>=S.alts.length-1;
+  var html='<div class="page"><div class="page-grid">';
+
+  // Sidebar with briefing notes
+  html+='<aside>';
+  html+='<div class="section-label">Briefing Notes</div>';
+  html+='<div class="panel"><div id="bn-list2"></div></div>';
+  html+='</aside>';
+
+  html+='<main>';
+
+  // Benefits panel + wizard
+    html+='<div class="panel" style="margin-bottom:14px">';
+  html+='<div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Economic Benefits — '+a.label+'</div></div>';
+  html+='<div style="padding:6px 0 10px;font-size:13px;color:var(--t2)">Enter the before-tax economic benefits expected from this alternative.</div>';
+  var life=Math.max(+a.life||10,1);
+  var yb=a.yearlyBenefits||[];
+  while(yb.length<life)yb.push(0);
+
+  html+='<div style="padding:16px 22px;border-bottom:1px solid var(--border)">';
+  html+='<div style="font-family:Georgia,serif;font-size:20px;color:var(--t1);margin-bottom:5px">Economic Benefits — '+(S.alts[S.activeTab]?S.alts[S.activeTab].label:'')+'</div>';
+  html+='<div style="font-size:13px;color:var(--t2);line-height:1.6">Enter the before-tax economic benefits expected from this alternative. Each alternative may have different benefit streams.</div>';
+  html+='</div>';
+
+
+  // Benefit estimation wizard
+  html+='<div class="helper-card">';
+  html+='<div class="helper-head" onclick="if(S.bw_open&&S.bw_alt===S.activeTab){S.bw_open=false;}else{if(S.bw_alt!==S.activeTab){S.bw_current=\'\';S.bw_improvement=\'\';};S.bw_open=true;S.bw_alt=S.activeTab;}render()">';
+  html+='<span class="helper-icon">💡</span><span class="helper-title">'+(S.alts[S.activeTab]?S.alts[S.activeTab].label:'')+'<br>Help me estimate benefits</span>';
+  html+='<span class="helper-toggle">'+(S.bw_open&&S.bw_alt===S.activeTab?'Hide':'Show')+'</span>';
+  html+='</div>';
+  if(S.bw_open&&S.bw_alt===S.activeTab){
+    html+='<div class="helper-body">';
+    var ai=S.activeTab;
+    var curAlt=S.alts[ai];
+    if(curAlt&&curAlt.annuityAmount>0){
+      html+='<div style="background:rgba(245,158,11,0.12);border:1px solid var(--amber);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--amber-dark);line-height:1.5">';
+      html+='<strong>Note:</strong> An annual benefit of '+fmtM(curAlt.annuityAmount)+' is already entered. ';
+      html+='Using this calculator will <strong>replace</strong> that value. ';
+      html+='<span style="cursor:pointer;text-decoration:underline" onclick="S.alts['+ai+'].annuityAmount=0;render()">Clear it first</span> if you want a clean start.';
+      html+='</div>';
+    }
+    html+='<div class="wizard-row"><div class="wizard-label">What type of benefit?</div>';
+    html+='<div class="pills" style="margin-top:6px">';
+    html+='<div class="pill'+(S.bw_type==="cost_saving"?" active":"")+'" onclick="S.bw_type=\'cost_saving\';render()"><div class="pill-dot"></div>Cost saving</div>';
+    html+='<div class="pill'+(S.bw_type==="revenue"?" active":"")+'" onclick="S.bw_type=\'revenue\';render()"><div class="pill-dot"></div>Revenue increase</div>';
+    html+='<div class="pill'+(S.bw_type==="both"?" active":"")+'" onclick="S.bw_type=\'both\';render()"><div class="pill-dot"></div>Both</div>';
+    html+='</div></div>';
+    var bwLbl=S.bw_type==="cost_saving"?"Current annual cost of this activity":S.bw_type==="revenue"?"Current annual revenue from this activity":"What is the combined annual value of the costs you expect to save plus the additional revenue you expect to earn from this new asset?";
+    html+='<div class="wizard-row"><div class="wizard-label">'+bwLbl+'</div>';
+    html+='<div class="underline-input" style="max-width:220px"><span class="pfx">'+sym+'</span>';
+    html+='<input type="text" value="'+(S.bw_current||"")+'" oninput="S.bw_current=this.value?+this.value:0;updateWizard()" onblur="S.bw_current=+this.value||0;updateWizard()" onfocus="this.style.borderBottomColor=\'var(--amber)\'"></div></div>';
+    if(S.bw_type!=='both'){
+      html+='<div class="wizard-row"><div class="wizard-label">Expected improvement from new asset</div>';
+      html+='<div class="underline-input" style="max-width:220px"><input type="text" value="'+(S.bw_improvement||"")+'" oninput="S.bw_improvement=this.value?+this.value:0;updateWizard()" onblur="S.bw_improvement=+this.value||0;updateWizard()" onfocus="this.style.borderBottomColor=\'var(--amber)\'"><span class="sfx">%</span></div></div>';
+    }
+    var bwSugg=S.bw_type==='both'?(S.bw_current?Math.round(S.bw_current):0):(S.bw_current&&S.bw_improvement?Math.round(S.bw_current*S.bw_improvement/100):0);
+    html+='<div class="wizard-result" id="bw-result" style="'+(bwSugg>0?'display:flex':'display:none')+'">';
+    html+='<div style="font-size:13px;color:var(--t2)">Suggested annual benefit: <strong style="color:var(--green)" id="bw-lbl">'+(bwSugg>0?fmtM(bwSugg):'')+' </strong></div>';
+    html+='<button class="wizard-use" onclick="var _s='+bwSugg+';if(!S.alts['+ai+'].annuity&&S.alts['+ai+'].annuityAmount>0){S.alts['+ai+'].yearlyBenefits[0]=_s;};S.alts['+ai+'].annuity=true;S.alts['+ai+'].annuityAmount=_s;S.bw_open=false;render()">Use this estimate ›</button>';
+    html+='</div>';
+    html+='</div>';
+  }
+  html+='</div>';
+
+  html+='<div style="padding:16px 22px;border-bottom:1px solid var(--border)">';
+  html+='<div class="field-label">Are the economic benefits the same each year?</div>';
+  html+='<div class="pills" style="margin-top:8px">';
+  html+='<div class="pill'+(a.annuity?" active":'')+'" onclick="S.alts['+S.activeTab+'].annuity=true;render()"><div class="pill-dot"></div>Yes — single annual amount</div>';
+  html+='<div class="pill'+(!a.annuity?" active":'')+'" onclick="var _ai=S.activeTab;S.alts[_ai].annuity=false;if(S.alts[_ai].annuityAmount>0){S.alts[_ai].yearlyBenefits[0]=S.alts[_ai].annuityAmount;};render()"><div class="pill-dot"></div>No — enter each year</div>';
+  html+='</div></div>';
+
+  if(a.annuity){
+    html+='<div style="padding:16px 22px;border-bottom:1px solid var(--border)">';
+    html+='<div class="field-label">Annual Economic Benefit (before tax)</div>';
+    html+='<div style="max-width:220px">'+uInput("$",a.annuityAmount,"S.alts["+S.activeTab+"].annuityAmount=+this.value||0","",false)+'</div>';
+    html+='<div style="margin-top:8px;font-size:11px;color:var(--t3)">After-tax = $'+fmt(a.annuityAmount*(1-S.taxRate/100))+' per year for '+life+' years</div>';
+    html+='</div>';
+  } else {
+    html+='<div style="padding:10px 22px 8px;display:grid;grid-template-columns:72px 1fr 1fr;gap:0 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);border-bottom:1px solid var(--border)"><span>Year</span><span>Before-Tax</span><span>After-Tax (×'+(1-S.taxRate/100).toFixed(2)+')</span></div>';
+    html+='<div style="max-height:350px;overflow-y:auto">';
+    for(var i=0;i<life;i++){
+      var at=yb[i]?"$"+fmt(yb[i]*(1-S.taxRate/100)):"--";
+      var altIdx=S.activeTab;
+      html+='<div style="padding:9px 22px;display:grid;grid-template-columns:72px 1fr 1fr;gap:0 14px;align-items:center;border-bottom:1px solid var(--border);background:'+(i%2===0?"var(--surface)":"transparent")+'">';
+      html+='<span style="font-size:12px;font-weight:600;color:var(--t2)">Year '+(i+1)+'</span>';
+      html+=uInput("$",yb[i]||"","S.alts["+altIdx+"].yearlyBenefits["+i+"]=+this.value||0","",false);
+      html+='<span style="font-family:monospace;font-size:13px;color:var(--green)">'+at+'</span>';
+      html+='</div>';
+    }
+    html+='</div>';
+  }
+  html+='</div>';
+
+
+  html+='</div>';
+
+
+
+
+
+  // Navigation panel
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">';
+  html+='<button class="btn-ghost" onclick="S.page=1;render()">‹ Back</button>';
+  if(!isLast){
+    html+='<button class="btn-primary" onclick="S.activeTab++;S.page=1;S.missingFields=null;render()" style="min-width:260px">Next: Asset Details — '+S.alts[S.activeTab+1].label+' ›</button>';
+  } else {
+    html+='<button class="btn-primary" onclick="runCalc()" style="min-width:260px">Calculate Results ›</button>';
+  }
+  html+='</div>';
+
+  html+='</main></div></div>';
+  document.getElementById('main-content').innerHTML=html;
+  makeBNList(NOTES2,'bn-list2');
+}
+
+function validateInputs(){
+  var errs=[];
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.coc<=0) errs.push("Required return must be greater than zero");
+  if(+S.coc>=100) errs.push("Required return cannot equal or exceed 100%");
+  for(var i=0;i<S.alts.length;i++){
+    var o=S.alts[i];
+    if(+o.cost<=0) errs.push((o.label||"Option "+(i+1))+" cost must be greater than zero");
+    if(+o.life<=0) errs.push((o.label||"Option "+(i+1))+" life must be greater than zero");
+    if(o.salvage!==undefined&&+o.salvage<0) errs.push((o.label||"Option "+(i+1))+" salvage cannot be negative");
+    if(o.salvage!==undefined&&+o.salvage>=+o.cost) errs.push((o.label||"Option "+(i+1))+" salvage cannot equal or exceed its cost");
+  }
+  return errs;
+}
+function runCalc(){
+  var valErrs=validateInputs();if(valErrs.length>0){S.missing=valErrs;render();return;}
+  try{
+    var results=[];
+    for(var i=0;i<S.alts.length;i++) results.push(calcAsset(S.alts[i],S.taxRate,S.coc));
+    S.res=results; S.page=3; render();
+  }catch(e){console.error(e);alert("Calculation error: "+e.message)}
+}
+
+// ── PAGE 3 ───────────────────────────────────────────────────────────────────
+function renderResTab(t,active){
+  var s='<div onclick="S.res_tab='+t+';renderPage3()" ';
+  s+='style="padding:9px 16px;cursor:pointer;font-size:13px;font-weight:600;';
+  s+='border-radius:8px 8px 0 0;border:1.5px solid '+(active?'var(--blue)':'var(--border)')+';';
+  s+='border-bottom:'+(active?'2px solid white':'1.5px solid var(--border)')+';';
+  s+='background:'+(active?'white':'transparent')+';';
+  s+='color:'+(active?'var(--blue)':'var(--t2)')+';margin-bottom:-2px">';
+  return s;
+}
+function renderPage3(){
+  var res=S.res, results=S.res;
+  var decisions=calcDecision(res);
+  var anyAccepted=decisions.some(function(d){return d.accept;});
+  var allRejected=!anyAccepted;
+  var tabLabels=['Summary','Sensitivity'];
+  S.alts.forEach(function(a){tabLabels.push(a.label+' Detail');});
+  if(S.res_tab>=tabLabels.length)S.res_tab=0;
+  var html='<div class="page"><div class="page-grid" style="grid-template-columns:280px 1fr">';
+
+  if(S.res_tab===0){
+  html+='<aside>';
+  html+='<div class="section-label">Understanding Results</div>';
+  html+='<div class="panel" style="margin-bottom:14px"><div id="bn-list3"></div></div>';
+
+  // Investment type selector
+  html+='<div class="decision-box" style="margin-bottom:14px">';
+  html+='<div class="decision-title">Type of Investment</div>';
+  html+='<div class="decision-type">';
+  html+='<div class="d-pill'+(S.investType==="independent"?" active":'')+'" onclick="S.investType=\'independent\';render()"><div class="pill-dot'+(S.investType==="independent"?" active":"")+'"></div>Independent</div>';
+  html+='<div class="d-pill'+(S.investType==="mutually_exclusive"?" active":'')+'" onclick="S.investType=\'mutually_exclusive\';render()"><div class="pill-dot'+(S.investType==="mutually_exclusive"?" active":"")+'"></div>Mutually Exclusive</div>';
+  html+='</div>';
+  html+='<div style="margin-top:10px;font-size:11px;line-height:1.6;color:var(--t2)">';
+  html+=S.investType==="independent"
+    ?"<strong>Independent</strong> means accepting one alternative does not prevent accepting another — there is no competition between them, only a separate accept/reject test for each."
+    :"<strong>Mutually exclusive</strong> means the alternatives compete with each other — only the single best one is chosen, even if a rejected alternative would also have been profitable on its own.";
+  html+='</div>';
+  if(S.investType==="mutually_exclusive"){
+    html+='<div style="margin-top:14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:8px">Capital Availability</div>';
+    html+='<div class="decision-type">';
+    html+='<div class="d-pill'+(S.capitalType==="adequate"?" active":'')+'" onclick="S.capitalType=\'adequate\';render()"><div class="pill-dot'+(S.capitalType==="adequate"?" active":"")+'"></div>Adequate</div>';
+    html+='<div class="d-pill'+(S.capitalType==="rationing"?" active":'')+'" onclick="S.capitalType=\'rationing\';render()"><div class="pill-dot'+(S.capitalType==="rationing"?" active":"")+'"></div>Rationing</div>';
+    html+='</div>';
+    html+='<div style="margin-top:8px;font-size:11px;line-height:1.6;color:var(--t2)">';
+    if(S.capitalType==="adequate") html+="With <strong>adequate capital</strong>, the goal is to maximize total dollars of value created — select the alternative with the <strong>largest NPV</strong>, provided it is greater than zero.";
+    else html+="Under <strong>capital rationing</strong>, your funds are limited, so the goal shifts to maximizing value created per dollar invested — select the alternative with the <strong>largest Benefit/Cost ratio</strong>, provided it exceeds 1.0. If B/C and NPV point to different alternatives, follow the B/C ratio.";
+    html+='</div>';
+  } else {
+    html+='<div style="margin-top:8px;font-size:11px;line-height:1.6;color:var(--t2)">Accept <strong>every alternative with a positive NPV</strong> (or B/C > 1, or IRR above your required return) — there is no need to choose only one.</div>';
+  }
+  html+='</div>';
+
+  html+='<div style="margin-top:4px;display:flex;flex-direction:column;gap:10px"><button class="btn-ghost" onclick="S.page=1;S.res=null;render()" style="width:148px;text-align:center">‹ Edit Inputs</button><button class="print-btn" onclick="printSummary()" style="width:148px;text-align:center">🖶 Print Summary</button><div style=\"font-size:10px;color:#8A96A6;margin-top:6px\">Use this button to print correctly</div></div>';
+  html+='</aside>';
+  } else {
+    html+='<aside style="padding:20px 16px"><button class="btn-ghost" onclick="S.page=1;S.res=null;render()" style="width:148px;text-align:center">‹ Edit Inputs</button><br><br><button class="print-btn" onclick="printSummary()" style="width:148px;text-align:center">🖶 Print Summary</button></aside>';
+  }
+  html+='<main>';
+
+  html+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;border-bottom:2px solid var(--border)">';
+  tabLabels.forEach(function(label,t){
+    html+=renderResTab(t,S.res_tab===t)+label+'</div>';
+  });
+  html+='</div>';
+
+  if(S.res_tab>=2){
+    html+='<div style="text-align:right;margin-bottom:12px"><button onclick="S.show_all=!S.show_all;S.alts.forEach(function(_,i){S.show_dcf[i]=S.show_all;S.show_table[i]=S.show_all;});renderPage3()" style="background:none;border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--t2)">'+(S.show_all?'Collapse All':'Expand All')+'</button></div>';
+  }
+
+  if(S.res_tab===0){
+    var winDec=decisions.find(function(d){return d.role==='winner';});
+    bannerClass=allRejected?'negative':(winDec?'positive':'negative');
+    var bannerText=allRejected?'No alternative clears the required rate of return.'
+      :S.investType==='independent'?'All alternatives with a positive NPV should be accepted.'
+      :winDec?S.alts[winDec.i].label+' is the recommended alternative.':'Evaluate each alternative.';
+    var winNPV=winDec?res[winDec.i].npv:null;
+    html+='<div class="banner '+bannerClass+'">';
+    html+='<div><div class="banner-headline">'+bannerText+'</div>';
+    if(winNPV!==null){
+      var winAlt=S.alts[winDec.i];
+      var effCoc=+S.coc+(+winAlt.riskPremium||0);
+      html+='<div class="banner-sub">'+(winNPV>=0?'The NPV is '+fmtM(winNPV)+', exceeding the '+effCoc+'% required return for this alternative.':'The NPV is '+fmtM(winNPV)+'. No alternative clears the required return.')+'</div>';
+    } else if(allRejected){
+      html+='<div class="banner-sub">Review costs, benefits or your required return before proceeding.</div>';
+    }
+    html+='</div>';
+    if(winNPV!==null){
+      html+='<div class="banner-npv"><div class="banner-npv-label">Net Present Value</div><div class="banner-npv-val">'+fmtM(winNPV)+'</div></div>';
+    }
+    html+='</div>';
+    html+='<div class="results-grid" style="grid-template-columns:repeat('+Math.min(S.alts.length,3)+',1fr);gap:14px;margin-bottom:14px">';
+    decisions.forEach(function(dec,i){
+      var r=res[i];
+      var cc=dec.role==='winner'?'winner':dec.role==='accept'?'accept':'reject';
+      var badge=dec.role==='winner'?'<span class="alt-badge badge-winner">Recommended</span>'
+        :dec.role==='accept'?'<span class="alt-badge badge-accept">Accept</span>'
+        :'<span class="alt-badge badge-reject">Reject</span>';
+      html+='<div class="alt-card '+cc+'"><div class="alt-card-head"><div class="alt-name">'+S.alts[i].label+'</div>'+badge+'</div><div class="metrics-row">';
+      [{l:'NPV',v:fmtM(r.npv),ok:r.npv>0},{l:'IRR',v:fmtPct(r.irr),ok:!isNaN(r.irr)&&r.irr*100>=S.coc},
+       {l:'B/C',v:r.bc.toFixed(3),ok:r.bc>=1},{l:'ANPV',v:fmtM(r.anpv),ok:r.anpv>0},
+       {l:'Payback',v:r.payback?r.payback.toFixed(2)+' yrs':'Beyond life',ok:r.payback!==null}].forEach(function(m){
+        html+='<div class="m-item"><span class="m-label">'+m.l+'</span><span class="m-val '+(m.ok?'ok':'bad')+'">'+m.v+'</span></div>';
+      });
+      html+='<div style="margin-top:6px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--t3)">'+dec.reason+'</div></div></div>';
+    });
+    html+='</div>';
+
+    html+='<div class="panel" style="margin-bottom:14px"><div class="panel-head"><div class="panel-dot" style="background:var(--blue)"></div><div class="panel-title">Financial Statistics</div></div>';
+    html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:8px 10px;background:var(--surface);font-size:10px;text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid var(--border)">Metric</th>';
+    S.alts.forEach(function(a){html+='<th style="text-align:right;padding:8px 10px;background:var(--surface);font-size:10px;text-transform:uppercase;border-bottom:2px solid var(--border)">'+a.label+'</th>';});
+    html+='</tr></thead><tbody>';
+    [{l:'NPV',fn:function(r){return{v:fmtM(r.npv),ok:r.npv>0};}},
+     {l:'IRR',fn:function(r){return{v:fmtPct(r.irr),ok:!isNaN(r.irr)&&r.irr*100>=S.coc};}},
+     {l:'Payback Period',fn:function(r){return{v:r.payback?r.payback.toFixed(2)+' yrs':'Beyond life',ok:r.payback!==null};}},
+     {l:'B/C Ratio',fn:function(r){return{v:r.bc.toFixed(3),ok:r.bc>=1};}},
+     {l:'Annualised NPV',fn:function(r){return{v:fmtM(r.anpv),ok:r.anpv>0};}}].forEach(function(row){
+      html+='<tr><td style="padding:8px 10px;font-weight:600;color:var(--t2);border-bottom:1px solid var(--border)">'+row.l+'</td>';
+      res.forEach(function(r){var st=row.fn(r);html+='<td style="text-align:right;padding:8px 10px;font-family:monospace;font-weight:700;color:'+(st.ok?'var(--green)':'var(--warn)')+';border-bottom:1px solid var(--border)">'+st.v+'</td>';});
+      html+='</tr>';
+    });
+    html+='</tbody></table></div></div>';
+
+    html+='<div class="panel" id="robustness-panel" style="margin-bottom:14px"><div class="panel-head"><div class="panel-dot" style="background:var(--green)"></div><div class="panel-title">Decision Robustness</div></div>';
+    results.forEach(function(r,i){
+      var a=S.alts[i],be=calcBreakEvenAlt(a);
+      var curBen=a.annuity?(+a.annuityAmount):(r.rows.reduce(function(s,rw){return s+rw.btBen;},0)/Math.max(+a.life,1));
+      var margin=curBen>0?((curBen-be)/curBen*100):0,ok2=r.npv>=0;
+      html+='<div class="sens-indicator '+(ok2?'si-positive':'si-negative')+'" style="margin-bottom:10px"><div class="si-title">'+a.label+' — Decision Robustness</div><div class="si-grid">';
+      if(ok2){
+        html+='<div class="si-item"><div class="si-label">Benefits can fall by</div><div class="si-val ok">'+fmt(margin,1)+'%</div><div class="si-sub">from '+fmtM(curBen)+' to '+fmtM(be)+' before NPV turns negative</div></div>';
+        if(!isNaN(r.irr))html+='<div class="si-item"><div class="si-label">Decision holds unless cost of capital exceeds</div><div class="si-val ok">'+fmtPct(r.irr)+'</div><div class="si-sub">current CoC is '+S.coc+'%</div></div>';
+      } else {
+        html+='<div class="si-item"><div class="si-label">Benefits must increase by</div><div class="si-val bad">'+fmt(Math.abs(margin),1)+'%</div><div class="si-sub">from '+fmtM(curBen)+' to '+fmtM(be)+' to reach the break-even point</div></div>';
+        if(!isNaN(r.irr))html+='<div class="si-item"><div class="si-label">Decision reverses if CoC falls to</div><div class="si-val bad">'+fmtPct(r.irr)+'</div><div class="si-sub">current CoC is '+S.coc+'%</div></div>';
+      }
+      html+='</div></div>';
+    });
+    html+='</div>';
+
+  } else if(S.res_tab===1){
+    html+='<div class="panel" style="margin-bottom:14px"><div class="panel-head"><div class="panel-dot" style="background:var(--blue)"></div><div class="panel-title">What Would It Take?</div></div>';
+        html+='<div style="font-size:13px;color:var(--t2);margin-bottom:14px">Minimum annual benefits required to earn your '+S.coc+'% return, per alternative:</div>';
+    html+='<div style="display:grid;grid-template-columns:repeat('+Math.min(S.alts.length,3)+',1fr);gap:12px">';
+    results.forEach(function(r,i){
+      var a=S.alts[i];var be=calcBreakEvenAlt(a);
+      var curBen=a.annuity?(+a.annuityAmount):(r.rows.reduce(function(s,rw){return s+rw.btBen},0)/Math.max(+a.life,1));
+      var margin=curBen>0?((curBen-be)/curBen*100):0;
+      html+='<div style="background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:14px">';
+      html+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:8px">'+S.alts[i].label+'</div>';
+      html+='<div style="font-family:monospace;font-size:22px;font-weight:800;color:var(--blue)">'+fmtM(be)+'</div>';
+      html+='<div style="font-size:10px;color:var(--t3);margin-top:3px">per year before tax</div>';
+      if(curBen>0)html+='<div style="font-size:11px;margin-top:8px;color:'+(curBen>=be?"var(--green)":"var(--warn)")+'">Your estimate: '+fmtM(curBen)+'  ('+(curBen>=be?"+":"")+fmt(margin,1)+'%)</div>';
+      html+='</div>';
+    });
+    html+='</div></div>';
+    html+='</div>';
+    html+='<div class="panel sensitivity-charts-panel" style="margin-bottom:14px"><div class="panel-head"><div class="panel-dot" style="background:#9F7AEA"></div><div class="panel-title">Sensitivity Charts</div></div>';
+    for(var i=0;i<S.alts.length;i++){
+      html+='<div class="charts-grid" style="margin-bottom:14px"><div class="chart-box"><div class="chart-title">'+S.alts[i].label+' — NPV by Cost of Capital</div><canvas id="chart-coc-'+i+'" width="420" height="260" style="width:100%;height:auto;display:block"></canvas></div><div class="chart-box"><div class="chart-title">'+S.alts[i].label+' — NPV by Average Annual Economic Benefits</div><canvas id="chart-ben-'+i+'" width="420" height="260" style="width:100%;height:auto;display:block"></canvas></div></div>';
+    }
+    html+='</div>';
+
+  } else {
+    var altIdx=S.res_tab-2,r=res[altIdx],a=S.alts[altIdx];
+    html+='<div class="collapsible" style="margin-bottom:14px"><div class="coll-head" onclick="S.show_dcf['+altIdx+']=!S.show_dcf['+altIdx+'];renderPage3()"><span class="coll-title">DCF Summary — '+a.label+'</span><span class="coll-arr" style="transform:'+(S.show_dcf[altIdx]?'rotate(90deg)':'rotate(0deg)')+'">›</span></div>';
+    if(S.show_dcf[altIdx]){
+      var pvDeprShields = r.pvS1 + r.pvS2;
+      var pvCheck = -a.cost + r.pvITC - (+a.wc||0) + r.pvBen + pvDeprShields + r.pvSalv + r.pvWC;
+      html+='<div class="coll-body open"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th class="left" style="padding:6px 10px;background:var(--surface);border-bottom:2px solid var(--border)">Item</th><th style="text-align:right;padding:6px 10px;background:var(--surface);border-bottom:2px solid var(--border)">Amount</th><th style="text-align:right;padding:6px 10px;background:var(--surface);border-bottom:2px solid var(--border)">Present Value</th></tr></thead><tbody>';
+      html+='<tr><td class="left" style="padding:6px 10px;border-bottom:1px solid var(--border)">Cost of Asset</td><td class="right" style="padding:6px 10px;border-bottom:1px solid var(--border)">'+fmtM(+a.cost)+'</td><td class="right neg" style="padding:6px 10px;border-bottom:1px solid var(--border)">'+fmtM(-(+a.cost))+'</td></tr>';
+      if(+a.itcPct>0)html+='<tr><td class="left" style="padding:6px 10px;border-bottom:1px solid var(--border)">Investment Tax Credit (Year 1)</td><td style="padding:6px 10px;border-bottom:1px solid var(--border)"></td><td class="right" style="padding:6px 10px;border-bottom:1px solid var(--border)">'+fmtM(r.pvITC)+'</td></tr>';
+      if(+a.wc||0)html+='<tr><td class="left" style="padding:6px 10px;border-bottom:1px solid var(--border)">Working Capital Outflow</td><td class="right" style="padding:6px 10px;border-bottom:1px solid var(--border)">'+fmtM(+a.wc||0)+'</td><td class="right neg" style="padding:6px 10px;border-bottom:1px solid var(--border)">'+fmtM(-(+a.wc||0))+'</td></tr>';
+      html+='<tr><td class="left" style="padding:6px 10px;border-bottom:1px solid var(--border)">PV of After-Tax Benefits</td><td style="padding:6px 10px;border-bottom:1px solid var(--border)"></td><td class="right" style="padding:6px 10px;border-bottom:1px solid var(--border)">'+fmtM(r.pvBen)+'</td></tr>';
+      html+='<tr><td class="left" style="padding:6px 10px;border-bottom:1px solid var(--border)">PV of Depreciation Tax Shields</td><td style="padding:6px 10px;border-bottom:1px solid var(--border)"></td><td class="right" style="padding:6px 10px;border-bottom:1px solid var(--border)">'+fmtM(pvDeprShields)+'</td></tr>';
+      var pvSalvNet = r.pvSalv + (r.pvLoss||0);
+      html+='<tr><td class="left" style="padding:6px 10px;border-bottom:1px solid var(--border)">After-Tax Salvage Value (PV)</td><td style="padding:6px 10px;border-bottom:1px solid var(--border)"></td><td class="right" style="padding:6px 10px;border-bottom:1px solid var(--border)">'+fmtM(pvSalvNet)+'</td></tr>';
+      if(+a.wc||0)html+='<tr><td class="left" style="padding:6px 10px;border-bottom:1px solid var(--border)">Working Capital Recovery (PV)</td><td style="padding:6px 10px;border-bottom:1px solid var(--border)"></td><td class="right" style="padding:6px 10px;border-bottom:1px solid var(--border)">'+fmtM(r.pvWC)+'</td></tr>';
+      html+='<tr class="npv-row '+(r.npv>=0?'ok':'bad')+'" style="font-weight:700"><td class="left" style="padding:8px 10px">Net Present Value</td><td style="padding:8px 10px"></td><td class="right" style="padding:8px 10px">'+fmtM(r.npv)+'</td></tr>';
+      html+='</tbody></table></div>';
+    }
+    html+='</div>';
+    html+='<div class="collapsible"><div class="coll-head" onclick="S.show_table['+altIdx+']=!S.show_table['+altIdx+'];renderPage3()"><span class="coll-title">Year-by-Year — '+a.label+'</span><span class="coll-arr" style="transform:'+(S.show_table[altIdx]?'rotate(90deg)':'rotate(0deg)')+'">›</span></div>';
+    if(S.show_table[altIdx]){
+      // Column totals
+      var totBtDepr=0,totAtDepr=0,totPvAtDepr=0,totBtBen=0,totAtBen=0,totPvAtBen=0;
+      var _effR=(+S.coc+(+a.riskPremium||0))/100;
+      r.rows.forEach(function(row,ri){
+        totBtDepr+=row.btDepr; totAtDepr+=row.atShield;
+        totPvAtDepr+=row.atShield/Math.pow(1+_effR,ri+1);
+        totBtBen+=row.btBen; totAtBen+=row.atBen; totPvAtBen+=row.pvAtBen;
+      });
+      var thS='padding:4px 8px;background:var(--surface);border-bottom:2px solid var(--border);text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap';
+      var tdS='padding:4px 8px;text-align:right;border-bottom:1px solid var(--border);font-family:monospace;font-size:11px';
+      var tdT='padding:5px 8px;text-align:right;font-family:monospace;font-size:11px;font-weight:700;border-top:2px solid var(--border);background:var(--surface)';
+      var divC='width:6px;padding:0;background:var(--border);border:none';
+      html+='<div class="coll-body open overflow-x"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+      html+='<thead><tr>';
+      html+='<th rowspan="2" style="'+thS+';text-align:left">Year</th>';
+      html+='<th colspan="3" style="'+thS+';text-align:center">Depreciation</th>';
+      html+='<th rowspan="2" style="'+divC+'"></th>';
+      html+='<th colspan="3" style="'+thS+';text-align:center">Benefits</th>';
+      html+='</tr><tr>';
+      html+='<th style="'+thS+'">BT Depr</th>';
+      html+='<th style="'+thS+'">AT Depr<br><span style="font-weight:400;font-size:9px">(Tax Shield)</span></th>';
+      html+='<th style="'+thS+'">PV of<br>AT Depr</th>';
+      html+='<th style="'+thS+'">BT Benefit</th>';
+      html+='<th style="'+thS+'">AT Benefit</th>';
+      html+='<th style="'+thS+'">PV of<br>AT Benefit</th>';
+      html+='</tr></thead><tbody>';
+      r.rows.forEach(function(row,ri){
+        var pvAtDepr=row.atShield/Math.pow(1+_effR,ri+1);
+        html+='<tr>';
+        html+='<td style="'+tdS+';text-align:left">'+row.yr+'</td>';
+        html+='<td style="'+tdS+'">'+fmtM(row.btDepr)+'</td>';
+        html+='<td style="'+tdS+'">'+fmtM(row.atShield)+'</td>';
+        html+='<td style="'+tdS+'">'+fmtM(pvAtDepr)+'</td>';
+        html+='<td style="'+divC+'"></td>';
+        html+='<td style="'+tdS+'">'+fmtM(row.btBen)+'</td>';
+        html+='<td style="'+tdS+'">'+fmtM(row.atBen)+'</td>';
+        html+='<td style="'+tdS+'">'+fmtM(row.pvAtBen)+'</td>';
+        html+='</tr>';
+      });
+      html+='<tr>';
+      html+='<td style="'+tdT+';text-align:left">Total</td>';
+      html+='<td style="'+tdT+'">'+fmtM(totBtDepr)+'</td>';
+      html+='<td style="'+tdT+'">'+fmtM(totAtDepr)+'</td>';
+      html+='<td style="'+tdT+'">'+fmtM(totPvAtDepr)+'</td>';
+      html+='<td style="'+divC+'"></td>';
+      html+='<td style="'+tdT+'">'+fmtM(totBtBen)+'</td>';
+      html+='<td style="'+tdT+'">'+fmtM(totAtBen)+'</td>';
+      html+='<td style="'+tdT+'">'+fmtM(totPvAtBen)+'</td>';
+      html+='</tr>';
+      html+='</tbody></table></div>';
+    }
+    html+='</div>';
+  }
+
+  html+='</main></div></div>';
+  window._capRawHtml=html;
+  document.getElementById('main-content').innerHTML=html;
+  if(S.res_tab===0)makeBNList(NOTES3,'bn-list3');
+
+    var pcts=[-30,-20,-10,0,10,20,30];
+  setTimeout(function(){
+    for(var i=0;i<S.alts.length;i++){
+      (function(idx){
+        var a2=S.alts[idx],r2=res[idx];
+        var base2=a2.annuity?(+a2.annuityAmount):(r2.rows.reduce(function(s,row){return s+row.btBen},0)/Math.max(+a2.life||10,1));
+        var cSens=pcts.map(function(p){
+          var tc=S.coc*(1+p/100),tr=tc/100,taf=tr>0?(1-Math.pow(1+tr,-a2.life))/tr:a2.life;
+          var tpb=a2.annuity?a2.annuityAmount*(1-S.taxRate/100)*taf:r2.rows.reduce(function(s,row,i){return s+row.atBen/Math.pow(1+tr,i+1)},0);
+          var tps=r2.rows.reduce(function(s,row,i){return s+row.atShield/Math.pow(1+tr,i+1)},0);
+          return{label:tc.toFixed(1)+"%",npv:tpb+r2.pvITC*(1+tr)/((1+tr))+tps+a2.salvage*(1-S.taxRate/100)/Math.pow(1+tr,a2.life)+a2.wc/Math.pow(1+tr,a2.life)-r2.pvOut};
+        });
+        var bSens=pcts.map(function(p){
+          var tb=base2*(1+p/100),r3=S.coc/100,af2=r3>0?(1-Math.pow(1+r3,-a2.life))/r3:a2.life;
+          var tpb=a2.annuity?tb*(1-S.taxRate/100)*af2:r2.rows.reduce(function(s,_,i){return s+(r2.rows[i].btBen*(1+p/100))*(1-S.taxRate/100)/Math.pow(1+r3,i+1)},0);
+          return{label:"$"+Math.round(tb/1000)+"k",npv:tpb+r2.pvITC+r2.pvS1+r2.pvS2+r2.pvSalv+r2.pvLoss+r2.pvWC-r2.pvOut};
+        });
+        drawChart("chart-coc-"+idx,cSens,"Cost of Capital (%)");
+        drawChart("chart-ben-"+idx,bSens,"Average Annual Benefit ($000s)");
+      })(i);
+    }
+  },50);
+}
+
+function printSummary(){
+  var res=S.res;if(!res)return;
+  var savedTab=S.res_tab,pd0=S.show_dcf,pd1=S.show_table,pd2=S.show_all;
+  S.show_all=true;
+  S.show_dcf={}; S.show_table={};
+  for(var _ai=0;_ai<S.alts.length;_ai++){S.show_dcf[_ai]=true;S.show_table[_ai]=true;}
+  var tabLabels=['Summary','Sensitivity'].concat(S.alts.map(function(a){return a.label+' Detail';}));
+  var pages=[];
+  for(var ti=0;ti<tabLabels.length;ti++){
+    S.res_tab=ti;renderPage3();
+    if(ti===1){
+      for(var i=0;i<S.alts.length;i++){(function(idx){
+        var r2=res[idx];
+        if(r2&&r2.cocSens)drawChart('chart-coc-'+idx,r2.cocSens,'Cost of Capital (%)');
+        if(r2&&r2.benSens)drawChart('chart-ben-'+idx,r2.benSens,'Average Annual Benefit ($000s)');
+      })(i);}
+    }
+    document.querySelectorAll('canvas').forEach(function(cv){
+      var img=document.createElement('img');
+      img.src=cv.toDataURL('image/png');
+      img.style.cssText='width:100%;height:auto;display:block';
+      cv.parentNode.replaceChild(img,cv);
+    });
+    var _rawH=window._capRawHtml||'';
+    var _mOpen=_rawH.indexOf('<main>');
+    var _mClose=_rawH.lastIndexOf('</main>');
+    var _mainEl=document.querySelector('main');
+    var _html=(_mOpen>=0&&_mClose>_mOpen)
+      ?_rawH.substring(_mOpen+6,_mClose)
+      :(_mainEl?_mainEl.innerHTML:'');
+    pages.push('<div class="_pg"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8A96A6;margin-bottom:8px">'+tabLabels[ti]+'</div>'+_html+'</div>');
+  }
+  S.res_tab=savedTab;S.show_dcf=pd0;S.show_table=pd1;S.show_all=pd2;renderPage3();
+  var _hdr='<div style="background:#1B3F6E;padding:8px 24px;margin-bottom:0"><span style="color:white;font-family:Georgia,serif;font-weight:600;font-size:15px">CapPlan — Asset Purchase With Alternatives</span></div>';
+  var _mc=document.getElementById('main-content');
+  var _saved=_mc.innerHTML;
+  var _savedPage=S.page;
+  for(var pi=1;pi<pages.length;pi++){
+    pages[pi]=pages[pi].replace('<div class="_pg">','<div class="_pg" style="page-break-before:always;break-before:page">');
+  }
+  pages[0]=_hdr+pages[0];
+  var _style='<style>'
+    +'._pg{width:100%;padding:0.35in;overflow:visible;box-sizing:border-box}'
+    +'aside,.print-btn,.btn-ghost,.btn-primary,.coll-arr,#masthead,#stepper{display:none!important}'
+    +'.p2-grid,.page-grid{display:block!important}.coll-body{display:block!important}'
+    +'.result-banner,.metric,.chart-box,.alt-card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:auto!important}'
+    +'.collapsible{box-shadow:none!important;border:1px solid #ccc!important;overflow:visible!important;break-inside:auto!important}'
+    +'.coll-head{break-after:auto!important;break-inside:auto!important}'
+    +'.charts-grid{display:grid!important;grid-template-columns:1fr 1fr!important}'
+    +'#robustness-panel{page-break-before:always;break-before:page}'
+    +'.metrics{grid-template-columns:repeat(3,1fr)}'
+    +'table{width:100%;font-size:8.5px;border-collapse:collapse}'
+    +'th,td{padding:3px 4px;border-bottom:1px solid #E2E6EC}'
+    +'th{background:#F7F8FA;text-align:right;font-size:8px;font-weight:700;text-transform:uppercase}'
+    +'th.left,td.left{text-align:left}'
+    +'@media print{body{margin:0;padding:0}#main-content{display:block!important}'
+    +'@page{margin:0.4in;size:landscape}}'
+    +'</style>';
+  _mc.innerHTML=_style+pages.join('');
+  var _mast=document.getElementById('masthead');
+  var _step=document.getElementById('stepper');
+  if(_mast)_mast.style.display='none';
+  if(_step)_step.style.display='none';
+  function _restore(){
+    document.body.classList.remove('printing');
+    if(_mast)_mast.style.display='';
+    if(_step)_step.style.display='';
+    _mc.innerHTML=_saved;
+    S.page=_savedPage;
+    render();
+  }
+  window.onafterprint=function(){window.onafterprint=null;_restore();};
+  document.body.classList.add('printing');
+  setTimeout(function(){window.print();},50);
+}
+function renderCoC(){
+  var box=document.getElementById('coc-box');if(!box)return;box.innerHTML='';
+
+  // ── Collapsed button ──
+  if(!S.coc_open){
+    box.innerHTML='<button onclick="S.coc_open=true;renderCoC()" style="display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;background:none;border:none;cursor:pointer;text-align:left"><div style="width:34px;height:34px;background:var(--green-soft);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="9" r="3"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2"/></svg></div><div><div style="font-size:13px;font-weight:700;color:var(--blue)">Cost of Capital Calculator</div><div style="font-size:11px;color:var(--t3);margin-top:2px">After-tax debt · Cost of equity · WACC</div></div><span style="margin-left:auto;color:var(--t3)">›</span></button>';
+    return;
+  }
+
+  // ── Calculations ──
+  var kd_at = +(S.coc_kd*(1-S.coc_tax/100)).toFixed(2);
+  var ke_gordon = S.coc_price>0 ? +((S.coc_div/S.coc_price*100)+S.coc_g).toFixed(2) : 0;
+  var ke_capm   = +(S.coc_rf+S.coc_beta*S.coc_mrp).toFixed(2);
+  var ke        = S.coc_eq_mode==='gordon' ? ke_gordon : ke_capm;
+  var we        = Math.max(0,100-S.coc_wd);
+  var wacc      = +(kd_at*S.coc_wd/100 + ke*we/100).toFixed(2);
+
+  function tip(t){return '<div style="font-size:10px;color:var(--t3);line-height:1.5;margin-top:3px;font-style:italic">'+t+'</div>';}
+  function row(label,key,val,suffix,tipText,readOnly){
+    var input=readOnly
+      ? '<span style="font-family:monospace;font-size:15px;font-weight:700;color:var(--blue)">'+val+(suffix?'&thinsp;'+suffix:'')+'</span>'
+      : '<div class="ui"><input type="text" value="'+val+'" onchange="S.'+key+'=+this.value||0;renderCoC()" style="font-family:monospace;font-size:15px;font-weight:600;border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;outline:none;padding:2px 0">'+(suffix?'<span style="font-size:12px;color:var(--t3)">'+suffix+'</span>':'')+'</div>';
+    return '<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:4px">'+label+'</div>'+input+(tipText?tip(tipText):'')+'</div>';
+  }
+  function sectionHead(n,title,color){
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:20px;height:20px;border-radius:50%;background:'+color+';color:white;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+n+'</div><div style="font-size:12px;font-weight:700;color:var(--t1)">'+title+'</div></div>';
+  }
+  function result(label,val,suffix){
+    return '<div style="background:var(--surface);border-radius:6px;padding:8px 10px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:var(--t2)">'+label+'</span><span style="font-family:monospace;font-size:15px;font-weight:700;color:var(--blue)">'+val+(suffix?'&thinsp;'+suffix:'')+'</span></div>';
+  }
+
+  var html='<div style="border:1px solid var(--blue);border-radius:10px;overflow:hidden">';
+  html+='<div style="background:var(--blue);padding:11px 14px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:700;color:white">Cost of Capital Calculator</span><button onclick="S.coc_open=false;renderCoC()" style="color:rgba(255,255,255,.7);background:none;border:none;font-size:20px;cursor:pointer;line-height:1">×</button></div>';
+  html+='<div style="padding:14px">';
+
+  // ── Section 1: After-tax cost of borrowing ──
+  html+=sectionHead(1,'After-tax cost of borrowing','var(--blue)');
+  html+=row('Interest rate on your debt','coc_kd',S.coc_kd,'%','The annual rate your bank or lender charges on loans or lines of credit.');
+  html+=row('Your business tax rate','coc_tax',S.coc_tax,'%','Because interest payments are tax-deductible, the government covers part of your borrowing cost. Your true cost is the interest rate minus the tax saving.');
+  html+=result('After-tax cost of borrowing',kd_at,'%');
+
+  // ── Section 2: Cost of equity ──
+  html+=sectionHead(2,'Cost of equity','#9F7AEA');
+  // Toggle Gordon / CAPM
+  html+='<div style="display:flex;gap:6px;margin-bottom:12px">';
+  ['gordon','capm'].forEach(function(m,i){
+    var active=S.coc_eq_mode===m;
+    var label=m==='gordon'?'Growth model':'CAPM';
+    var sub=m==='gordon'?'Dividend / earnings growth':'Market risk';
+    html+='<button onclick="S.coc_eq_mode=\''+m+'\';renderCoC()" style="flex:1;padding:7px 8px;border-radius:7px;border:1.5px solid '+(active?'var(--blue)':'var(--border)')+';background:'+(active?'var(--blue-soft)':'transparent')+';cursor:pointer;text-align:left"><div style="font-size:11px;font-weight:700;color:'+(active?'var(--blue)':'var(--t2)')+'">'+label+'</div><div style="font-size:10px;color:var(--t3)">'+sub+'</div></button>';
+  });
+  html+='</div>';
+
+  if(S.coc_eq_mode==='gordon'){
+    html+=row('Expected dividend or profit distribution next year ($)','coc_div',S.coc_div,'$','The cash you expect to pay out to owners or shareholders in the coming year. For an owner-managed business, this is the return you expect to take out.');
+    html+=row('Current value of the business ($)','coc_price',S.coc_price,'$','What the business is worth today — the price a willing buyer would pay. If you are unsure, use book value or a recent valuation.');
+    html+=row('Expected annual growth rate of the firm','coc_g',S.coc_g,'%','How fast do you expect revenues and earnings to grow each year? A stable, mature business might use 2–3%. A growing business might use 5–8%.');
+    var formula=S.coc_price>0?'('+S.coc_div+' ÷ '+S.coc_price+' × 100) + '+S.coc_g+'% growth':'Enter a business value above';
+    html+='<div style="font-size:10px;color:var(--t3);margin-bottom:10px;font-style:italic">Formula: (annual distribution ÷ business value) + growth rate &nbsp;→&nbsp; '+formula+'</div>';
+  } else {
+    html+=row('Risk-free rate','coc_rf',S.coc_rf,'%','The return on a risk-free investment such as a government bond. Use the current rate on a 10-year government bond.');
+    html+=row('Beta (business risk factor)','coc_beta',S.coc_beta,'','A measure of how risky your business is relative to the overall market. 1.0 = average market risk. Higher values mean more risk. Most small businesses fall between 0.8 and 1.5.');
+    html+=row('Market risk premium','coc_mrp',S.coc_mrp,'%','The extra return investors demand for taking on business risk rather than holding safe government bonds. Typically 5–6% for most markets.');
+    html+='<div style="font-size:10px;color:var(--t3);margin-bottom:10px;font-style:italic">Formula: risk-free rate + (beta × market risk premium) = '+S.coc_rf+' + ('+S.coc_beta+' × '+S.coc_mrp+')</div>';
+  }
+  html+=result('Cost of equity',ke,'%');
+
+  // ── Section 3: Overall cost of capital ──
+  html+=sectionHead(3,'Overall cost of capital (WACC)','var(--green)');
+  html+='<div style="background:var(--surface);border-radius:6px;padding:8px 10px;margin-bottom:12px;font-size:11px;color:var(--t2)">Carried from above — after-tax cost of borrowing <strong>'+kd_at+'%</strong>, cost of equity <strong>'+ke+'%</strong></div>';
+  html+=row('Debt as % of total financing','coc_wd',S.coc_wd,'%','What proportion of your business is funded by loans vs. owner investment? For example, if you borrowed $60 of every $100 invested, enter 60.');
+  html+='<div style="font-size:11px;color:var(--t3);margin-bottom:10px">Equity portion: '+(100-S.coc_wd)+'%</div>';
+  html+='<div style="font-size:10px;color:var(--t3);margin-bottom:10px;font-style:italic">Formula: ('+kd_at+'% × '+S.coc_wd+'%) + ('+ke+'% × '+we+'%) = '+wacc+'%</div>';
+
+  // ── Final result ──
+  html+='<div style="margin-top:4px;padding:12px 14px;background:var(--green-soft);border-radius:8px;border:1px solid var(--green);display:flex;justify-content:space-between;align-items:center">';
+  html+='<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--green)">Cost of Capital</div><div style="font-family:monospace;font-size:24px;font-weight:700;color:var(--green)">'+wacc+'%</div></div>';
+  html+='<button onclick="S.coc='+wacc+';S.coc_open=false;renderCoC();var el=document.getElementById(\'inp-coc\');if(el){el.value='+wacc+';}" style="background:var(--green);color:white;border:none;border-radius:7px;padding:10px 14px;font-size:12px;font-weight:700;cursor:pointer">Use this rate →</button>';
+  html+='</div>';
+
+  html+='</div></div>';
+  box.innerHTML=html;
+}
+
+function render(){
+  var lbl=document.getElementById("cur-label");if(lbl)lbl.textContent=getSym()+" "+S.currency;
+  updateStepper();
+  if(S.page===1)renderPage1();
+  else if(S.page===2)renderPage2();
+  else if(S.page===3&&S.res)renderPage3();
+  renderCoC();
+  autoSave();
+}
+
+
+
+
+
+
+// ── Storage: localStorage primary, IndexedDB secondary ───────────────────
+var IDB_NAME='capplan';
+var IDB_STORE='analyses';
+var IDB_MODEL='M2';
+var LS_STORE_KEY='capplan_m2_analyses';  // stores all named analyses
+var _idb=null;
+
+// localStorage helpers
+function lsGetAll(){
+  if(!LS_OK)return [];
+  try{
+    var obj=JSON.parse(localStorage.getItem(LS_STORE_KEY)||'{}');
+    var rows=[];
+    Object.keys(obj).forEach(function(k){rows.push(obj[k]);});
+    rows.sort(function(a,b){return b.saved>a.saved?1:-1;});
+    return rows;
+  }catch(e){return [];}
+}
+
+function lsSave(payload){
+  if(!LS_OK)return false;
+  try{
+    var obj=JSON.parse(localStorage.getItem(LS_STORE_KEY)||'{}');
+    obj[payload.label]=payload;
+    localStorage.setItem(LS_STORE_KEY,JSON.stringify(obj));
+    console.log('[CapPlan] lsSave: saved label='+payload.label+' total='
+      +Object.keys(obj).length);
+    return true;
+  }catch(e){console.error('[CapPlan] lsSave error',e);return false;}
+}
+
+function lsLoad(label){
+  if(!LS_OK)return null;
+  try{
+    var obj=JSON.parse(localStorage.getItem(LS_STORE_KEY)||'{}');
+    return obj[label]||null;
+  }catch(e){return null;}
+}
+
+function lsDelete(label){
+  if(!LS_OK)return;
+  try{
+    var obj=JSON.parse(localStorage.getItem(LS_STORE_KEY)||'{}');
+    delete obj[label];
+    localStorage.setItem(LS_STORE_KEY,JSON.stringify(obj));
+  }catch(e){}
+}
+
+// IndexedDB (used when deployed to a persistent origin)
+function openIDB(cb){
+  if(_idb){return cb(_idb);}
+  var req=indexedDB.open(IDB_NAME,1);
+  req.onupgradeneeded=function(e){
+    var db=e.target.result;
+    if(!db.objectStoreNames.contains(IDB_STORE)){
+      db.createObjectStore(IDB_STORE,{keyPath:'id',autoIncrement:true});
+    }
+  };
+  req.onsuccess=function(e){
+    _idb=e.target.result;
+    console.log('[CapPlan] openIDB: success, stores:',Array.from(_idb.objectStoreNames));
+    cb(_idb);
+  };
+  req.onerror=function(){console.error('[CapPlan] openIDB error');cb(null);};
+}
+
+function idbSave(payload,cb){
+  openIDB(function(db){
+    if(!db)return cb&&cb(null);
+    var rtx=db.transaction(IDB_STORE,'readonly');
+    var rreq=rtx.objectStore(IDB_STORE).getAll();
+    rreq.onsuccess=function(){
+      var rows=rreq.result||[];
+      var existing=rows.filter(function(r){
+        return r.model===IDB_MODEL&&r.label===payload.label;
+      });
+      if(existing.length)payload.id=existing[0].id;
+      var wtx=db.transaction(IDB_STORE,'readwrite');
+      var store=wtx.objectStore(IDB_STORE);
+      if(existing.length){
+        store.put(payload);
+      } else {
+        store.add(payload);
+      }
+      wtx.oncomplete=function(){
+        cb&&cb(true);
+      };
+      wtx.onerror=function(){console.error('[CapPlan] idbSave tx error');cb&&cb(false);};
+    };
+    rreq.onerror=function(){
+      var wtx=db.transaction(IDB_STORE,'readwrite');
+      wtx.objectStore(IDB_STORE).add(payload);
+      wtx.oncomplete=function(){cb&&cb(true);};
+    };
+  });
+}
+
+function idbGetAll(cb){
+  openIDB(function(db){
+    if(!db)return cb([]);
+    var tx=db.transaction(IDB_STORE,'readonly');
+    var req=tx.objectStore(IDB_STORE).getAll();
+    req.onsuccess=function(){
+      var all=req.result||[];
+      var rows=all.filter(function(r){return r.model===IDB_MODEL;});
+      rows.sort(function(a,b){return b.saved>a.saved?1:-1;});
+      cb(rows);
+    };
+    req.onerror=function(){console.error('[CapPlan] idbGetAll error');cb([]);};
+  });
+}
+
+function idbDelete(id,label,cb){
+  lsDelete(label);
+  openIDB(function(db){
+    if(!db)return cb&&cb();
+    var tx=db.transaction(IDB_STORE,'readwrite');
+    tx.objectStore(IDB_STORE).delete(id);
+    tx.oncomplete=function(){cb&&cb();};
+  });
+}
+
+// Primary save: localStorage. Secondary: IndexedDB.
+function storeSave(payload,cb){
+  var lsOk=lsSave(payload);
+  idbSave(payload,function(idbOk){
+    cb&&cb(lsOk||idbOk);
+  });
+}
+
+// Primary read: localStorage (reliable on localhost).
+// Falls back to IndexedDB if localStorage is empty.
+function storeGetAll(cb){
+  var lsRows=lsGetAll();
+  if(lsRows.length>0){
+    cb(lsRows);
+  } else {
+    idbGetAll(cb);
+  }
+}
+
+
+// ── Auto-save (localStorage fallback, IndexedDB primary) ─────────────────
+var AUTO_SAVE_KEY='capplan_m2_autosave';
+var LS_OK=(function(){try{localStorage.setItem('__t','1');localStorage.removeItem('__t');return true;}catch(e){return false;}})();
+var IDB_OK=(location.protocol!=='file:');
+
+
+function autoSave(){
+  var payload=buildPayload('\u2605 Last session');
+  // IndexedDB auto-save slot
+  // localStorage-primary save (persists reliably on localhost)
+  storeSave(payload,null);
+}
+
+function buildPayload(label){
+  var fields=['currency', 'coc_open', 'coc_eq_mode', 'coc_kd', 'coc_tax', 'coc_div', 'coc_price', 'coc_g', 'coc_rf', 'coc_beta', 'coc_mrp', 'coc_wd', 'cost', 'itcPct', 'life', 'salvage', 'method', 'hyr', 'ddbRate', 'workingCapital', 'annuity', 'annuityAmount', 'yearlyBenefits', 'taxRate', 'coc'];
+  var st={};fields.forEach(function(k){st[k]=S[k];});
+  return {capplan_version:'1.0',model:IDB_MODEL,saved:new Date().toISOString(),
+          label:label||'Untitled',state:st};
+}
+
+function applyPayload(p){
+  if(!p||!p.state)return false;
+  Object.keys(p.state).forEach(function(k){if(k in S)S[k]=p.state[k];});
+  S.res=null;S.page=1;S.show_dcf=false;S.show_table=false;
+  return true;
+}
+
+// ── Modal helper ──────────────────────────────────────────────────────────
+function getSLModal(){
+  var ov=document.getElementById('sl-modal');
+  if(!ov){ov=document.createElement('div');ov.id='sl-modal';document.body.appendChild(ov);}
+  ov.style.display='flex';ov.className='sl-modal-overlay';
+  return ov;
+}
+function closeSLModal(){
+  var el=document.getElementById('sl-modal');
+  if(el){el.style.display='none';el.innerHTML='';}
+}
+
+function showSLHelp(){
+  var ov=getSLModal();
+  ov.innerHTML='<div class="sl-modal" style="width:440px">'
+    +'<div class="sl-modal-title">Saving &amp; Loading Your Work</div>'
+    +'<div class="sl-help-panel">'
+    +'<ul>'
+    +'<li><strong>Auto-save:</strong> CapPlan automatically saves your work as you type. '
+    +'If you close the tab by accident, your data will still be there when you reopen it.</li>'
+    +'<li><strong>Save:</strong> Gives your analysis a name so you can find it later. '
+    +'Use this when you want to keep a permanent named copy &mdash; for example, '
+    +'&ldquo;City Hall HVAC&rdquo; or &ldquo;Warehouse Solar&rdquo;.</li>'
+    +'<li><strong>Load:</strong> Opens a list of all your saved analyses for this model. '
+    +'Click Load next to any entry to restore it. '
+    +'The &starf; Last session entry is your most recent auto-save.</li>'
+    +'<li><strong>Export file:</strong> Downloads your analysis as a .json file. '
+    +'Use this to back it up, move it to another computer, or share it with a colleague.</li>'
+    +'<li><strong>Import file:</strong> Loads a .json file that was previously exported. '
+    +'Available inside the Load dialog.</li>'
+    +'</ul>'
+    +'<div class="sl-help-note">'
+    +'Saved analyses are stored in this browser on this device. '
+    +'They are not affected by clearing your Downloads folder. '
+    +'Use <strong>Export</strong> to keep a copy outside the browser.'
+    +'</div>'
+    +'</div>'
+    +'<div class="sl-modal-btns">'
+    +'<button class="sl-modal-btn primary" onclick="closeSLModal()">Got it</button>'
+    +'</div>'
+    +'</div>';
+}
+
+// ── Save ──────────────────────────────────────────────────────────────────
+function saveAnalysis(){
+  var lbl='';
+  if(LS_OK)try{var ex=JSON.parse(localStorage.getItem(AUTO_SAVE_KEY)||'{}');
+    if(ex.label&&ex.label!=='★ Last session')lbl=ex.label;}catch(e){}
+  var inp=document.getElementById('save-label-input');
+  if(inp){inp.value=lbl;}
+  var m=document.getElementById('sl-save-modal');
+  if(m){m.style.display='flex';}
+  setTimeout(function(){if(inp){inp.focus();inp.select();}},50);
+}
+
+
+function confirmSave(){
+  var el=document.getElementById('save-label-input');
+  var label=(el?el.value.trim():'')||'Untitled analysis';
+  var payload=buildPayload(label);
+  function afterSave(){
+    var sm=document.getElementById('sl-save-modal');
+    if(sm)sm.style.display='none';
+    closeSLModal();
+    var btn=document.getElementById('sl-save-btn');
+    if(btn){var orig=btn.innerHTML;
+      btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Saved';
+      setTimeout(function(){btn.innerHTML=orig;},1800);}
+  }
+  storeSave(payload,function(ok){
+    afterSave();
+  });
+}
+
+// ── Export (download file) ────────────────────────────────────────────────
+function exportAnalysis(){
+  var el=document.getElementById('save-label-input');
+  var label=(el?el.value.trim():'')||'CapPlan Analysis';
+  var payload=buildPayload(label);
+  if(LS_OK)try{localStorage.setItem(AUTO_SAVE_KEY,JSON.stringify(payload));}catch(e){}
+  var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;
+  a.download=label.replace(/[^a-z0-9_\- ]/gi,'_').replace(/\s+/g,'_')+'.json';
+  a.click();URL.revokeObjectURL(url);
+  closeSLModal();
+}
+
+// ── Load ──────────────────────────────────────────────────────────────────
+function loadAnalysis(){
+  var ov=getSLModal();
+  if(!IDB_OK){
+    ov.innerHTML='<div class="sl-modal" style="width:400px">'
+      +'<div class="sl-modal-title">Load Analysis</div>'
+      +'<div style="padding:12px 14px;background:rgba(245,158,11,.1);border:1px solid var(--amber);border-radius:8px;font-size:13px;line-height:1.6;margin-bottom:16px">'
+      +'<strong>Saved analyses unavailable.</strong><br>'
+      +'You are opening this file directly from your hard drive. '
+      +'To use Save &amp; Load, open a terminal in your capplan folder and run:<br><br>'
+      +'<code style="background:var(--surface);padding:4px 8px;border-radius:4px;font-size:12px">python3 -m http.server 8080</code><br><br>'
+      +'Then open in your browser: <code>http://localhost:8080/capplan_model1.html</code>'
+      +'</div>'
+      +'<div class="sl-label" style="margin-bottom:6px">Or import a previously exported file</div>'
+      +'<button class="sl-modal-btn primary" style="width:100%" '
+      +'onclick="document.getElementById(\'sl-file-input\').click()">Import file\u2026</button>'
+      +'<div class="sl-modal-btns"><button class="sl-modal-btn secondary" onclick="closeSLModal()">Close</button></div>'
+      +'</div>';
+    return;
+  }
+  ov.innerHTML='<div class="sl-modal" style="width:420px"><div class="sl-modal-title">Load Analysis</div>'
+    +'<div id="sl-list-area"><div style="font-size:13px;color:var(--t2);padding:12px 0">Loading saved analyses\u2026</div></div>'
+    +'<div class="sl-modal-btns" style="margin-top:10px">'
+    +'<button class="sl-modal-btn secondary" onclick="closeSLModal()">Cancel</button>'
+    +'<button class="sl-modal-btn secondary" onclick="document.getElementById(\'sl-file-input\').click()">Import file</button>'
+    +'</div></div>';
+  storeGetAll(function(rows){
+    var area=document.getElementById('sl-list-area');
+    if(!area)return;
+    if(!rows.length){
+      area.innerHTML='<div style="font-size:13px;color:var(--t2);padding:12px 0;text-align:center">'
+        +'No saved analyses yet.<br>Fill in the form and click Save to store one.</div>';
+      return;
+    }
+    var html='<div style="max-height:280px;overflow-y:auto;margin:0 -4px">';
+    rows.forEach(function(row){
+      var d=new Date(row.saved);
+      var dateStr=d.toLocaleDateString(undefined,{month:'short',day:'numeric'})
+        +' '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+      var isAuto=row.label==='\u2605 Last session';
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border)">'
+        +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'
+        +(isAuto?'<span style="color:var(--t3);font-size:11px;margin-right:4px">&#9733;</span>':'')+row.label+'</div>'
+        +'<div style="font-size:11px;color:var(--t3)">'+dateStr+'</div>'
+        +'</div>'
+        +'<button class="sl-modal-btn primary" style="padding:5px 12px;font-size:12px" '
+        +'onclick="loadFromIDB('+row.id+',\''+row.label+'\')"  >Load</button>'
+        +'<button class="sl-modal-btn secondary" style="padding:5px 10px;font-size:12px;color:var(--warn)" '
+        +'onclick="deleteFromIDB('+row.id+',\''+row.label+'\')"  style="padding:5px 10px;font-size:12px;color:var(--warn)">&#128465;</button>'
+        +'</div>';
+    });
+    html+='</div>';
+    area.innerHTML=html;
+  });
+}
+
+function loadFromIDB(id,label){
+  // Try localStorage first (primary store)
+  if(label){
+    var p=lsLoad(label);
+    if(p){
+      if(applyPayload(p)){render();closeSLModal();return;}
+    }
+  }
+  // Fall back to IndexedDB
+  if(!id){console.error('[CapPlan] loadFromIDB: no id or label found');return;}
+  openIDB(function(db){
+    if(!db)return;
+    var tx=db.transaction(IDB_STORE,'readonly');
+    var req=tx.objectStore(IDB_STORE).get(id);
+    req.onsuccess=function(){
+      var p=req.result;
+      if(p&&applyPayload(p)){render();closeSLModal();}
+    };
+  });
+}
+
+function deleteFromIDB(id,label){
+  idbDelete(id,label,function(){
+    loadAnalysis();
+  });
+}
+
+// ── Import from file ──────────────────────────────────────────────────────
+function handleFileLoad(event){
+  var file=event.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var p=JSON.parse(e.target.result);
+      if(p.model&&p.model!==IDB_MODEL){
+        alert('This file is from '+p.model+', not M1. Please load it in the correct model.');return;
+      }
+      if(applyPayload(p)){
+        // also save it into IDB so it appears in the list
+        idbSave(p,null);
+        render();closeSLModal();
+      }
+    }catch(err){alert('Could not read file. Please check it is a valid CapPlan JSON file.');}
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+
+
+CapPlanAuth.init('model2');
+   render();
+
+// Attach masthead button listeners after DOM is ready
+document.addEventListener("DOMContentLoaded",function(){
+  var hb=document.getElementById("sl-help-btn");
+  var sb=document.getElementById("sl-save-btn");
+  var lb=document.getElementById("sl-load-btn");
+  console.log("[CapPlan] masthead listeners attached: help="+!!hb+" save="+!!sb+" load="+!!lb);
+  // Use event delegation — catches clicks on button OR any child (SVG, text)
+  document.getElementById("masthead").addEventListener("click",function(e){
+    var t=e.target;
+    // Walk up to find the button in case click landed on SVG or span child
+    while(t&&t.tagName!=="BUTTON")t=t.parentElement;
+    if(!t)return;
+    if(t.id==="sl-save-btn"){console.log("[CapPlan] save btn clicked");saveAnalysis();}
+    else if(t.id==="sl-load-btn"){console.log("[CapPlan] load btn clicked");loadAnalysis();}
+    else if(t.id==="sl-help-btn"){console.log("[CapPlan] help btn clicked");showSLHelp();}
+  });
+  // Static save modal buttons
+  var csb=document.getElementById('sl-confirm-save-btn');
+  var cab=document.getElementById('sl-cancel-save-btn');
+  var exb=document.getElementById('sl-export-btn');
+  if(csb)csb.addEventListener('click',function(e){e.stopPropagation();confirmSave();});
+  if(cab)cab.addEventListener('click',function(e){
+    e.stopPropagation();
+    var sm=document.getElementById('sl-save-modal');
+    if(sm)sm.style.display='none';
+  });
+  if(exb)exb.addEventListener('click',function(e){e.stopPropagation();exportAnalysis();});
+  // Stop clicks inside the modal box from reaching the overlay
+  var smInner=document.querySelector('#sl-save-modal .sl-modal');
+  if(smInner)smInner.addEventListener('click',function(e){e.stopPropagation();});
+  // Click on overlay background closes modal
+  var smOv=document.getElementById('sl-save-modal');
+  if(smOv)smOv.addEventListener('click',function(){
+    smOv.style.display='none';
+  });
+});
+</script>
+
+<div id="sl-save-modal" class="sl-modal-overlay" style="display:none">
+  <div class="sl-modal" style="width:380px">
+    <div class="sl-modal-title">Save Analysis</div>
+    <div class="sl-label">Analysis name</div>
+    <input id="save-label-input" type="text" placeholder="e.g. City Hall HVAC replacement">
+    <div style="font-size:12px;color:#4a5568;margin-bottom:14px">Saves to this browser. Use <strong>Export</strong> to download a portable file.</div>
+    <button class="sl-modal-btn primary" style="width:100%;margin-bottom:8px" id="sl-confirm-save-btn">Save</button>
+    <div class="sl-modal-btns">
+      <button class="sl-modal-btn secondary" id="sl-cancel-save-btn">Cancel</button>
+      <button class="sl-modal-btn secondary" style="font-size:11px;color:#8a96a6" id="sl-export-btn">↓ Export to file</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="sl-file-input" accept=".json" style="display:none" onchange="handleFileLoad(event)">
+</body>
+</html>

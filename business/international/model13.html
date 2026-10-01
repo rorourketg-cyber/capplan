@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan — Maximum Purchase Price</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#F7F8FA;color:#0F1D2E;font-size:14px}
+input,select,button{font-family:inherit;font-size:14px}button{cursor:pointer;background:none;border:none}select{-webkit-appearance:none;appearance:none}
+:root{--blue:#1B3F6E;--green:#2E7D52;--surface:#F7F8FA;--panel:#fff;--border:#E2E6EC;--t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;--warn:#C84B31;--blue-soft:rgba(27,63,110,0.08);--green-soft:rgba(46,125,82,0.09);--amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7;--amber-light:#FEF3C7}
+#masthead{background:var(--blue);min-height:80px;display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 16px;position:sticky;top:0;z-index:100;gap:0}
+.logo{display:flex;align-items:center;gap:12px;margin-right:20px;flex-shrink:0}.logo-icon{width:34px;height:34px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:Georgia,serif;font-size:22px;color:white}.logo-text span{color:#A8C5E8}
+
+#stepper{background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px}
+.step{display:flex;align-items:center;gap:8px;padding:13px 4px;border-bottom:2px solid transparent}.step.active{border-bottom-color:var(--blue)}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--border);color:var(--t3)}
+.step.active .step-num{background:var(--blue);color:white}.step.done .step-num{background:var(--green);color:white}
+.step-label{font-size:13px;font-weight:500;color:var(--t3)}.step.active .step-label{color:var(--blue)}.step.done .step-label{color:var(--green)}
+.step-sep{color:var(--border);margin:0 8px;font-size:16px}
+.page{max-width:1100px;margin:0 auto;padding:24px 22px}
+.page-grid{display:grid;grid-template-columns:310px 1fr;gap:22px}
+.p2-grid{display:grid;grid-template-columns:280px 1fr;gap:22px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-bottom:18px}
+.panel-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr}
+.field{padding:13px 18px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.field.full{grid-column:1/-1;border-right:none}.field.last{border-bottom:none}
+.field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:6px}
+.field-note{font-size:10px;color:var(--t3);margin-top:4px}
+.ui{display:flex;align-items:center;gap:6px}.ui .pfx,.ui .sfx{font-family:monospace;font-size:12px;color:var(--t3);flex-shrink:0}
+.ui input{font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none}
+.ui input:focus{border-bottom-color:var(--blue)}.ui input:disabled{color:var(--t3);opacity:.6}
+.ui select{font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none;cursor:pointer}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.pill{display:flex;align-items:center;gap:6px;padding:6px 13px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;user-select:none}
+.pill.active{border-color:var(--blue);background:var(--blue-soft);color:var(--blue)}
+.pill-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--t3);flex-shrink:0}.pill.active .pill-dot{border-color:var(--blue);background:var(--blue)}
+.btn-primary{background:var(--blue);color:white;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-ghost{background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn{display:flex;align-items:center;gap:6px;background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.action-row{display:flex;gap:10px;margin-top:4px}
+.bn-item{border-bottom:1px solid var(--border)}.bn-item:last-child{border-bottom:none}
+.bn-head{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;cursor:pointer}
+.bn-head:hover{background:var(--surface)}
+.bn-qmark{width:21px;height:21px;border-radius:50%;background:var(--blue-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--blue);flex-shrink:0;margin-top:1px;margin-right:5px}
+.bn-q{font-size:13px;line-height:1.5;color:var(--blue);flex:1}
+.bn-arr{color:var(--t3);font-size:14px;flex-shrink:0;margin-top:2px;transition:transform .2s}
+.bn-body{padding:10px 13px 12px 44px;font-size:12.5px;line-height:1.7;color:var(--t2);background:var(--surface);border-top:1px solid var(--border);display:none}
+.bn-body.open{display:block}
+
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:11px}
+.helper-card{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.helper-head{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--amber-light)}
+.helper-head:hover{background:#fde68a}
+.helper-icon{font-size:18px;flex-shrink:0}.helper-title{font-size:13px;font-weight:700;color:var(--amber-dark);flex:1}
+.helper-toggle{font-size:11px;font-weight:600;color:var(--amber-dark);opacity:.7}
+.helper-body{padding:16px;border-top:1.5px solid var(--amber);display:flex;flex-direction:column;gap:14px}
+.wizard-row{display:flex;flex-direction:column;gap:6px}
+.wizard-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dark)}
+.underline-input{display:flex;align-items:center;gap:6px}
+.underline-input input{font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none}
+.underline-input input:focus{border-bottom-color:var(--amber)}
+.underline-input .pfx{font-family:monospace;font-size:13px;color:var(--t3);flex-shrink:0}
+.underline-input .sfx{font-size:13px;color:var(--t3);flex-shrink:0}
+.wizard-result{background:var(--green-soft);border:1px solid var(--green);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.wizard-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.helper-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dark)}
+.result-banner{border-radius:10px;padding:20px 24px;margin-bottom:18px;background:var(--green-soft);border:1.5px solid var(--green);display:flex;align-items:center;justify-content:space-between;gap:20px}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.metric{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.metric-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:7px}
+.metric-val{font-family:monospace;font-size:18px;font-weight:700;color:var(--t1)}.metric-val.ok{color:var(--green)}.metric-val.warn{color:var(--warn)}
+.metric-sub{font-size:10px;color:var(--t3);margin-top:3px}
+.chart-box{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:18px}
+.chart-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:6px}
+.chart-sub{font-size:11px;color:var(--t3);margin-bottom:12px}
+.collapsible{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:14px;overflow:hidden}
+.coll-head{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.coll-head:hover{background:var(--surface)}
+.coll-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.coll-arr{color:var(--t3);font-size:14px;transition:transform .2s}
+.coll-body{display:none;border-top:1px solid var(--border)}.coll-body.open{display:block}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{padding:8px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}
+th.left{text-align:left}
+td{padding:8px 14px;text-align:right;font-family:monospace;border-bottom:1px solid var(--border)}
+td.left{text-align:left;font-family:inherit;color:var(--t1)}td.sub{text-align:left;font-family:inherit;color:var(--t3);font-size:11px}
+tr.total-row td{font-weight:700;background:var(--surface)}tr:nth-child(even){background:var(--surface)}
+tr.highlight td{background:var(--blue-soft)!important;font-weight:700;color:var(--blue)}
+.mode-toggle{display:flex;gap:0;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:18px}
+.mode-btn{flex:1;padding:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .15s}
+.mode-btn.active{background:var(--blue);color:white}.mode-btn:not(.active){background:white;color:var(--t2)}
+
+
+
+
+
+@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;background:white}#masthead{position:static!important;height:auto!important;padding:8px 0!important}#stepper,.btn-ghost,.print-btn,.coll-arr,.mode-toggle{display:none!important}.page-grid,.p2-grid{display:block!important}aside{display:none!important}.coll-body{display:block!important}.coll-head{break-after:avoid!important}.result-banner,.metric,.chart-box,.collapsible,.helper-card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid}table{font-size:9px;table-layout:fixed}th,td{padding:3px 5px}thead{display:table-header-group}tr{break-inside:avoid}@page{margin:0.5in;size:landscape}}
+
+
+
+.model-overview {
+  background: var(--amber-soft);
+  border: 1.5px solid var(--amber);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--amber-dark);
+  line-height: 1.6;
+}
+.model-overview strong { color: var(--amber-dark); }
+
+.sl-btn{display:flex;align-items:center;gap:5px;background:none;border:1px solid rgba(255,255,255,.35);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;color:white;cursor:pointer;white-space:nowrap;transition:background .15s}
+.sl-btn:hover{background:rgba(255,255,255,.15)}
+.sl-btn svg{flex-shrink:0;pointer-events:none}
+.sl-group{display:flex;align-items:center;gap:6px;margin-left:20px}
+.sl-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#8a96a6;margin-bottom:4px}
+#save-label-input{width:100%;font-size:13px;padding:6px 8px;border:1px solid #d1d9e0;border-radius:6px;background:#f8f9fa;color:#1a2332;margin-bottom:10px;box-sizing:border-box}
+.sl-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px);cursor:default}
+.sl-modal{background:#ffffff;border-radius:12px;padding:24px;width:340px;max-width:90vw;box-shadow:0 4px 6px rgba(0,0,0,.07),0 16px 48px rgba(0,0,0,.22);border:1px solid rgba(0,0,0,.08)}
+.sl-modal-title{font-size:15px;font-weight:700;color:#1a2332;margin-bottom:16px}
+.sl-modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.sl-modal-btn{padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none}
+.sl-modal-btn.primary{background:var(--blue);color:white}
+.sl-modal-btn.secondary{background:#f8f9fa;color:#4a5568;border:1px solid #d1d9e0}
+.sl-auto-badge{font-size:10px;background:var(--green-soft);color:var(--green);border-radius:4px;padding:2px 6px;font-weight:700}
+.sl-help-btn{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;border:1.5px solid rgba(255,255,255,.5);background:none;color:white;font-size:12px;font-weight:700;cursor:pointer;line-height:1;flex-shrink:0;transition:background .15s}
+.sl-help-btn:hover{background:rgba(255,255,255,.2)}
+.sl-help-panel{font-size:13px;color:#2d3748;line-height:1.6}
+.sl-help-panel h3{font-size:14px;font-weight:700;color:#1a2332;margin:0 0 12px}
+.sl-help-panel ul{margin:0;padding:0 0 0 18px}
+.sl-help-panel li{margin-bottom:8px}
+.sl-help-panel li strong{color:#1a2332}
+.sl-help-panel .sl-help-note{margin-top:14px;padding:10px 12px;background:#f0f4ff;border-left:3px solid #3b82f6;border-radius:0 6px 6px 0;font-size:12px;color:#4a5568}
+
+.sl-list-row{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border)}
+.mast-title-block{display:flex;flex-direction:column;justify-content:center;gap:3px;flex:1;min-width:0;padding-right:16px}
+.mast-title{font-size:17px;font-weight:800;color:white;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mast-question{font-size:12px;font-weight:700;font-style:italic;color:rgba(255,255,255,.82);font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+@media print{body:not(.printing){display:none!important}}
+</style>
+</head>
+<body>
+<div id="masthead">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg>
+    </div>
+    <div class="logo-text">Cap<span>Plan</span></div>
+  </div>
+  <div class="mast-title-block">
+    <div class="mast-title">Maximum Purchase Price</div>
+    <div class="mast-question">What is the maximum we should pay for this asset?</div>
+  </div>
+  <div style="position:relative"><button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600" id="cur-btn" onclick="toggleCur()"><span id="cur-label">$ USD</span> ▾</button><div id="cur-dropdown" style="display:none;position:absolute;right:0;top:110%;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,29,46,.16);min-width:200px;z-index:300;overflow:hidden"></div></div>
+  <div class="sl-group">
+    <button class="sl-help-btn" id="sl-help-btn" title="Save &amp; Load help">?</button>
+    <button class="sl-btn" id="sl-save-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Save
+    </button>
+    <button class="sl-btn" id="sl-load-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Load
+    </button>
+  </div>
+</div>
+<div id="stepper">
+  <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Asset Details</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step2"><div class="step-num" id="sn2">2</div><div class="step-label">Results</div></div>
+</div>
+<div id="main-content"></div>
+<!-- Auth0 SPA SDK + CapPlan auth library -->
+<script src="../../capplan-auth.js"></script>
+<script>
+var CURRENCIES=[{code:"USD",symbol:"$",label:"US Dollar"},{code:"EUR",symbol:"€",label:"Euro"},{code:"JPY",symbol:"¥",label:"Japanese Yen"},{code:"GBP",symbol:"£",label:"British Pound"},{code:"INR",symbol:"₹",label:"Indian Rupee"},{code:"CHF",symbol:"CHF",label:"Swiss Franc"},{code:"CAD",symbol:"CA$",label:"Canadian Dollar"},{code:"AUD",symbol:"AU$",label:"Australian Dollar"},{code:"NZD",symbol:"NZ$",label:"New Zealand Dollar"}];
+function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
+
+var S={
+  page:1,currency:"USD",cur_open:false,  coc_open:false,coc_eq_mode:"gordon",coc_kd:6,coc_tax:35,coc_div:0,coc_price:0,coc_g:5,coc_rf:4.5,coc_beta:1.0,coc_mrp:5.5,coc_wd:50,
+  res:null,show_dcf:false,
+  res_tab:0, show_all:false,show_coc_sens:false,show_ben_sens:false,missingFields:null,
+  bw_open:false,bw_type:"cost_saving",bw_current:"",bw_improvement:"",
+  benefits:"",life:"",svPct:"",method:"Double-declining",hyr:true,ddbRate:"",
+  taxRate:"",coc:""
+};
+
+function toggleCur(){S.cur_open=!S.cur_open;var dd=document.getElementById("cur-dropdown");dd.style.display=S.cur_open?"block":"none";if(S.cur_open){dd.innerHTML="";CURRENCIES.forEach(function(c){var b=document.createElement("button");b.style.cssText="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:"+(c.code===S.currency?"var(--blue-soft)":"transparent")+";border:none;border-bottom:1px solid var(--border);cursor:pointer";b.innerHTML='<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--blue);width:36px">'+c.symbol+'</span><span>'+c.label+'</span>';b.onclick=function(){S.currency=c.code;S.cur_open=false;var dd=document.getElementById('cur-dropdown');if(dd)dd.style.display='none';render();};dd.appendChild(b);});}}
+
+// ── CALC — Analytical solver ──────────────────────────────────────────────────
+// NPV = -P + pvBen + P*pvTSfactor(method,hyr,rate,life,r,tax) + P*svPct*(1-tax)/(1+r)^life = 0
+// P = pvBen / (1 - pvTSfactor*tax - svPct*(1-tax)/(1+r)^life)
+
+function calcDeprFactors(life,method,hyr,ddbRate){
+  // Returns depr per $1 of purchase price for each year
+  var d=[];
+  if(method==="Double-declining"){var rate=ddbRate/100;d.push(rate*(hyr?0.5:1));for(var y=2;y<=life;y++)d.push((1-d.reduce(function(s,v){return s+v},0))*rate);}
+  else if(method==="Straight-line"){var y1=1/life*(hyr?0.5:1);d.push(y1);for(var y=2;y<=life;y++)d.push(hyr?(1-y1)/(life-1):1/life);}
+  return d;
+}
+
+function calcMaxPrice(benefits,life,svPct,method,hyr,ddbRate,taxRate,coc){
+  var tx=taxRate/100, r=coc/100;
+  var pvBen=benefits*(1-tx)*((1-Math.pow(1+r,-life))/r);
+  var pvTSfactor=0;
+  {
+    var df=calcDeprFactors(life,method,hyr,ddbRate);
+    pvTSfactor=df.reduce(function(s,d,i){return s+d*tx/Math.pow(1+r,i+1)},0);
+  }
+  var pvSalvFactor=(svPct/100)*(1-tx)/Math.pow(1+r,life);
+  var denom=1-pvTSfactor-pvSalvFactor;
+  var maxPrice=denom>0?pvBen/denom:0;
+
+  // CoC sensitivity
+  var cocSens=[-6,-4,-2,-1,0,1,2,4,6].map(function(delta){
+    var r2=(coc+delta)/100;if(r2<=0)return{coc:coc+delta,price:0};
+    var pvB2=benefits*(1-tx)*((1-Math.pow(1+r2,-life))/r2);
+    var pvTS2=0;
+    var df2=calcDeprFactors(life,method,hyr,ddbRate);pvTS2=df2.reduce(function(s,d,i){return s+d*tx/Math.pow(1+r2,i+1)},0);
+    var pvS2=(svPct/100)*(1-tx)/Math.pow(1+r2,life);
+    var d2=1-pvTS2-pvS2;
+    return{coc:coc+delta,price:d2>0?pvB2/d2:0};
+  });
+
+  // Benefits sensitivity (±40% in 10% steps)
+  var benSens=[-0.40,-0.30,-0.20,-0.10,0,0.10,0.20,0.30,0.40].map(function(delta){
+    var b2=benefits*(1+delta);
+    var pvB2=b2*(1-tx)*((1-Math.pow(1+r,-life))/r);
+    var d2=1-pvTSfactor-pvSalvFactor;
+    return{benefits:b2,price:d2>0?pvB2/d2:0,delta:delta*100};
+  });
+
+  // Negotiation range: max price at required return vs at 0%
+  var pvBen0=benefits*(1-tx)*life; // at r=0
+  var ceiling0=denom>0?pvBen0/(1-pvSalvFactor):0;
+
+  return{maxPrice:maxPrice,pvBen:pvBen,pvTSfactor:pvTSfactor,pvSalvFactor:pvSalvFactor,
+    cocSens:cocSens,benSens:benSens,negotiationCeiling:ceiling0,denom:denom};
+}
+
+function calcAll(){
+  return calcMaxPrice(+S.benefits||0,+S.life||1,+S.svPct||0,S.method,S.hyr,+S.ddbRate,+S.taxRate||0,+S.coc||0);
+}
+
+function fmt(n,d){if(n==null||isNaN(n))return"--";d=d||0;return n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmtM(n){if(n==null||isNaN(n))return"--";var s=getSym();return n<0?"-"+s+fmt(Math.abs(n)):s+fmt(n)}
+
+function updateStepper(){for(var i=1;i<=2;i++){var step=document.getElementById("step"+i),sn=document.getElementById("sn"+i);step.className="step";if(i<S.page){step.classList.add("done");sn.textContent="✓"}else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}else sn.textContent=String(i);var n=i;(function(n,step){step.onclick=function(){if(n<S.page||(n===2&&S.res)){S.page=n;render()}}})(n,step);step.style.cursor=(i<S.page||(i===2&&S.res))?"pointer":"default";}}
+
+var NOTES_BUS=[
+  {q:"How do I estimate annual benefits?",a:"The annual after-tax value the asset will generate — cost savings, revenue, or efficiency gains. Be conservative and use an average where benefits vary year to year."},
+  {q:"How is salvage value handled?",a:"Entered as a percentage of whatever you pay. Both salvage and depreciation tax shields scale with the unknown price, allowing the model to solve for the maximum price analytically."}
+];
+var NOTES_CON=[
+  {q:"How do I use this result when bidding?",a:"This is your price ceiling. Any price below it earns more than your target return; any price above earns less. Use it as your walk-away limit in negotiations."},
+  {q:"What is the negotiation range?",a:"The gap between the asking price and your maximum. If the asking price exceeds your maximum, either negotiate it down, accept a lower return, or walk away."}
+];
+
+function makeBNList(notes,id){var list=document.getElementById(id);if(!list)return;list.innerHTML="";notes.forEach(function(n,i){var item=document.createElement("div");item.className="bn-item";var head=document.createElement("div");head.className="bn-head";head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+id+i+'">›</div>';var body=document.createElement("div");body.className="bn-body";body.textContent=n.a;if(n.v){var vb=document.createElement("button");vb.className="watch-btn";vb.textContent="▶ Learn More";vb.onclick=function(e){e.stopPropagation();openVideo(n.v)};body.appendChild(vb)}head.onclick=function(){var open=body.classList.contains("open");body.classList.toggle("open");document.getElementById("arr"+id+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";head.style.background=open?"":"var(--surface)";};item.appendChild(head);item.appendChild(body);list.appendChild(item);})}
+function cR(l,k,v,s){return'<div style="margin-bottom:11px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:5px">'+l+'</div><div class="ui"><input type="text" value="'+v+'" onchange="S.'+k+'=+this.value||0;renderCoC()" onfocus="this.style.borderBottomColor=\'var(--blue)\'" onblur="this.style.borderBottomColor=\'var(--border)\'" style="font-family:monospace;font-size:15px;font-weight:600;border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;outline:none;padding:2px 0">'+(s?'<span style="font-size:12px;color:var(--t3)">'+s+'</span>':'')+'</div></div>'}
+
+function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last?" last":"")+'"><div class="field-label">'+l+'</div>'+h+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';}
+function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--blue)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
+
+function validateInputs(){
+  var errs=[];
+  if(S.benefits!==''&&+S.benefits<=0) errs.push("Annual benefit must be greater than zero");
+  if(+S.life<=0) errs.push("Asset life must be greater than zero");
+  if(+S.svPct<0) errs.push("Salvage percentage cannot be negative");
+  if(+S.svPct>=100) errs.push("Salvage percentage cannot equal or exceed 100%");
+  if(S.method==="Double-declining"&&!(+S.ddbRate>0)) errs.push("Depreciation rate must be greater than zero for double-declining method");
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.coc<=0) errs.push("Required return must be greater than zero");
+  return errs;
+}
+function goToResults(){
+  var missing=[];  if(!S.benefits&&S.benefits!==0)missing.push("Annual Benefits");if(!S.life)missing.push("Economic Life");
+  if(!S.svPct&&S.svPct!==0)missing.push("Salvage Value %");
+  if(S.method==="Double-declining"&&!S.ddbRate)missing.push("Depreciation Rate");
+  if(!S.taxRate)missing.push("Tax Rate");if(!S.coc)missing.push("Required Return");
+  if(missing.length>0){S.missingFields=missing;render();return;}
+  S.missingFields=null;
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
+  try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+}
+function resetInputs(){S.benefits="";S.life="";S.svPct="";S.method="Double-declining";S.hyr=true;S.ddbRate="";S.taxRate="";S.coc="";S.missingFields=null;S.bw_open=false;S.bw_current="";S.bw_improvement="";render();}
+function loadExample(){
+    S.benefits=20000;S.life=10;S.svPct=10;S.method="Double-declining";S.hyr=true;S.ddbRate=20;S.taxRate=30;S.coc=12;
+  S.missingFields=null;render();
+}
+
+function drawChart(canvasId,data,current){
+  var canvas=document.getElementById(canvasId);if(!canvas)return;
+  var ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;
+  var pad={top:16,bottom:48,left:80,right:16};var cw=W-pad.left-pad.right,ch=H-pad.top-pad.bottom;
+  ctx.clearRect(0,0,W,H);
+  var vals=data.map(function(d){return d.price});var minV=Math.min.apply(null,vals),maxV=Math.max.apply(null,vals);var rng=maxV-minV||maxV*0.2;var lo=minV-rng*0.1,hi=maxV+rng*0.15;
+  ctx.strokeStyle="#E2E6EC";ctx.lineWidth=1;
+  for(var i=0;i<=4;i++){var y=pad.top+ch*(1-i/4);ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();ctx.fillStyle="#8A96A6";ctx.font="10px system-ui";ctx.textAlign="right";ctx.fillText(getSym()+fmt((lo+(hi-lo)*(i/4))/1000,0)+"k",pad.left-3,y+3);}
+  var bw=Math.floor(cw/data.length*0.6),gap=cw/data.length,midIdx=data.findIndex(function(d){return d.coc===current});if(midIdx<0)midIdx=Math.floor(data.length/2);
+  data.forEach(function(d,i){var x=pad.left+gap*i+(gap-bw)/2,bh=(d.price-lo)/(hi-lo)*ch,y=pad.top+ch-bh;ctx.fillStyle=i===midIdx?"#1B3F6E":"#93B4D8";ctx.fillRect(x,y,bw,bh);ctx.fillStyle=i===midIdx?"var(--blue)":"#8A96A6";ctx.font=i===midIdx?"bold 10px system-ui":"10px system-ui";ctx.textAlign="center";ctx.fillText(d.coc+"%",x+bw/2,H-pad.bottom+13);});
+  ctx.strokeStyle="#4A5568";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(pad.left,pad.top+ch);ctx.lineTo(pad.left+cw,pad.top+ch);ctx.stroke();ctx.fillStyle="#4A5568";ctx.font="bold 12px system-ui";ctx.textAlign="center";ctx.fillText("Required Return (%)",pad.left+cw/2,H-3);
+
+  canvas.style.cursor='crosshair';
+  canvas.addEventListener('touchstart',function(e){e.preventDefault();},{passive:false});
+
+  var tip=document.createElement('div');
+  tip.style.cssText='position:absolute;background:#1B3F6E;color:white;padding:5px 10px;border-radius:6px;font-size:12px;font-weight:700;pointer-events:none;display:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2)';
+  canvas.parentNode.style.position='relative';
+  canvas.parentNode.appendChild(tip);
+  canvas.addEventListener('mousemove',function(e){
+    var rect=canvas.getBoundingClientRect();
+    var mx=(e.clientX-rect.left)*(W/rect.width);
+    var hit=null;
+    data.forEach(function(d,i){
+      var x=pad.left+gap*i+(gap-bw)/2;
+      if(mx>=x&&mx<=x+bw) hit=d;
+    });
+    if(hit){
+      tip.style.display='block';
+      tip.style.left=(e.clientX-rect.left+12)+'px';
+      tip.style.top=(e.clientY-rect.top-28)+'px';
+      tip.textContent=hit.coc+'% return: max price '+getSym()+fmt(hit.price,0);
+    } else { tip.style.display='none'; }
+  });
+  canvas.addEventListener('mouseleave',function(){tip.style.display='none';});
+}
+function renderCoC(){
+  var box=document.getElementById('coc-box');if(!box)return;box.innerHTML='';
+
+  // ── Collapsed button ──
+  if(!S.coc_open){
+    box.innerHTML='<button onclick="S.coc_open=true;renderCoC()" style="display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;background:none;border:none;cursor:pointer;text-align:left"><div style="width:34px;height:34px;background:var(--green-soft);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="9" r="3"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2"/></svg></div><div><div style="font-size:13px;font-weight:700;color:var(--blue)">Cost of Capital Calculator</div><div style="font-size:11px;color:var(--t3);margin-top:2px">After-tax debt · Cost of equity · WACC</div></div><span style="margin-left:auto;color:var(--t3)">›</span></button>';
+    return;
+  }
+
+  // ── Calculations ──
+  var kd_at = +(S.coc_kd*(1-S.coc_tax/100)).toFixed(2);
+  var ke_gordon = S.coc_price>0 ? +((S.coc_div/S.coc_price*100)+S.coc_g).toFixed(2) : 0;
+  var ke_capm   = +(S.coc_rf+S.coc_beta*S.coc_mrp).toFixed(2);
+  var ke        = S.coc_eq_mode==='gordon' ? ke_gordon : ke_capm;
+  var we        = Math.max(0,100-S.coc_wd);
+  var wacc      = +(kd_at*S.coc_wd/100 + ke*we/100).toFixed(2);
+
+  function tip(t){return '<div style="font-size:10px;color:var(--t3);line-height:1.5;margin-top:3px;font-style:italic">'+t+'</div>';}
+  function row(label,key,val,suffix,tipText,readOnly){
+    var input=readOnly
+      ? '<span style="font-family:monospace;font-size:15px;font-weight:700;color:var(--blue)">'+val+(suffix?'&thinsp;'+suffix:'')+'</span>'
+      : '<div class="ui"><input type="text" value="'+val+'" onchange="S.'+key+'=+this.value||0;renderCoC()" style="font-family:monospace;font-size:15px;font-weight:600;border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;outline:none;padding:2px 0">'+(suffix?'<span style="font-size:12px;color:var(--t3)">'+suffix+'</span>':'')+'</div>';
+    return '<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:4px">'+label+'</div>'+input+(tipText?tip(tipText):'')+'</div>';
+  }
+  function sectionHead(n,title,color){
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:20px;height:20px;border-radius:50%;background:'+color+';color:white;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+n+'</div><div style="font-size:12px;font-weight:700;color:var(--t1)">'+title+'</div></div>';
+  }
+  function result(label,val,suffix){
+    return '<div style="background:var(--surface);border-radius:6px;padding:8px 10px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:var(--t2)">'+label+'</span><span style="font-family:monospace;font-size:15px;font-weight:700;color:var(--blue)">'+val+(suffix?'&thinsp;'+suffix:'')+'</span></div>';
+  }
+
+  var html='<div style="border:1px solid var(--blue);border-radius:10px;overflow:hidden">';
+  html+='<div style="background:var(--blue);padding:11px 14px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:700;color:white">Cost of Capital Calculator</span><button onclick="S.coc_open=false;renderCoC()" style="color:rgba(255,255,255,.7);background:none;border:none;font-size:20px;cursor:pointer;line-height:1">×</button></div>';
+  html+='<div style="padding:14px">';
+
+  // ── Section 1: After-tax cost of borrowing ──
+  html+=sectionHead(1,'After-tax cost of borrowing','var(--blue)');
+  html+=row('Interest rate on your debt','coc_kd',S.coc_kd,'%','The annual rate your bank or lender charges on loans or lines of credit.');
+  html+=row('Your business tax rate','coc_tax',S.coc_tax,'%','Because interest payments are tax-deductible, the government covers part of your borrowing cost. Your true cost is the interest rate minus the tax saving.');
+  html+=result('After-tax cost of borrowing',kd_at,'%');
+
+  // ── Section 2: Cost of equity ──
+  html+=sectionHead(2,'Cost of equity','#9F7AEA');
+  // Toggle Gordon / CAPM
+  html+='<div style="display:flex;gap:6px;margin-bottom:12px">';
+  ['gordon','capm'].forEach(function(m,i){
+    var active=S.coc_eq_mode===m;
+    var label=m==='gordon'?'Growth model':'CAPM';
+    var sub=m==='gordon'?'Dividend / earnings growth':'Market risk';
+    html+='<button onclick="S.coc_eq_mode=\''+m+'\';renderCoC()" style="flex:1;padding:7px 8px;border-radius:7px;border:1.5px solid '+(active?'var(--blue)':'var(--border)')+';background:'+(active?'var(--blue-soft)':'transparent')+';cursor:pointer;text-align:left"><div style="font-size:11px;font-weight:700;color:'+(active?'var(--blue)':'var(--t2)')+'">'+label+'</div><div style="font-size:10px;color:var(--t3)">'+sub+'</div></button>';
+  });
+  html+='</div>';
+
+  if(S.coc_eq_mode==='gordon'){
+    html+=row('Expected dividend or profit distribution next year ($)','coc_div',S.coc_div,'$','The cash you expect to pay out to owners or shareholders in the coming year. For an owner-managed business, this is the return you expect to take out.');
+    html+=row('Current value of the business ($)','coc_price',S.coc_price,'$','What the business is worth today — the price a willing buyer would pay. If you are unsure, use book value or a recent valuation.');
+    html+=row('Expected annual growth rate of the firm','coc_g',S.coc_g,'%','How fast do you expect revenues and earnings to grow each year? A stable, mature business might use 2–3%. A growing business might use 5–8%.');
+    var formula=S.coc_price>0?'('+S.coc_div+' ÷ '+S.coc_price+' × 100) + '+S.coc_g+'% growth':'Enter a business value above';
+    html+='<div style="font-size:10px;color:var(--t3);margin-bottom:10px;font-style:italic">Formula: (annual distribution ÷ business value) + growth rate &nbsp;→&nbsp; '+formula+'</div>';
+  } else {
+    html+=row('Risk-free rate','coc_rf',S.coc_rf,'%','The return on a risk-free investment such as a government bond. Use the current rate on a 10-year government bond.');
+    html+=row('Beta (business risk factor)','coc_beta',S.coc_beta,'','A measure of how risky your business is relative to the overall market. 1.0 = average market risk. Higher values mean more risk. Most small businesses fall between 0.8 and 1.5.');
+    html+=row('Market risk premium','coc_mrp',S.coc_mrp,'%','The extra return investors demand for taking on business risk rather than holding safe government bonds. Typically 5–6% for most markets.');
+    html+='<div style="font-size:10px;color:var(--t3);margin-bottom:10px;font-style:italic">Formula: risk-free rate + (beta × market risk premium) = '+S.coc_rf+' + ('+S.coc_beta+' × '+S.coc_mrp+')</div>';
+  }
+  html+=result('Cost of equity',ke,'%');
+
+  // ── Section 3: Overall cost of capital ──
+  html+=sectionHead(3,'Overall cost of capital (WACC)','var(--green)');
+  html+='<div style="background:var(--surface);border-radius:6px;padding:8px 10px;margin-bottom:12px;font-size:11px;color:var(--t2)">Carried from above — after-tax cost of borrowing <strong>'+kd_at+'%</strong>, cost of equity <strong>'+ke+'%</strong></div>';
+  html+=row('Debt as % of total financing','coc_wd',S.coc_wd,'%','What proportion of your business is funded by loans vs. owner investment? For example, if you borrowed $60 of every $100 invested, enter 60.');
+  html+='<div style="font-size:11px;color:var(--t3);margin-bottom:10px">Equity portion: '+(100-S.coc_wd)+'%</div>';
+  html+='<div style="font-size:10px;color:var(--t3);margin-bottom:10px;font-style:italic">Formula: ('+kd_at+'% × '+S.coc_wd+'%) + ('+ke+'% × '+we+'%) = '+wacc+'%</div>';
+
+  // ── Final result ──
+  html+='<div style="margin-top:4px;padding:12px 14px;background:var(--green-soft);border-radius:8px;border:1px solid var(--green);display:flex;justify-content:space-between;align-items:center">';
+  html+='<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--green)">Cost of Capital</div><div style="font-family:monospace;font-size:24px;font-weight:700;color:var(--green)">'+wacc+'%</div></div>';
+  html+='<button onclick="S.coc='+wacc+';S.coc_open=false;renderCoC();var el=document.getElementById(\'inp-coc\');if(el){el.value='+wacc+';}" style="background:var(--green);color:white;border:none;border-radius:7px;padding:10px 14px;font-size:12px;font-weight:700;cursor:pointer">Use this rate →</button>';
+  html+='</div>';
+
+  html+='</div></div>';
+  box.innerHTML=html;
+}
+
+
+function updateWizard(){
+  var res=document.getElementById('bw-result');
+  if(!res)return;
+  var suggested=S.bw_type==='both'
+    ?(S.bw_current?Math.round(S.bw_current):0)
+    :(S.bw_current&&S.bw_improvement?Math.round(S.bw_current*S.bw_improvement/100):0);
+  if(suggested>0){
+    res.style.display='flex';
+    var lbl=res.querySelector('#bw-lbl');
+    if(lbl)lbl.textContent=getSym()+fmt(suggested,0);
+    var btn=res.querySelector('.wizard-use');
+    if(btn)btn.onclick=function(){S.benefits=suggested;S.bw_open=false;render();};
+  }else{
+    res.style.display='none';
+  }
+}
+
+function renderPage1(){
+  var sym=getSym(),isDDB=S.method==="Double-declining";
+  var html='<div class="page"><div class="page-grid"><aside>';
+  html+='<div class="section-label">Briefing Notes</div><div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div>';
+  html+='<div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div>';
+  html+='</aside><main>';
+
+  // How this works
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What it does.</strong> Calculates the maximum price you should pay for an asset and still earn your target return — accounting for depreciation tax shields and salvage value, both of which scale with the price paid.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you need.</strong> Expected annual benefit, asset life, salvage as a percentage of price, depreciation method, tax rate, and target return.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you get.</strong> Your price ceiling, a nominal ceiling at zero return, and sensitivity tables showing how the maximum changes with return and benefit assumptions.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Try the example.</strong> To see how the program works, click the <strong>Load Example</strong> button at the bottom of this page.</div></div></div></div>';
+
+  
+  // Benefit wizard
+  html+='<div class="helper-card">';
+  html+='<div class="helper-head" onclick="S.bw_open=!S.bw_open;render()">';
+  html+='<span class="helper-title">Help me estimate annual benefits</span>';
+  html+='<span style="font-size:11px;font-weight:700;color:var(--amber-dark);text-transform:uppercase;letter-spacing:.06em">'+(S.bw_open?'Hide':'Show')+'</span>';
+  html+='</div>';
+  if(S.bw_open){
+    html+='<div class="helper-body" style="display:flex;flex-direction:column;gap:14px">';
+    html+='<div style="font-size:12px;color:var(--t2);background:var(--surface);border-radius:6px;padding:8px 12px;line-height:1.5">';
+    html+='<strong>Pre-tax estimate.</strong> Enter pre-tax figures — the model applies the tax rate when calculating the maximum price.';
+    html+='</div>';
+    if(+S.benefits>0){
+      html+='<div style="background:rgba(245,158,11,0.12);border:1px solid var(--amber);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--amber-dark);line-height:1.5">';
+      html+='<strong>Note:</strong> An annual benefit of '+fmtM(+S.benefits)+' is already entered. ';
+      html+='Using this calculator will <strong>replace</strong> that value. ';
+      html+='<span style="cursor:pointer;text-decoration:underline" onclick="S.benefits=0;render()">Clear it first</span> if you want a clean start.';
+      html+='</div>';
+    }
+    html+='<div class="wizard-row"><div class="wizard-label">What type of benefit?</div>';
+    html+='<div class="pills" style="margin-top:6px">';
+    html+='<div class="pill'+(S.bw_type==="cost_saving"?" active":"")+'" onclick="S.bw_type=\'cost_saving\';render()"><div class="pill-dot"></div>Cost saving</div>';
+    html+='<div class="pill'+(S.bw_type==="revenue"?" active":"")+'" onclick="S.bw_type=\'revenue\';render()"><div class="pill-dot"></div>Revenue increase</div>';
+    html+='<div class="pill'+(S.bw_type==="both"?" active":"")+'" onclick="S.bw_type=\'both\';render()"><div class="pill-dot"></div>Both</div>';
+    html+='</div></div>';
+    var bwLbl=S.bw_type==="cost_saving"?"Current annual cost of this activity":S.bw_type==="revenue"?"Current annual revenue from this activity":"What is the combined annual value of the costs you expect to save plus the additional revenue you expect to earn from this new asset?";
+    html+='<div class="wizard-row"><div class="wizard-label">'+bwLbl+'</div>';
+    html+='<div class="underline-input" style="max-width:220px"><span class="pfx">'+sym+'</span>';
+    html+='<input type="text" value="'+(S.bw_current||"")+'" oninput="S.bw_current=this.value?+this.value:0;updateWizard()" onblur="S.bw_current=+this.value||0;updateWizard()" onfocus="this.style.borderBottomColor=\'var(--amber)\'"></div></div>';
+    if(S.bw_type!=='both'){
+      html+='<div class="wizard-row"><div class="wizard-label">Expected improvement from new asset</div>';
+      html+='<div class="underline-input" style="max-width:220px"><input type="text" value="'+(S.bw_improvement||"")+'" oninput="S.bw_improvement=this.value?+this.value:0;updateWizard()" onblur="S.bw_improvement=+this.value||0;updateWizard()" onfocus="this.style.borderBottomColor=\'var(--amber)\'"><span class="sfx">%</span></div></div>';
+    }
+    var bwSugg=S.bw_type==='both'?(S.bw_current?Math.round(S.bw_current):0):(S.bw_current&&S.bw_improvement?Math.round(S.bw_current*S.bw_improvement/100):0);
+    html+='<div class="wizard-result" id="bw-result" style="'+(bwSugg>0?'':'display:none')+'">';
+    html+='<div style="font-size:13px;color:var(--t2)">Suggested annual benefit: <strong style="color:var(--green)" id="bw-lbl">'+(bwSugg>0?fmtM(bwSugg):'')+' </strong></div>';
+    html+='<button class="wizard-use" onclick="S.benefits='+bwSugg+';S.bw_open=false;render()">Use this estimate ›</button>';
+    html+='</div>';
+    html+='</div>';
+  }
+  html+='</div>';
+
+    html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset Data</div></div><div class="field-grid">';
+  html+=field("Annual Benefits (pre-tax)",uIn(sym,S.benefits,"inp-ben","S.benefits=+this.value||0","",false),false,false,"Enter the pre-tax annual benefit — incremental revenues or cost savings. The model applies the tax rate to calculate the after-tax present value.");
+  html+=field("Economic Life",uIn("",S.life,"inp-life","S.life=+this.value||0","years",false));
+  html+=field("Salvage Value (% of purchase price)",uIn("",S.svPct,"inp-sv","S.svPct=+this.value||0","%",false),false,true,"Enter as a percentage — e.g. 10 means 10% of whatever you pay");
+  html+='</div></div>';
+
+  {
+    html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--green)"></div><div class="panel-title">Depreciation</div></div><div class="field-grid">';
+    html+=field("Method",'<div class="ui"><select onchange="S.method=this.value;render()">'+["Double-declining","Straight-line","Sum-of-years-digits"].map(function(m){return'<option'+(m===S.method?" selected":"")+'>'+m+'</option>'}).join("")+'</select></div>');
+    html+=field(isDDB?"Rate":"Rate — N/A",uIn("",isDDB?S.ddbRate:"N/A","inp-rate","if(S.method===\'Double-declining\')S.ddbRate=+this.value||0","%",!isDDB)+(!isDDB?'<div class="field-note">Defined by method formula</div>':""));
+    html+=field("Half-Year Rule",'<div class="pills"><div class="pill'+(S.hyr?" active":"")+'" onclick="S.hyr=true;render()"><div class="pill-dot"></div>Yes</div><div class="pill'+(!S.hyr?" active":"")+'" onclick="S.hyr=false;render()"><div class="pill-dot"></div>No</div></div>',true,true);
+    html+='</div></div>';
+  }
+
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--t3)"></div><div class="panel-title">'+("Firm Data")+'</div></div><div class="field-grid">';
+  html+=field("Tax Rate",uIn("",S.taxRate,"inp-tax","S.taxRate=+this.value||0","%",false));
+  html+=field("Required Rate of Return",uIn("",S.coc,"inp-coc","S.coc=+this.value||0","%",false),false,true);
+  html+='</div></div>';
+
+  if(S.missingFields&&S.missingFields.length>0)html+='<div style="background:rgba(200,75,49,.07);border:1.5px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)"><strong>Please complete:</strong> '+S.missingFields.join(", ")+'.</div>';
+  html+='<div class="action-row" style="justify-content:space-between;align-items:center"><span style="font-size:11.5px;color:var(--t3)">New here? Try <strong style="color:var(--t2)">Load Example</strong></span><div style="display:flex;gap:10px"><button class="btn-ghost" onclick="loadExample()">Load Example</button><button class="btn-ghost" onclick="resetInputs()">Reset</button><button class="btn-primary" onclick="goToResults()">Calculate ›</button></div></div>';
+  html+='</main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES_BUS,"bn-list1");
+  renderCoC();
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+  autoSave();
+}
+
+function renderResTab(t,active){
+  var s='<div onclick="S.res_tab='+t+';renderPage2()" ';
+  s+='style="padding:9px 16px;cursor:pointer;font-size:13px;font-weight:600;';
+  s+='border-radius:8px 8px 0 0;border:1.5px solid '+(active?'var(--blue)':'var(--border)')+';';
+  s+='border-bottom:'+(active?'2px solid white':'1.5px solid var(--border)')+';';
+  s+='background:'+(active?'white':'transparent')+';';
+  s+='color:'+(active?'var(--blue)':'var(--t2)')+';margin-bottom:-2px">';
+  return s;
+}
+
+function renderPage2(){
+  var res=S.res,sym=getSym();
+  var tabLabels=['Summary','Chart','Sensitivity','Detail'];
+  if(S.res_tab>=tabLabels.length)S.res_tab=0;
+  var isFullWidth=(S.res_tab>=1);
+  var html='<div class="page"><div class="p2-grid" style="grid-template-columns:'+(isFullWidth?'1fr':'280px 1fr')+'">';
+
+  if(S.res_tab===0){
+    html+='<aside>';
+    html+='<div class="section-label">Understanding Results</div><div class="panel" style="margin-bottom:14px"><div id="bn-list2"></div></div>';
+    html+='<div style="display:flex;flex-direction:column;gap:10px"><button class="btn-ghost" onclick="S.page=1;render()" style="width:148px;text-align:center">‹ Edit Inputs</button><button class="print-btn" onclick="printSummary()" style="width:148px;text-align:center">&#128374; Print Summary</button><div style="font-size:10px;color:#8A96A6;margin-top:6px">Use this button to print correctly</div></div>';
+    html+='</aside>';
+  } else {
+    html+='<aside style="padding:20px 16px"><button class="btn-ghost" onclick="S.page=1;render()" style="width:148px;text-align:center">‹ Edit Inputs</button><br><br><button class="print-btn" onclick="printSummary()" style="width:148px;text-align:center">&#128374; Print Summary</button></aside>';
+  }
+
+  html+='<main>';
+  html+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;border-bottom:2px solid var(--border)">';
+  tabLabels.forEach(function(label,t){
+    html+=renderResTab(t,S.res_tab===t)+label+'</div>';
+  });
+  html+='</div>';
+
+  // ── TAB 0: SUMMARY ────────────────────────────────────────────────────────
+  if(S.res_tab===0){
+    html+='<div class="result-banner">';
+    html+='<div><div style="font-family:Georgia,serif;font-size:22px;color:var(--green);line-height:1.3">Maximum purchase price: <strong>'+fmtM(res.maxPrice)+'</strong></div>';
+    html+='<div style="font-size:13px;color:var(--t2);margin-top:8px;line-height:1.6">Do not pay more than this amount to earn your '+S.coc+'% required return. This is your walk-away price in any negotiation.</div></div>';
+    html+='<div style="background:var(--green);border-radius:10px;padding:14px 20px;text-align:center;flex-shrink:0"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.75)">Maximum Price</div><div style="font-family:monospace;font-size:26px;font-weight:800;color:white;margin-top:4px">'+fmtM(res.maxPrice)+'</div></div></div>';
+    html+='<div class="metrics">';
+    html+='<div class="metric"><div class="metric-label">Maximum Price</div><div class="metric-val ok">'+fmtM(res.maxPrice)+'</div><div class="metric-sub">Walk-away at '+S.coc+'% required return</div></div>';
+    html+='<div class="metric"><div class="metric-label">PV of Benefits</div><div class="metric-val ok">'+fmtM(res.pvBen)+'</div><div class="metric-sub">After-tax benefits × AT annuity factor</div></div>';
+    html+='<div class="metric"><div class="metric-label">Negotiation Ceiling</div><div class="metric-val warn">'+fmtM(res.negotiationCeiling)+'</div><div class="metric-sub">Maximum at 0% return — do not exceed</div></div>';
+    html+='</div>';
+    var range=res.negotiationCeiling-res.maxPrice;var pct=range>0?range/res.negotiationCeiling*100:0;
+    html+='<div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.06)">';
+    html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:12px">Negotiation Range</div>';
+    html+='<div style="display:flex;height:28px;border-radius:5px;overflow:hidden;margin-bottom:8px">';
+    html+='<div style="flex:1;background:var(--green);display:flex;align-items:center;padding:0 10px"><span style="font-size:11px;font-weight:700;color:white">Your target: '+fmtM(res.maxPrice)+'</span></div>';
+    html+='<div style="width:'+Math.max(5,pct).toFixed(0)+'%;background:#F59E0B;display:flex;align-items:center;padding:0 8px;min-width:80px"><span style="font-size:10px;font-weight:700;color:#92400E;white-space:nowrap">+'+fmtM(range)+'</span></div>';
+    html+='</div>';
+    html+='<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3)"><span>Maximum at your required return</span><span>Ceiling at 0% return: '+fmtM(res.negotiationCeiling)+'</span></div>';
+    html+='</div>';
+  }
+
+  // ── TAB 1: SENSITIVITY ────────────────────────────────────────────────────
+  else if(S.res_tab===1){
+    html+='<div class="panel" style="margin-bottom:18px;break-inside:auto!important;page-break-inside:auto!important"><div class="chart-box" style="break-inside:auto!important;page-break-inside:auto!important">';
+    html+='<div class="chart-title">Maximum Price by Required Return</div>';
+    html+='<div class="chart-sub">Higher required return demands a lower maximum price</div>';
+    html+='<canvas id="price-chart" width="700" height="420" style="width:100%;height:auto;display:block"></canvas>';
+    html+='</div></div>';
+  }else if(S.res_tab===2){
+    html+='<div class="collapsible"><div class="coll-head"><span class="coll-title">Maximum Price by Annual Benefits</span></div>';
+    html+='<div class="coll-body open" style="padding:4px 0"><div style="padding:10px 18px 6px;font-size:12px;color:var(--t2);line-height:1.6">How the maximum price changes as annual benefit estimates vary. Use this to understand the sensitivity of your bid to your benefit assumptions.</div>';
+    html+='<table><thead><tr><th class="left">Annual Benefits</th><th>Maximum Price</th><th>vs Current</th></tr></thead><tbody>';
+    res.benSens.forEach(function(row){
+      var isCur=Math.abs(row.delta)<0.001;var diff=row.price-res.maxPrice;
+      html+='<tr'+(isCur?' class="highlight"':'')+'>'
+        +'<td class="left">'+(isCur?'★ ':'')+fmtM(row.benefits)+(row.delta!==0?' ('+(row.delta>0?'+':'')+fmt(row.delta,0)+'%)':'')+'</td>'
+        +'<td>'+fmtM(row.price)+'</td>'
+        +'<td style="color:'+(isCur?'var(--t3)':diff>0?'var(--green)':'var(--warn)')+'">'+(isCur?'current':(diff>0?'+':'')+fmtM(diff))+'</td></tr>';
+    });
+    html+='</tbody></table></div></div>';
+  }
+
+  // ── TAB 3: DETAIL ─────────────────────────────────────────────────────────
+  else if(S.res_tab===3){
+    html+='<div style="text-align:right;margin-bottom:12px"><button onclick="S.show_all=!S.show_all;S.show_dcf=S.show_all;renderPage2()" style="background:none;border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--t2)">'+(S.show_all?'Collapse All':'Expand All')+'</button></div>';
+    html+='<div class="collapsible"><div class="coll-head" onclick="S.show_dcf=!S.show_dcf;renderPage2()"><span class="coll-title">DCF Summary</span><span style="font-size:12px;font-weight:600;color:var(--blue)">'+(S.show_dcf?'Hide':'Show')+'</span></div>';
+    if(S.show_dcf){
+      html+='<div class="coll-body open"><div style="padding:12px 18px;font-size:12px;color:var(--t2)">At the maximum price of '+fmtM(res.maxPrice)+', NPV = 0. Every dollar less generates positive NPV.</div>';
+      html+='<table><tbody>';
+      html+='<tr class="total-row"><td class="left" colspan="2">Inflows at Maximum Price (P)</td><td>'+fmtM(res.pvBen+res.pvTSfactor*res.maxPrice+res.pvSalvFactor*res.maxPrice)+'</td></tr>';
+      html+='<tr><td class="left">PV of benefits (AT annuity)</td><td class="sub">Years 1–'+S.life+'</td><td>'+fmtM(res.pvBen)+'</td></tr>';
+      html+='<tr><td class="left">PV of depreciation tax shields</td><td class="sub">Years 1–'+S.life+'</td><td>'+fmtM(res.pvTSfactor*res.maxPrice)+'</td></tr>';
+      html+='<tr><td class="left">PV of AT salvage value ('+S.svPct+'% of P)</td><td class="sub">Year '+S.life+'</td><td>'+fmtM(res.pvSalvFactor*res.maxPrice)+'</td></tr>';
+      html+='<tr class="total-row" style="border-top:2px solid var(--blue)"><td class="left" colspan="2">Maximum Purchase Price (= Total PV Inflows)</td><td style="color:var(--green);font-size:15px;font-weight:800">'+fmtM(res.maxPrice)+'</td></tr>';
+      html+='</tbody></table></div>';
+    }
+    html+='</div>';
+  }
+
+  html+='</main></div></div>';
+  window._capRawHtml=html;
+  document.getElementById('main-content').innerHTML=html;
+  makeBNList(NOTES_BUS,"bn-list2");
+  document.getElementById("cur-label").textContent=getSym()+" "+S.currency;
+  if(S.res_tab===1){setTimeout(function(){drawChart("price-chart",res.cocSens,+S.coc);},50);}
+}
+
+function printSummary(){
+  var res=S.res;if(!res)return;
+  var savedTab=S.res_tab,pd0=S.show_dcf,pd1=S.show_ben_sens;
+  S.show_dcf=true;S.show_ben_sens=true;
+  var _mc=document.getElementById('main-content');
+  var _saved=_mc.innerHTML;
+  var _savedPage=S.page;
+  var pages=[];
+  var tabLabels=['Summary','Chart','Sensitivity','Detail'];
+  for(var ti=0;ti<tabLabels.length;ti++){
+    S.res_tab=ti;renderPage2();
+    if(ti===1){drawChart('price-chart',res.cocSens,+S.coc);}
+    document.querySelectorAll('canvas').forEach(function(cv){
+      var img=document.createElement('img');
+      img.src=cv.toDataURL('image/png');
+      img.style.cssText='width:100%;height:auto;display:block';
+      cv.parentNode.replaceChild(img,cv);
+    });
+    var _main=document.querySelector('main');
+    var _html=_main?_main.innerHTML:'';
+    pages.push('<div class="pg"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8A96A6;margin-bottom:8px">'+tabLabels[ti]+'</div>'+_html+'</div>');
+  }
+  S.res_tab=savedTab;S.show_dcf=pd0;S.show_ben_sens=pd1;renderPage2();
+  var hdr='<div style="background:#1B3F6E;padding:8px 24px"><span style="color:white;font-family:Georgia,serif;font-weight:600;font-size:15px">CapPlan — Maximum Purchase Price</span></div>';
+  pages[0]='<div class="pg">'+hdr+pages[0].slice('<div class="pg">'.length);
+  for(var pi=1;pi<pages.length;pi++){
+    pages[pi]=pages[pi].replace('<div class="pg">','<div class="pg" style="page-break-before:always;break-before:page">');
+  }
+  var _ovr=document.createElement('style');
+  _ovr.id='_print_ovr';
+  _ovr.textContent='.pg{width:100%;padding:0.2in;overflow:visible;box-sizing:border-box}'
+    +'@media print{'
+    +'aside,.print-btn,.btn-ghost,.coll-arr,#masthead,#stepper{display:none!important}'
+    +'.p2-grid{display:block!important}.coll-body{display:block!important}'
+    +'#main-content{display:block!important}'
+    +'.chart-box,.panel,.collapsible,.result-banner,.metric{break-inside:auto!important;page-break-inside:auto!important}'
+    +'.coll-head{break-after:auto!important}tr{break-inside:auto!important}'
+    +'tbody{orphans:1!important;widows:1!important}'
+    +'main>div:first-child{display:none!important}'
+    +'img{max-height:4.5in!important;width:auto!important;display:block!important}'
+    +'@page{margin:0.4in;size:landscape}}';
+  document.head.appendChild(_ovr);
+  _mc.innerHTML=pages.join('');
+  var _mast=document.getElementById('masthead');
+  var _step=document.getElementById('stepper');
+  if(_mast)_mast.style.display='none';
+  if(_step)_step.style.display='none';
+  function _restore(){
+    document.body.classList.remove('printing');
+    if(_mast)_mast.style.display='';
+    if(_step)_step.style.display='';
+    _mc.innerHTML=_saved;
+    S.page=_savedPage;
+    var o=document.getElementById('_print_ovr');
+    if(o)o.parentNode.removeChild(o);
+    render();
+  }
+  window.onafterprint=function(){window.onafterprint=null;_restore();};
+  document.body.classList.add('printing');
+  setTimeout(function(){window.print();},50);
+}
+function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();var cl=document.getElementById("cur-label");if(cl)cl.textContent=getSym()+" "+S.currency;}
+// ── Storage: localStorage primary, IndexedDB secondary ───────────────────
+var IDB_NAME='capplan';
+var IDB_STORE='analyses';
+var IDB_MODEL='M13';
+var LS_STORE_KEY='capplan_m13_analyses';  // stores all named analyses
+var _idb=null;
+
+// localStorage helpers
+function lsGetAll(){
+  if(!LS_OK)return [];
+  try{
+    var obj=JSON.parse(localStorage.getItem(LS_STORE_KEY)||'{}');
+    var rows=[];
+    Object.keys(obj).forEach(function(k){rows.push(obj[k]);});
+    rows.sort(function(a,b){return b.saved>a.saved?1:-1;});
+    return rows;
+  }catch(e){return [];}
+}
+
+function lsSave(payload){
+  if(!LS_OK)return false;
+  try{
+    var obj=JSON.parse(localStorage.getItem(LS_STORE_KEY)||'{}');
+    obj[payload.label]=payload;
+    localStorage.setItem(LS_STORE_KEY,JSON.stringify(obj));
+    console.log('[CapPlan] lsSave: saved label='+payload.label+' total='
+      +Object.keys(obj).length);
+    return true;
+  }catch(e){console.error('[CapPlan] lsSave error',e);return false;}
+}
+
+function lsLoad(label){
+  if(!LS_OK)return null;
+  try{
+    var obj=JSON.parse(localStorage.getItem(LS_STORE_KEY)||'{}');
+    return obj[label]||null;
+  }catch(e){return null;}
+}
+
+function lsDelete(label){
+  if(!LS_OK)return;
+  try{
+    var obj=JSON.parse(localStorage.getItem(LS_STORE_KEY)||'{}');
+    delete obj[label];
+    localStorage.setItem(LS_STORE_KEY,JSON.stringify(obj));
+  }catch(e){}
+}
+
+// IndexedDB (used when deployed to a persistent origin)
+function openIDB(cb){
+  if(_idb){return cb(_idb);}
+  var req=indexedDB.open(IDB_NAME,1);
+  req.onupgradeneeded=function(e){
+    var db=e.target.result;
+    if(!db.objectStoreNames.contains(IDB_STORE)){
+      db.createObjectStore(IDB_STORE,{keyPath:'id',autoIncrement:true});
+    }
+  };
+  req.onsuccess=function(e){
+    _idb=e.target.result;
+    console.log('[CapPlan] openIDB: success, stores:',Array.from(_idb.objectStoreNames));
+    cb(_idb);
+  };
+  req.onerror=function(){console.error('[CapPlan] openIDB error');cb(null);};
+}
+
+function idbSave(payload,cb){
+  openIDB(function(db){
+    if(!db)return cb&&cb(null);
+    var rtx=db.transaction(IDB_STORE,'readonly');
+    var rreq=rtx.objectStore(IDB_STORE).getAll();
+    rreq.onsuccess=function(){
+      var rows=rreq.result||[];
+      var existing=rows.filter(function(r){
+        return r.model===IDB_MODEL&&r.label===payload.label;
+      });
+      if(existing.length)payload.id=existing[0].id;
+      var wtx=db.transaction(IDB_STORE,'readwrite');
+      var store=wtx.objectStore(IDB_STORE);
+      if(existing.length){
+        store.put(payload);
+      } else {
+        store.add(payload);
+      }
+      wtx.oncomplete=function(){
+        cb&&cb(true);
+      };
+      wtx.onerror=function(){console.error('[CapPlan] idbSave tx error');cb&&cb(false);};
+    };
+    rreq.onerror=function(){
+      var wtx=db.transaction(IDB_STORE,'readwrite');
+      wtx.objectStore(IDB_STORE).add(payload);
+      wtx.oncomplete=function(){cb&&cb(true);};
+    };
+  });
+}
+
+function idbGetAll(cb){
+  openIDB(function(db){
+    if(!db)return cb([]);
+    var tx=db.transaction(IDB_STORE,'readonly');
+    var req=tx.objectStore(IDB_STORE).getAll();
+    req.onsuccess=function(){
+      var all=req.result||[];
+      var rows=all.filter(function(r){return r.model===IDB_MODEL;});
+      rows.sort(function(a,b){return b.saved>a.saved?1:-1;});
+      cb(rows);
+    };
+    req.onerror=function(){console.error('[CapPlan] idbGetAll error');cb([]);};
+  });
+}
+
+function idbDelete(id,label,cb){
+  lsDelete(label);
+  openIDB(function(db){
+    if(!db)return cb&&cb();
+    var tx=db.transaction(IDB_STORE,'readwrite');
+    tx.objectStore(IDB_STORE).delete(id);
+    tx.oncomplete=function(){cb&&cb();};
+  });
+}
+
+// Primary save: localStorage. Secondary: IndexedDB.
+function storeSave(payload,cb){
+  var lsOk=lsSave(payload);
+  idbSave(payload,function(idbOk){
+    cb&&cb(lsOk||idbOk);
+  });
+}
+
+// Primary read: localStorage (reliable on localhost).
+// Falls back to IndexedDB if localStorage is empty.
+function storeGetAll(cb){
+  var lsRows=lsGetAll();
+  if(lsRows.length>0){
+    cb(lsRows);
+  } else {
+    idbGetAll(cb);
+  }
+}
+
+
+// ── Auto-save (localStorage fallback, IndexedDB primary) ─────────────────
+var AUTO_SAVE_KEY='capplan_m13_autosave';
+var LS_OK=(function(){try{localStorage.setItem('__t','1');localStorage.removeItem('__t');return true;}catch(e){return false;}})();
+var IDB_OK=(location.protocol!=='file:');
+
+
+function autoSave(){
+  var payload=buildPayload('\u2605 Last session');
+  // IndexedDB auto-save slot
+  // localStorage-primary save (persists reliably on localhost)
+  storeSave(payload,null);
+}
+
+function buildPayload(label){
+  var fields=['currency', 'coc_open', 'coc_eq_mode', 'coc_kd', 'coc_tax', 'coc_div', 'coc_price', 'coc_g', 'coc_rf', 'coc_beta', 'coc_mrp', 'coc_wd', 'cost', 'itcPct', 'life', 'salvage', 'method', 'hyr', 'ddbRate', 'workingCapital', 'annuity', 'annuityAmount', 'yearlyBenefits', 'taxRate', 'coc'];
+  var st={};fields.forEach(function(k){st[k]=S[k];});
+  return {capplan_version:'1.0',model:IDB_MODEL,saved:new Date().toISOString(),
+          label:label||'Untitled',state:st};
+}
+
+function applyPayload(p){
+  if(!p||!p.state)return false;
+  Object.keys(p.state).forEach(function(k){if(k in S)S[k]=p.state[k];});
+  S.res=null;S.page=1;S.show_dcf=false;S.show_table=false;
+  return true;
+}
+
+// ── Modal helper ──────────────────────────────────────────────────────────
+function getSLModal(){
+  var ov=document.getElementById('sl-modal');
+  if(!ov){ov=document.createElement('div');ov.id='sl-modal';document.body.appendChild(ov);}
+  ov.style.display='flex';ov.className='sl-modal-overlay';
+  return ov;
+}
+function closeSLModal(){
+  var el=document.getElementById('sl-modal');
+  if(el){el.style.display='none';el.innerHTML='';}
+}
+
+function showSLHelp(){
+  var ov=getSLModal();
+  ov.innerHTML='<div class="sl-modal" style="width:440px">'
+    +'<div class="sl-modal-title">Saving &amp; Loading Your Work</div>'
+    +'<div class="sl-help-panel">'
+    +'<ul>'
+    +'<li><strong>Auto-save:</strong> CapPlan automatically saves your work as you type. '
+    +'If you close the tab by accident, your data will still be there when you reopen it.</li>'
+    +'<li><strong>Save:</strong> Gives your analysis a name so you can find it later. '
+    +'Use this when you want to keep a permanent named copy &mdash; for example, '
+    +'&ldquo;City Hall HVAC&rdquo; or &ldquo;Warehouse Solar&rdquo;.</li>'
+    +'<li><strong>Load:</strong> Opens a list of all your saved analyses for this model. '
+    +'Click Load next to any entry to restore it. '
+    +'The &starf; Last session entry is your most recent auto-save.</li>'
+    +'<li><strong>Export file:</strong> Downloads your analysis as a .json file. '
+    +'Use this to back it up, move it to another computer, or share it with a colleague.</li>'
+    +'<li><strong>Import file:</strong> Loads a .json file that was previously exported. '
+    +'Available inside the Load dialog.</li>'
+    +'</ul>'
+    +'<div class="sl-help-note">'
+    +'Saved analyses are stored in this browser on this device. '
+    +'They are not affected by clearing your Downloads folder. '
+    +'Use <strong>Export</strong> to keep a copy outside the browser.'
+    +'</div>'
+    +'</div>'
+    +'<div class="sl-modal-btns">'
+    +'<button class="sl-modal-btn primary" onclick="closeSLModal()">Got it</button>'
+    +'</div>'
+    +'</div>';
+}
+
+// ── Save ──────────────────────────────────────────────────────────────────
+function saveAnalysis(){
+  var lbl='';
+  if(LS_OK)try{var ex=JSON.parse(localStorage.getItem(AUTO_SAVE_KEY)||'{}');
+    if(ex.label&&ex.label!=='★ Last session')lbl=ex.label;}catch(e){}
+  var inp=document.getElementById('save-label-input');
+  if(inp){inp.value=lbl;}
+  var m=document.getElementById('sl-save-modal');
+  if(m){m.style.display='flex';}
+  setTimeout(function(){if(inp){inp.focus();inp.select();}},50);
+}
+
+
+function confirmSave(){
+  var el=document.getElementById('save-label-input');
+  var label=(el?el.value.trim():'')||'Untitled analysis';
+  var payload=buildPayload(label);
+  function afterSave(){
+    var sm=document.getElementById('sl-save-modal');
+    if(sm)sm.style.display='none';
+    closeSLModal();
+    var btn=document.getElementById('sl-save-btn');
+    if(btn){var orig=btn.innerHTML;
+      btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Saved';
+      setTimeout(function(){btn.innerHTML=orig;},1800);}
+  }
+  storeSave(payload,function(ok){
+    afterSave();
+  });
+}
+
+// ── Export (download file) ────────────────────────────────────────────────
+function exportAnalysis(){
+  var el=document.getElementById('save-label-input');
+  var label=(el?el.value.trim():'')||'CapPlan Analysis';
+  var payload=buildPayload(label);
+  if(LS_OK)try{localStorage.setItem(AUTO_SAVE_KEY,JSON.stringify(payload));}catch(e){}
+  var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;
+  a.download=label.replace(/[^a-z0-9_\- ]/gi,'_').replace(/\s+/g,'_')+'.json';
+  a.click();URL.revokeObjectURL(url);
+  closeSLModal();
+}
+
+// ── Load ──────────────────────────────────────────────────────────────────
+function loadAnalysis(){
+  var ov=getSLModal();
+  if(!IDB_OK){
+    ov.innerHTML='<div class="sl-modal" style="width:400px">'
+      +'<div class="sl-modal-title">Load Analysis</div>'
+      +'<div style="padding:12px 14px;background:rgba(245,158,11,.1);border:1px solid var(--amber);border-radius:8px;font-size:13px;line-height:1.6;margin-bottom:16px">'
+      +'<strong>Saved analyses unavailable.</strong><br>'
+      +'You are opening this file directly from your hard drive. '
+      +'To use Save &amp; Load, open a terminal in your capplan folder and run:<br><br>'
+      +'<code style="background:var(--surface);padding:4px 8px;border-radius:4px;font-size:12px">python3 -m http.server 8080</code><br><br>'
+      +'Then open in your browser: <code>http://localhost:8080/capplan_model1.html</code>'
+      +'</div>'
+      +'<div class="sl-label" style="margin-bottom:6px">Or import a previously exported file</div>'
+      +'<button class="sl-modal-btn primary" style="width:100%" '
+      +'onclick="document.getElementById(\'sl-file-input\').click()">Import file\u2026</button>'
+      +'<div class="sl-modal-btns"><button class="sl-modal-btn secondary" onclick="closeSLModal()">Close</button></div>'
+      +'</div>';
+    return;
+  }
+  ov.innerHTML='<div class="sl-modal" style="width:420px"><div class="sl-modal-title">Load Analysis</div>'
+    +'<div id="sl-list-area"><div style="font-size:13px;color:var(--t2);padding:12px 0">Loading saved analyses\u2026</div></div>'
+    +'<div class="sl-modal-btns" style="margin-top:10px">'
+    +'<button class="sl-modal-btn secondary" onclick="closeSLModal()">Cancel</button>'
+    +'<button class="sl-modal-btn secondary" onclick="document.getElementById(\'sl-file-input\').click()">Import file</button>'
+    +'</div></div>';
+  storeGetAll(function(rows){
+    var area=document.getElementById('sl-list-area');
+    if(!area)return;
+    if(!rows.length){
+      area.innerHTML='<div style="font-size:13px;color:var(--t2);padding:12px 0;text-align:center">'
+        +'No saved analyses yet.<br>Fill in the form and click Save to store one.</div>';
+      return;
+    }
+    var html='<div style="max-height:280px;overflow-y:auto;margin:0 -4px">';
+    rows.forEach(function(row){
+      var d=new Date(row.saved);
+      var dateStr=d.toLocaleDateString(undefined,{month:'short',day:'numeric'})
+        +' '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+      var isAuto=row.label==='\u2605 Last session';
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border)">'
+        +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'
+        +(isAuto?'<span style="color:var(--t3);font-size:11px;margin-right:4px">&#9733;</span>':'')+row.label+'</div>'
+        +'<div style="font-size:11px;color:var(--t3)">'+dateStr+'</div>'
+        +'</div>'
+        +'<button class="sl-modal-btn primary" style="padding:5px 12px;font-size:12px" '
+        +'onclick="loadFromIDB('+row.id+',\''+row.label+'\')"  >Load</button>'
+        +'<button class="sl-modal-btn secondary" style="padding:5px 10px;font-size:12px;color:var(--warn)" '
+        +'onclick="deleteFromIDB('+row.id+',\''+row.label+'\')"  style="padding:5px 10px;font-size:12px;color:var(--warn)">&#128465;</button>'
+        +'</div>';
+    });
+    html+='</div>';
+    area.innerHTML=html;
+  });
+}
+
+function loadFromIDB(id,label){
+  // Try localStorage first (primary store)
+  if(label){
+    var p=lsLoad(label);
+    if(p){
+      if(applyPayload(p)){render();closeSLModal();return;}
+    }
+  }
+  // Fall back to IndexedDB
+  if(!id){console.error('[CapPlan] loadFromIDB: no id or label found');return;}
+  openIDB(function(db){
+    if(!db)return;
+    var tx=db.transaction(IDB_STORE,'readonly');
+    var req=tx.objectStore(IDB_STORE).get(id);
+    req.onsuccess=function(){
+      var p=req.result;
+      if(p&&applyPayload(p)){render();closeSLModal();}
+    };
+  });
+}
+
+function deleteFromIDB(id,label){
+  idbDelete(id,label,function(){
+    loadAnalysis();
+  });
+}
+
+// ── Import from file ──────────────────────────────────────────────────────
+function handleFileLoad(event){
+  var file=event.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var p=JSON.parse(e.target.result);
+      if(p.model&&p.model!==IDB_MODEL){
+        alert('This file is from '+p.model+', not M1. Please load it in the correct model.');return;
+      }
+      if(applyPayload(p)){
+        // also save it into IDB so it appears in the list
+        idbSave(p,null);
+        render();closeSLModal();
+      }
+    }catch(err){alert('Could not read file. Please check it is a valid CapPlan JSON file.');}
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+
+
+CapPlanAuth.init('model13');
+   render();
+
+// Attach masthead button listeners after DOM is ready
+document.addEventListener("DOMContentLoaded",function(){
+  var hb=document.getElementById("sl-help-btn");
+  var sb=document.getElementById("sl-save-btn");
+  var lb=document.getElementById("sl-load-btn");
+  console.log("[CapPlan] masthead listeners attached: help="+!!hb+" save="+!!sb+" load="+!!lb);
+  // Use event delegation — catches clicks on button OR any child (SVG, text)
+  document.getElementById("masthead").addEventListener("click",function(e){
+    var t=e.target;
+    // Walk up to find the button in case click landed on SVG or span child
+    while(t&&t.tagName!=="BUTTON")t=t.parentElement;
+    if(!t)return;
+    if(t.id==="sl-save-btn"){console.log("[CapPlan] save btn clicked");saveAnalysis();}
+    else if(t.id==="sl-load-btn"){console.log("[CapPlan] load btn clicked");loadAnalysis();}
+    else if(t.id==="sl-help-btn"){console.log("[CapPlan] help btn clicked");showSLHelp();}
+  });
+  // Static save modal buttons
+  var csb=document.getElementById('sl-confirm-save-btn');
+  var cab=document.getElementById('sl-cancel-save-btn');
+  var exb=document.getElementById('sl-export-btn');
+  if(csb)csb.addEventListener('click',function(e){e.stopPropagation();confirmSave();});
+  if(cab)cab.addEventListener('click',function(e){
+    e.stopPropagation();
+    var sm=document.getElementById('sl-save-modal');
+    if(sm)sm.style.display='none';
+  });
+  if(exb)exb.addEventListener('click',function(e){e.stopPropagation();exportAnalysis();});
+  // Stop clicks inside the modal box from reaching the overlay
+  var smInner=document.querySelector('#sl-save-modal .sl-modal');
+  if(smInner)smInner.addEventListener('click',function(e){e.stopPropagation();});
+  // Click on overlay background closes modal
+  var smOv=document.getElementById('sl-save-modal');
+  if(smOv)smOv.addEventListener('click',function(){
+    smOv.style.display='none';
+  });
+});
+</script>
+
+<div id="sl-save-modal" class="sl-modal-overlay" style="display:none">
+  <div class="sl-modal" style="width:380px">
+    <div class="sl-modal-title">Save Analysis</div>
+    <div class="sl-label">Analysis name</div>
+    <input id="save-label-input" type="text" placeholder="e.g. City Hall HVAC replacement">
+    <div style="font-size:12px;color:#4a5568;margin-bottom:14px">Saves to this browser. Use <strong>Export</strong> to download a portable file.</div>
+    <button class="sl-modal-btn primary" style="width:100%;margin-bottom:8px" id="sl-confirm-save-btn">Save</button>
+    <div class="sl-modal-btns">
+      <button class="sl-modal-btn secondary" id="sl-cancel-save-btn">Cancel</button>
+      <button class="sl-modal-btn secondary" style="font-size:11px;color:#8a96a6" id="sl-export-btn">↓ Export to file</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="sl-file-input" accept=".json" style="display:none" onchange="handleFileLoad(event)">
+</body>
+</html>
