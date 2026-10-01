@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* ── TOKENS ──────────────────────────────────────────────────────────────── */
+/* Layout: full-width sections, max-width 1100px content, two-column fork hero */
+:root {
+  --navy:   #0F1D2E;
+  --blue:   #1B3F6E;
+  --blue-mid:#2A5298;
+  --blue-soft:rgba(27,63,110,0.09);
+  --green:  #2E7D52;
+  --green-warm:#3D8B5A;
+  --green-soft:rgba(46,125,82,0.10);
+  --gold:   #C9A84C;
+  --gold-soft:rgba(201,168,76,0.15);
+  --surface:#F5F7FA;
+  --border: #DDE3EE;
+  --bg:     #ffffff;
+  --fg1:    #0F1D2E;
+  --fg2:    #445066;
+  --fg3:    #8A96A6;
+  --white:  #ffffff;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --navy:   #070F18;
+    --blue:   #1B3F6E;
+    --blue-mid:#2A5298;
+    --blue-soft:rgba(27,63,110,0.18);
+    --green:  #2E7D52;
+    --green-warm:#3D8B5A;
+    --green-soft:rgba(46,125,82,0.18);
+    --gold:   #C9A84C;
+    --gold-soft:rgba(201,168,76,0.12);
+    --surface:#111A27;
+    --border: #1E2D44;
+    --bg:     #0D1724;
+    --fg1:    #E8EDF5;
+    --fg2:    #8FA3BE;
+    --fg3:    #4A6080;
+    --white:  #ffffff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --navy:   #070F18;
+  --blue:   #1B3F6E;
+  --blue-mid:#2A5298;
+  --blue-soft:rgba(27,63,110,0.18);
+  --green:  #2E7D52;
+  --green-warm:#3D8B5A;
+  --green-soft:rgba(46,125,82,0.18);
+  --gold:   #C9A84C;
+  --gold-soft:rgba(201,168,76,0.12);
+  --surface:#111A27;
+  --border: #1E2D44;
+  --bg:     #0D1724;
+  --fg1:    #E8EDF5;
+  --fg2:    #8FA3BE;
+  --fg3:    #4A6080;
+  --white:  #ffffff;
+  color-scheme: dark;
+}
+
+/* ── RESET & BASE ─────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);color:var(--fg1);
+  font-size:16px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  padding-inline:0;
+  padding-block: 0;
+}
+h1,h2,h3,h4{font-family:'Playfair Display',Georgia,serif;line-height:1.15;text-wrap:balance}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+img{max-width:100%}
+
+/* ── INNER ────────────────────────────────────────────────────────────────── */
+.inner{max-width:1100px;margin:0 auto;padding-inline:32px}
+
+/* ── NAV ──────────────────────────────────────────────────────────────────── */
+#nav{
+  position:sticky;
+  top:env(safe-area-inset-top,0px);
+  z-index:200;
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner{
+  max-width:1100px;margin:0 auto;
+  padding:0 32px;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.logo-mark{
+  width:30px;height:30px;
+  background:linear-gradient(135deg,var(--blue-mid),var(--green));
+  border-radius:7px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.logo-text{font-family:'Playfair Display',serif;font-size:19px;color:var(--fg1);letter-spacing:.01em}
+.logo-text em{font-style:normal;color:var(--blue-mid)}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{font-size:14px;font-weight:500;color:var(--fg2);transition:color .15s}
+.nav-links a:hover{color:var(--fg1)}
+.nav-signin{
+  background:var(--blue);border:1px solid var(--blue);
+  border-radius:6px;padding:6px 16px;font-size:13px;font-weight:600;
+  color:var(--white) !important;transition:background .15s !important;
+}
+.nav-signin:hover{background:var(--blue-mid) !important;border-color:var(--blue-mid) !important}
+
+/* ── HERO ─────────────────────────────────────────────────────────────────── */
+#hero{
+  background:var(--bg);
+  padding:72px 32px 0;
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;overflow:hidden;
+  border-bottom:1px solid var(--border);
+}
+.hero-eyebrow{
+  font-size:11px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--blue-mid);margin-bottom:22px;
+  position:relative;
+}
+.hero-headline{
+  font-size:clamp(38px,5vw,70px);color:var(--fg1);
+  text-align:center;max-width:840px;
+  margin-bottom:22px;position:relative;
+}
+.hero-headline em{font-style:italic;color:var(--blue-mid)}
+.hero-sub{
+  font-size:17px;color:var(--fg2);
+  text-align:center;max-width:580px;line-height:1.75;
+  margin-bottom:52px;position:relative;
+}
+
+/* Fork */
+.hero-fork{
+  display:grid;grid-template-columns:1fr 1fr;
+  width:100%;max-width:940px;
+  border-radius:14px 14px 0 0;
+  overflow:hidden;
+  box-shadow:0 -20px 72px rgba(0,0,0,0.45);
+  position:relative;
+}
+.fork-panel{padding:36px 40px;display:flex;flex-direction:column;gap:18px}
+.fork-panel.business{background:var(--blue);border-right:1px solid rgba(255,255,255,0.12)}
+.fork-panel.personal{background:var(--green)}
+.fork-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.55)}
+.fork-title{font-family:'Playfair Display',serif;font-size:24px;color:var(--white);line-height:1.2}
+.fork-desc{font-size:14px;color:rgba(255,255,255,0.72);line-height:1.65}
+.fork-chips{display:flex;gap:7px;flex-wrap:wrap}
+.fork-chip{
+  background:rgba(255,255,255,0.11);border:1px solid rgba(255,255,255,0.18);
+  border-radius:20px;padding:4px 11px;font-size:11px;color:rgba(255,255,255,0.82);
+  font-weight:500;
+}
+.fork-chip.free-chip{background:var(--gold-soft);border-color:rgba(201,168,76,0.35);color:var(--gold)}
+.fork-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--white);border:none;border-radius:8px;
+  padding:11px 20px;font-size:13px;font-weight:700;
+  margin-top:6px;align-self:flex-start;
+  transition:transform .15s,box-shadow .15s;
+}
+.fork-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.25)}
+.fork-panel.business .fork-btn{color:var(--blue)}
+.fork-panel.personal .fork-btn{color:var(--green)}
+.fork-arrow{font-size:15px;transition:transform .15s}
+.fork-btn:hover .fork-arrow{transform:translateX(3px)}
+
+/* ── SECTION HEADERS ─────────────────────────────────────────────────────── */
+.sect-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+.sect-hl{font-size:clamp(26px,3vw,40px);color:var(--fg1);margin-bottom:14px}
+.sect-sub{font-size:16px;color:var(--fg2);max-width:580px;line-height:1.75;margin-bottom:48px}
+
+/* ── HOW IT WORKS ─────────────────────────────────────────────────────────── */
+#how{background:var(--surface);padding:88px 0}
+#how .sect-eyebrow{color:var(--blue-mid)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.step{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:12px;padding:28px 28px 32px;
+  position:relative;overflow:hidden;
+}
+.step::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  border-radius:3px 3px 0 0;
+}
+.step.s1::after{background:var(--blue-mid)}
+.step.s2::after{background:var(--green)}
+.step.s3::after{background:var(--gold)}
+.step-n{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;color:var(--border);line-height:1;margin-bottom:14px;font-variant-numeric:tabular-nums}
+.step-title{font-family:'Playfair Display',serif;font-size:19px;color:var(--fg1);margin-bottom:9px}
+.step-body{font-size:13px;color:var(--fg2);line-height:1.7}
+
+/* ── SUBSCRIBER RESOURCES ────────────────────────────────────────────────── */
+#resources{background:var(--bg);padding:88px 0}
+#resources .sect-eyebrow{color:var(--gold)}
+.resources-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.res-card{
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.res-head{
+  background:var(--navy);padding:28px 28px 24px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.res-icon{
+  width:44px;height:44px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.res-icon.ask{background:rgba(201,168,76,0.18)}
+.res-icon.bg{background:rgba(27,63,110,0.4)}
+.res-icon.ppt{background:rgba(46,125,82,0.3)}
+.res-title{font-family:'Playfair Display',serif;font-size:19px;color:var(--white)}
+.res-body{padding:22px 28px;flex:1;display:flex;flex-direction:column;gap:16px}
+.res-desc{font-size:14px;color:var(--fg2);line-height:1.7}
+.res-gate{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--gold-soft);border:1px solid rgba(201,168,76,0.3);
+  border-radius:6px;padding:6px 12px;
+  font-size:12px;font-weight:600;color:var(--gold);
+  margin-top:auto;align-self:flex-start;
+}
+
+/* ── EMAIL CAPTURE ───────────────────────────────────────────────────────── */
+#email-capture{
+  background:var(--surface);padding:72px 0;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.capture-inner{
+  max-width:680px;margin:0 auto;
+  text-align:center;padding-inline:32px;
+}
+.capture-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue-mid);margin-bottom:16px}
+.capture-hl{font-family:'Playfair Display',serif;font-size:clamp(24px,3vw,36px);color:var(--fg1);margin-bottom:14px}
+.capture-sub{font-size:15px;color:var(--fg2);line-height:1.7;max-width:500px;margin-inline:auto;margin-bottom:36px}
+.capture-form{display:flex;gap:10px;max-width:480px;margin:0 auto}
+.capture-input{
+  flex:1;min-width:0;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;padding:12px 16px;font-size:14px;
+  color:var(--fg1);font-family:inherit;
+  transition:border-color .15s;
+}
+.capture-input::placeholder{color:var(--fg3)}
+.capture-input:focus{outline:none;border-color:var(--blue-mid)}
+.capture-btn{
+  background:var(--blue);border:none;border-radius:8px;
+  padding:12px 22px;font-size:14px;font-weight:700;
+  color:var(--white);white-space:nowrap;
+  transition:background .15s;flex-shrink:0;
+}
+.capture-btn:hover{background:var(--blue-mid)}
+.capture-fine{font-size:12px;color:var(--fg3);margin-top:14px}
+.capture-success{
+  display:none;
+  background:var(--green-soft);border:1px solid rgba(46,125,82,0.3);
+  border-radius:10px;padding:16px 24px;
+  font-size:15px;color:var(--green);
+  text-align:center;max-width:480px;margin:0 auto;
+}
+
+/* ── TRUST STRIP ─────────────────────────────────────────────────────────── */
+#trust{background:var(--surface);padding:64px 0}
+.trust-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;max-width:800px;margin:0 auto;text-align:center}
+.trust-n{font-family:'Playfair Display',serif;font-size:52px;font-weight:700;color:var(--blue);line-height:1;font-variant-numeric:tabular-nums}
+.trust-lbl{font-size:13px;color:var(--fg2);margin-top:8px;line-height:1.5}
+
+/* ── FOOTER ───────────────────────────────────────────────────────────────── */
+#footer{background:var(--surface);border-top:1px solid var(--border);padding:44px 0}
+.footer-inner{
+  max-width:1100px;margin:0 auto;padding-inline:32px;
+  display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:32px;
+}
+.footer-brand .logo-text{font-size:17px}
+.footer-copy{font-size:12px;color:var(--fg3);margin-top:6px}
+.footer-nav{display:flex;flex-wrap:wrap;gap:10px 28px}
+.footer-nav a{font-size:13px;color:var(--fg2);transition:color .15s}
+.footer-nav a:hover{color:var(--fg1)}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
+@media(max-width:768px){
+  .inner{padding-inline:20px}
+  .nav-inner{padding-inline:20px}
+  .nav-links{display:none}
+  #hero{padding:64px 20px 0}
+  .hero-fork{grid-template-columns:1fr;border-radius:12px 12px 0 0}
+  .fork-panel.business{border-right:none;border-bottom:1px solid rgba(255,255,255,0.12)}
+  .steps,.resources-grid,.trust-strip{grid-template-columns:1fr}
+  .capture-form{flex-direction:column}
+  .capture-btn{width:100%}
+  .footer-inner{flex-direction:column;padding-inline:20px}
+}
+</style>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 18 18" width="15" height="15" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg>
+
+      </div>
+      <div class="logo-text">Cap<em>Plan</em></div>
+    </div>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#resources">Resources</a>
+      <a href="#email-capture">Newsletter</a>
+      <a href="#" class="nav-signin">Sign in</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-eyebrow">Capital planning · Built for real decisions</div>
+  <h1 class="hero-headline">Every capital decision deserves<br><em>a proper analysis</em></h1>
+  <p class="hero-sub">CapPlan puts rigorous financial modelling in the hands of the people who need it — business owners evaluating assets, and individuals making the purchases that shape their financial lives.</p>
+
+  <div class="hero-fork">
+    <div class="fork-panel business">
+      <div class="fork-eyebrow">CapPlan Business</div>
+      <div class="fork-title">Capital planning for your organisation</div>
+      <div class="fork-desc">Thirteen models covering asset purchase, lease vs buy, rental rate-setting, replacement analysis, sale and leaseback, and price negotiation. US Edition includes full MACRS and Section 179 treatment. International Edition covers SL, DDB, and SYD depreciation in nine currencies.</div>
+      <div class="fork-chips">
+        <span class="fork-chip free-chip">★ Free: Asset Purchase Analysis</span>
+        <span class="fork-chip">Lease vs buy</span>
+        <span class="fork-chip">Rental rates</span>
+        <span class="fork-chip">Replacement timing</span>
+        <span class="fork-chip">Price negotiation</span>
+      </div>
+      <button class="fork-btn" onclick="window.location.href='business/index.html'">
+        Go to Business suite <span class="fork-arrow">→</span>
+      </button>
+    </div>
+    <div class="fork-panel personal">
+      <div class="fork-eyebrow">CapPlan Personal</div>
+      <div class="fork-title">Capital planning for your personal finances</div>
+      <div class="fork-desc">Nine models for the financial decisions individuals face — when to buy, when to replace, whether to lease, what to pay, and what to sell for. Works for cars, appliances, boats, and any durable asset. No financial training required.</div>
+      <div class="fork-chips">
+        <span class="fork-chip free-chip">★ Free: Should I Buy This?</span>
+        <span class="fork-chip">Lease vs buy</span>
+        <span class="fork-chip">When to replace</span>
+        <span class="fork-chip">What to pay</span>
+        <span class="fork-chip">When to sell</span>
+      </div>
+      <button class="fork-btn" onclick="window.location.href='personal/index.html'">
+        Go to Personal suite <span class="fork-arrow">→</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="inner">
+    <div class="sect-eyebrow" style="color:var(--blue-mid)">How it works</div>
+    <h2 class="sect-hl">From question to answer<br>in three steps</h2>
+    <p class="sect-sub">CapPlan turns complex capital planning calculations into guided, plain-language analyses anyone can run.</p>
+    <div class="steps">
+      <div class="step s1">
+        <div class="step-n">01</div>
+        <div class="step-title">Find your model</div>
+        <div class="step-body">The solution finder asks a few plain-language questions about your decision and routes you to the right model instantly — no guesswork about which tool applies to your situation.</div>
+      </div>
+      <div class="step s2">
+        <div class="step-n">02</div>
+        <div class="step-title">Enter your numbers</div>
+        <div class="step-body">Each model walks you through inputs with clear labels and guidance on where to find the data. Built-in estimators handle the figures that are hard to know precisely. Load an example to see how it works first.</div>
+      </div>
+      <div class="step s3">
+        <div class="step-n">03</div>
+        <div class="step-title">Understand the answer</div>
+        <div class="step-body">Results include a clear recommendation, sensitivity analysis showing how the answer shifts under different assumptions, and full DCF workings. Every result explains not just what, but why.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SUBSCRIBER RESOURCES -->
+<section id="resources">
+  <div class="inner">
+    <div class="sect-eyebrow" style="color:var(--gold)">Business subscriber resources</div>
+    <h2 class="sect-hl">More than models —<br>a capital budgeting education</h2>
+    <p class="sect-sub">Business subscribers get direct access to three resources built by the creator of CapPlan, available nowhere else.</p>
+    <div class="resources-grid">
+
+      <div class="res-card">
+        <div class="res-head">
+          <div class="res-icon ask">💬</div>
+          <div class="res-title">Ask Bob</div>
+        </div>
+        <div class="res-body">
+          <p class="res-desc">An indexed library of questions and answers on capital budgeting — the ones business owners actually ask. Written by Bob, the creator of CapPlan, from decades of advising on capital decisions. Searchable, practical, and plainly written.</p>
+          <div class="res-gate">🔒 Business subscribers only</div>
+        </div>
+      </div>
+
+      <div class="res-card">
+        <div class="res-head">
+          <div class="res-icon bg">📖</div>
+          <div class="res-title">Deep Background</div>
+        </div>
+        <div class="res-body">
+          <p class="res-desc">Substantive material on the concepts behind the models — depreciation methods, cost of capital, NPV and IRR, lease accounting, and more. Designed for the business owner who wants to understand the theory, not just run the numbers.</p>
+          <div class="res-gate">🔒 Business subscribers only</div>
+        </div>
+      </div>
+
+      <div class="res-card">
+        <div class="res-head">
+          <div class="res-icon ppt">📊</div>
+          <div class="res-title">Project Presentation Templates</div>
+        </div>
+        <div class="res-body">
+          <p class="res-desc">Ready-to-use PowerPoint templates for presenting your capital plan to stakeholders, a board, or a lender. Each template includes structure, guidance notes, and placeholder slides built around the CapPlan output format.</p>
+          <div class="res-gate">🔒 Business subscribers only</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- EMAIL CAPTURE -->
+<section id="email-capture">
+  <div class="capture-inner">
+    <div class="capture-eyebrow">From the desk of Bob</div>
+    <h2 class="capture-hl">Get a free capital budgeting<br>tip every month</h2>
+    <p class="capture-sub">Each month, Bob — the creator of CapPlan — shares one practical insight on capital budgeting: a decision framework, a common mistake, or a concept that changes how you think about asset investment.</p>
+
+    <form class="capture-form" id="capture-form">
+      <input class="capture-input" type="email" id="capture-email" placeholder="your@email.com" required>
+      <button type="submit" class="capture-btn">Subscribe free</button>
+    </form>
+    <div class="capture-success" id="capture-success">
+      ✓ You're on the list. First tip arrives next month.
+    </div>
+    <p class="capture-fine">No spam. Unsubscribe any time. Not a CapPlan account — just the newsletter.</p>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section id="trust">
+  <div class="inner">
+    <div class="trust-strip">
+      <div>
+        <div class="trust-n">13</div>
+        <div class="trust-lbl">Business capital planning models, covering every asset decision type</div>
+      </div>
+      <div>
+        <div class="trust-n">9</div>
+        <div class="trust-lbl">Personal finance models for the decisions that shape your financial life</div>
+      </div>
+      <div>
+        <div class="trust-n">0</div>
+        <div class="trust-lbl">Financial training required — every model works for a first-time user</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo-text">Cap<em>Plan</em></div>
+      <div class="footer-copy">© 2026 CapPlan. Capital planning for business and personal finance.</div>
+    </div>
+    <nav class="footer-nav">
+      <a href="business/index.html">Business suite</a>
+      <a href="personal/index.html">Personal suite</a>
+      <a href="#email-capture">Newsletter</a>
+      <a href="#">Sign in</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+// Email capture form
+document.getElementById('capture-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var email = document.getElementById('capture-email').value.trim();
+  if (!email) return;
+  // Store locally; real implementation would POST to an email service
+  try { localStorage.setItem('capplan_newsletter_email', email); } catch(err) {}
+  document.getElementById('capture-form').style.display = 'none';
+  document.getElementById('capture-success').style.display = 'block';
+});
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    var id = this.getAttribute('href');
+    if (id === '#') return;
+    var target = document.querySelector(id);
+    if (target) { e.preventDefault(); target.scrollIntoView({behavior:'smooth'}); }
+  });
+});
+</script>
+
+</html>
