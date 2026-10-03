@@ -13,7 +13,7 @@ const CapPlanAuth = (() => {
 
   // ── Config ────────────────────────────────────────────────────────────────
   const AUTH0_DOMAIN    = 'dev-74uhps8oq6hjgk8o.us.auth0.com';
-  const AUTH0_CLIENT_ID = '1oCZLeLb8rcdIPvQKHOplADLcdFX87T0';
+  const AUTH0_CLIENT_ID = 'zNrADr5Yz57Tg9tVKH7lcN5YtPguyIuR';
   const STRIPE_PUB_KEY  = 'pk_test_51UKfwkPnu63aqS4gaT5ynA4PKp4xWsZIPFS5adtJOfote9HxFarTdDT18TiE45oHI9Luyx3PbVdYiU3VofMUK4NV00l8zFGQn2';
   const CHECKOUT_WORKER = 'https://patient-base-51d4.rorourketg.workers.dev';
 
@@ -210,4 +210,5 @@ const CapPlanAuth = (() => {
   };
 
 })();
+
 
