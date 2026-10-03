@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan Personal — What's the Least I Should Accept?</title>
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#F0F4F0;color:#0F1D2E;font-size:14px;-webkit-font-smoothing:antialiased}
+input,select,button{font-family:inherit;font-size:14px}button{cursor:pointer;background:none;border:none}select{-webkit-appearance:none;appearance:none}
+:root{--green:#2E7D52;--green-warm:#3D8B5A;--green-soft:rgba(46,125,82,0.10);--green-mid:#EBF5EE;--green-dark:#1A5C35;
+--blue:#1B3F6E;--blue-soft:rgba(27,63,110,0.08);
+--amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7;
+--surface:#F7FAF7;--panel:#fff;--border:#D8E8DC;--t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;--warn:#C84B31;--warn-soft:rgba(200,75,49,.07)}
+#masthead{background:var(--green);height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}.logo-mark{width:30px;height:30px;background:rgba(255,255,255,0.2);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:Georgia,serif;font-size:20px;color:white}.logo-text span{color:rgba(255,255,255,0.6)}
+.logo-sub{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-left:4px;padding-left:12px;border-left:1px solid rgba(255,255,255,0.25)}
+.module-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.9)}
+#stepper{background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px}
+.step{display:flex;align-items:center;gap:8px;padding:13px 4px;border-bottom:2px solid transparent}
+.step.active{border-bottom-color:var(--green)}.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--border);color:var(--t3)}
+.step.active .step-num{background:var(--green);color:white}.step.done .step-num{background:var(--green-warm);color:white}
+.step-label{font-size:13px;font-weight:500;color:var(--t3)}.step.active .step-label{color:var(--green)}.step.done .step-label{color:var(--green-warm)}
+.step-sep{color:var(--border);margin:0 8px;font-size:16px}
+.page{max-width:1040px;margin:0 auto;padding:24px 22px}
+.page-grid{display:grid;grid-template-columns:300px 1fr;gap:22px}.page-grid>main{min-width:0;overflow:hidden}
+.p2-grid{display:grid;grid-template-columns:220px 1fr;gap:22px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);overflow:hidden;margin-bottom:18px}
+.panel-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.field-grid{display:grid;grid-template-columns:1fr}
+.field{padding:13px 18px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.field.full{grid-column:1/-1;border-right:none}.field.last{border-bottom:none}
+.field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:6px}
+.field-note{font-size:10px;color:var(--t3);margin-top:4px;line-height:1.5}
+.ui{display:flex;align-items:center;gap:6px}
+.ui .pfx,.ui .sfx{font-family:monospace;font-size:12px;color:var(--t3);flex-shrink:0}
+.ui input{font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none}
+.ui input:focus{border-bottom-color:var(--green)}.ui input:disabled{color:var(--t3);opacity:.6}
+.ui select{font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none;cursor:pointer}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.pill{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;user-select:none}
+.pill.active{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+.pill-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--t3);flex-shrink:0}.pill.active .pill-dot{border-color:var(--green);background:var(--green)}
+.btn-primary{background:var(--green);color:white;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-primary:hover{background:var(--green-warm)}
+.btn-ghost{display:flex;align-items:center;justify-content:center;background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn:hover{border-color:var(--green);color:var(--green)}
+.action-row{display:flex;gap:10px;margin-top:4px}
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:11px}
+.bn-item{border-bottom:1px solid var(--border)}.bn-item:last-child{border-bottom:none}
+.bn-head{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;cursor:pointer}.bn-head:hover{background:var(--surface)}
+.bn-qmark{width:21px;height:21px;border-radius:50%;background:var(--green-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--green);flex-shrink:0;margin-top:1px;margin-right:5px}
+.bn-q{font-size:13px;line-height:1.5;color:var(--green);flex:1}.bn-arr{color:var(--t3);font-size:14px;flex-shrink:0;margin-top:2px;transition:transform .2s}
+.bn-body{padding:10px 13px 12px 44px;font-size:12.5px;line-height:1.7;color:var(--t2);background:var(--surface);border-top:1px solid var(--border);display:none}.bn-body.open{display:block}
+.watch-btn{margin-top:10px;display:flex;width:fit-content;align-items:center;gap:5px;border:1px solid var(--green);border-radius:5px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--green);background:none;cursor:pointer}
+.helper-card{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.helper-head{padding:11px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--amber-mid)}.helper-head:hover{background:#fde68a}
+.helper-icon{font-size:18px;flex-shrink:0}.helper-title{font-size:13px;font-weight:700;color:var(--amber-dark);flex:1}.helper-toggle{font-size:11px;font-weight:600;color:var(--amber-dark);opacity:.7}
+.helper-body{padding:16px;border-top:1.5px solid var(--amber);display:flex;flex-direction:column;gap:12px}
+.helper-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dark)}
+.helper-result{background:var(--green-soft);border:1.5px solid var(--green);border-radius:8px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.helper-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.result-banner{border-radius:10px;padding:20px 24px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.result-banner.good{background:var(--green-soft);border:1.5px solid var(--green)}
+.result-banner.warn{background:var(--warn-soft);border:1.5px solid var(--warn)}
+.result-banner.neutral{background:var(--surface);border:1.5px solid var(--border)}
+.result-banner.info{background:var(--blue-soft);border:1.5px solid #93B4D8}
+.result-box{border-radius:10px;padding:14px 20px;text-align:center;flex-shrink:0}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.metric{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.metric-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:7px}
+.metric-val{font-family:monospace;font-size:18px;font-weight:700;color:var(--t1)}.metric-val.good{color:var(--green)}.metric-val.warn{color:var(--warn)}.metric-val.info{color:var(--blue)}
+.metric-sub{font-size:10px;color:var(--t3);margin-top:3px;line-height:1.4}
+.chart-box{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:18px}
+.chart-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:4px}.chart-sub{font-size:11px;color:var(--t3);margin-bottom:12px}
+.collapsible{background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:14px;overflow:hidden}
+.coll-head{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}.coll-head:hover{background:var(--surface)}
+.coll-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}.coll-arr{color:var(--t3);font-size:14px;transition:transform .2s}
+.coll-body{display:none;border-top:1px solid var(--border)}.coll-body.open{display:block}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{padding:8px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}th.left{text-align:left}
+td{padding:8px 14px;text-align:right;font-family:monospace;border-bottom:1px solid var(--border)}td.left{text-align:left;font-family:inherit;color:var(--t1)}td.sub{text-align:left;font-family:inherit;color:var(--t3);font-size:11px}
+tr.total-row td{font-weight:700;background:var(--surface)}tr:nth-child(even){background:var(--surface)}
+tr.highlight td{background:var(--green-soft)!important;font-weight:700;color:var(--green)}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,29,46,.82);z-index:9999;display:flex;align-items:center;justify-content:center}
+.modal-box{background:white;border-radius:10px;overflow:hidden;width:min(820px,95vw)}
+.modal-head{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.modal-close{font-size:22px;color:var(--t3);line-height:1;cursor:pointer}
+.video-wrap{position:relative;padding-bottom:56.25%;height:0}.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;background:white}#masthead{display:none!important}#stepper,.btn-ghost,.print-btn,.coll-arr{display:none!important}.page-grid,.p2-grid{display:block!important}aside{display:none!important}.coll-body{display:block!important}.coll-head{break-after:avoid!important}.result-banner,.metric,.chart-box,.collapsible,.helper-card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:auto!important}table{table-layout:auto}th,td{padding:3px 5px}thead{display:table-header-group}tr{break-inside:auto!important}@page{margin:0.5in;size:landscape}}
+#model-banner {
+  background: var(--blue);
+  color: white;
+  text-align: center;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: Georgia, serif;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  border-bottom: 2px solid rgba(255,255,255,0.12);
+}
+body.printing>*:not(#main-content){display:none!important}
+</style>
+</head>
+<body>
+<div id="masthead">
+  <div class="logo"><div class="logo-mark"><svg viewBox="0 0 18 18" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg></div><div class="logo-text">Cap<span>Plan</span></div><div class="logo-sub">Personal</div></div>
+  <div class="module-name">What's the Least I Should Accept?</div>
+  <div style="position:relative"><button style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:5px;padding:6px 12px;color:white;font-size:12px;font-weight:600" id="cur-btn" onclick="toggleCur()"><span id="cur-label">$ USD</span> ▾</button><div id="cur-dropdown" style="display:none;position:absolute;right:0;top:110%;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,29,46,.16);min-width:200px;z-index:300;overflow:hidden"></div></div>
+</div>
+<div id="model-banner">What is the minimum price I should accept if I sell this asset?</div>
+<div id="stepper">
+  <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Asset details</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step2"><div class="step-num" id="sn2">2</div><div class="step-label">Results</div></div>
+</div>
+<div id="main-content"></div>
+<!-- Auth0 SPA SDK + CapPlan auth library -->
+<script src="/capplan-auth.js"></script>
+<script>
+var CURRENCIES=[{code:"USD",symbol:"$",label:"US Dollar"},{code:"EUR",symbol:"€",label:"Euro"},{code:"GBP",symbol:"£",label:"British Pound"},{code:"CAD",symbol:"CA$",label:"Canadian Dollar"},{code:"AUD",symbol:"AU$",label:"Australian Dollar"},{code:"NZD",symbol:"NZ$",label:"New Zealand Dollar"},{code:"JPY",symbol:"¥",label:"Japanese Yen"}];
+function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
+function toggleCur(){S.cur_open=!S.cur_open;var dd=document.getElementById("cur-dropdown");dd.style.display=S.cur_open?"block":"none";if(S.cur_open){dd.innerHTML="";CURRENCIES.forEach(function(c){var b=document.createElement("button");b.style.cssText="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:"+(c.code===S.currency?"var(--green-soft)":"transparent")+";border:none;border-bottom:1px solid var(--border);cursor:pointer";b.innerHTML='<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--green);width:36px">'+c.symbol+'</span><span>'+c.label+'</span>';b.onclick=function(){S.currency=c.code;S.cur_open=false;render()};dd.appendChild(b);});}}
+
+var S={page:1,currency:"USD",cur_open:false,res:null,missingFields:null,
+  show_maths:false,show_age_sens:false,show_return_sens:false,bw_open:false,bw_val:"",bw_pct:"",
+  cost:"",age:"",benefits:"",coc:"",taxRate:0};
+
+function calcMinPrice(cost,age,benefits,coc,tx){
+  var r=coc/100;
+  var pvBen=benefits*((1-Math.pow(1+r,-age))/r);
+  var netCostToRecover=cost-pvBen;
+  // Price must yield enough after-tax proceeds (discounted) to cover net cost
+  // netCostToRecover = price * (1-tx) / (1+r)^age
+  // price = netCostToRecover * (1+r)^age / (1-tx)
+  var denom=(1-tx)/Math.pow(1+r,age);
+  return denom>0?netCostToRecover/denom:0;
+}
+function calcAll(){
+  var cost=+S.cost,age=+S.age||1,benefits=+S.benefits||0,coc=+S.coc||0,tx=+S.taxRate/100||0;
+  var minP=calcMinPrice(cost,age,benefits,coc,tx);
+  var finPos=-cost+benefits*((1-Math.pow(1+(coc/100),-age))/(coc/100));
+  var cocSens=[-4,-3,-2,-1,0,1,2,3,4].map(function(delta){
+    var c2=coc+delta;if(c2<=0)return{coc:c2,price:0};
+    return{coc:c2,price:calcMinPrice(cost,age,benefits,c2,tx)};
+  });
+  var ageSens=[];for(var a=Math.max(1,age-3);a<=age+3;a++){ageSens.push({age:a,price:calcMinPrice(cost,a,benefits,coc,tx)});}
+  var r2=coc/100;var pvBen=benefits*((1-Math.pow(1+r2,-age))/r2);
+  return{minPrice:minP,finPos:finPos,pvBen:pvBen,cocSens:cocSens,ageSens:ageSens,tx:tx};
+}
+function fmt(n,d){if(n==null||isNaN(n))return"--";d=d||0;return n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmtM(n){if(n==null||isNaN(n))return"--";var s=getSym();return n<0?"-"+s+fmt(Math.abs(n)):s+fmt(n)}
+function updateStepper(){for(var i=1;i<=2;i++){var step=document.getElementById("step"+i),sn=document.getElementById("sn"+i);step.className="step";if(i<S.page){step.classList.add("done");sn.textContent="✓"}else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}else sn.textContent=String(i);var n=i;(function(n,step){step.onclick=function(){if(n<S.page||(n===2&&S.res)){S.page=n;render()}}})(n,step);step.style.cursor=(i<S.page||(i===2&&S.res))?"pointer":"default";}}
+
+var NOTES1=[
+  {q:"What counts as annual value received?",a:"The benefit the asset provided each year you owned it — cost savings, income generated, or value of use. For a vehicle, think fuel savings versus alternatives, convenience value, or avoided hire costs."},
+  {q:"What target return should I use?",a:"The minimum annual return you required when you bought the asset. If you are unsure, use your borrowing rate at the time of purchase."}
+];
+var NOTES2=[
+  {q:"What does the financial position mean?",a:"Your investment minus the present value of everything recovered so far through use. A negative figure means the asset still owes you money — the floor price is what you need from the sale to close that gap at your target return."},
+  {q:"How is the floor price calculated?",a:"It grows your outstanding financial position forward at your target return to the date of sale. The result is the minimum sale proceeds needed to finish earning your target return."},
+  {q:"Is this the price I should advertise?",a:"No — it is your walk-away minimum. Advertise above it and negotiate down to it if necessary. If the market price is below your floor, consider whether continuing to use the asset is more valuable than selling."},
+  {q:"What if the market price is below my floor?",a:"You have two choices: accept a lower return than you originally targeted, or keep the asset longer to recover more value through use before selling. The age sensitivity table shows how your floor changes as you hold longer."}
+];
+function makeBNList(notes,id){var list=document.getElementById(id);if(!list)return;list.innerHTML="";notes.forEach(function(n,i){var item=document.createElement("div");item.className="bn-item";var head=document.createElement("div");head.className="bn-head";head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+id+i+'">›</div>';var body=document.createElement("div");body.className="bn-body";body.textContent=n.a;head.onclick=function(){var open=body.classList.contains("open");body.classList.toggle("open");document.getElementById("arr"+id+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";head.style.background=open?"":"var(--surface)";};item.appendChild(head);item.appendChild(body);list.appendChild(item);});}
+function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last?" last":"")+'"><div class="field-label">'+l+'</div>'+h+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';}
+function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?'':val===0?'0':''+val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--green)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
+
+function validateInputs(){
+  var errs=[];
+  if(+S.cost<=0) errs.push("What you paid must be greater than zero");
+  if(+S.age<=0) errs.push("Time owned must be greater than zero");
+  if(S.life!==''&&+S.life<=0) errs.push("Asset life must be greater than zero");
+  if(S.life!==''&&+S.age>+S.life) errs.push("Time owned cannot exceed asset life");
+  if(S.benefits!==''&&+S.benefits<0) errs.push("Annual value received cannot be negative");
+  if(+S.coc<=0) errs.push("Target return must be greater than zero");
+  if(+S.coc>=100) errs.push("Target return cannot equal or exceed 100%");
+  return errs;
+}
+function goToResults(){
+  var missing=[];
+  if(!S.cost)missing.push("What you paid for it");if(!S.age)missing.push("How long you've owned it");
+  if(!S.benefits&&S.benefits!==0)missing.push("Annual value received");if(!S.coc)missing.push("Target return");
+  if(missing.length>0){S.missingFields=missing;render();return;}
+  S.missingFields=null;
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
+  try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+}
+function resetInputs(){S.cost="";S.age="";S.benefits="";S.coc="";S.missingFields=null;S.bw_open=false;S.bw_val="";S.bw_pct="";render();}
+function loadExample(){S.cost=25000;S.age=3;S.benefits=4000;S.coc=6;S.taxRate=0;S.missingFields=null;render();}
+
+function drawChart(canvasId,data,current){
+  var canvas=document.getElementById(canvasId);if(!canvas)return;
+  var ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;
+  var pad={top:16,bottom:48,left:80,right:16};var cw=W-pad.left-pad.right,ch=H-pad.top-pad.bottom;
+  ctx.clearRect(0,0,W,H);
+  var vals=data.map(function(d){return d.price}).filter(function(v){return v>0});if(!vals.length)return;
+  var minV=Math.min.apply(null,vals),maxV=Math.max.apply(null,vals);var rng=maxV-minV||maxV*0.2;var lo=minV-rng*0.1,hi=maxV+rng*0.15;
+  ctx.strokeStyle="#D8E8DC";ctx.lineWidth=1;for(var i=0;i<=4;i++){var y=pad.top+ch*(1-i/4);ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();ctx.fillStyle="#8A96A6";ctx.font="10px system-ui";ctx.textAlign="right";ctx.fillText(getSym()+fmt((lo+(hi-lo)*(i/4))/1000,0)+"k",pad.left-3,y+3);}
+  var bw=Math.floor(cw/data.length*0.6),gap=cw/data.length;
+  data.forEach(function(d,i){if(d.price<=0)return;var x=pad.left+gap*i+(gap-bw)/2,bh=(d.price-lo)/(hi-lo)*ch,y=pad.top+ch-bh;var isCur=d.coc===current;ctx.fillStyle=isCur?"#2E7D52":"#6DBF8A";ctx.fillRect(x,y,bw,bh);ctx.fillStyle=isCur?"var(--green)":"#8A96A6";ctx.font=isCur?"bold 10px system-ui":"10px system-ui";ctx.textAlign="center";ctx.fillText(d.coc+"%",x+bw/2,H-pad.bottom+13);});
+  ctx.strokeStyle="#4A5568";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(pad.left,pad.top+ch);ctx.lineTo(pad.left+cw,pad.top+ch);ctx.stroke();ctx.fillStyle="#4A5568";ctx.font="bold 11px system-ui";ctx.textAlign="center";ctx.fillText("Target return — higher return needs a higher price",pad.left+cw/2,H-3);
+}
+
+function renderPage1(){
+  var sym=getSym();
+  var html='<div class="page"><div class="page-grid"><aside><div class="section-label">About this tool</div>';
+  html+='<div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div>';
+  html+='</aside><main>';
+
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:16px 18px;margin-bottom:14px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:12px">What is the minimum price you should accept?</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Value already received.</strong> The model calculates the present value of all benefits you have had from owning the asset so far — what it has already returned to you.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Financial position.</strong> Your financial position is your original investment minus the value already received. A negative figure means the asset still owes you money.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Floor price.</strong> The floor price is the sale proceeds needed to close the financial gap at your target return. It is the minimum you should accept from any buyer.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Private number.</strong> This is your walk-away price. Never reveal it to buyers — always list higher and negotiate down to it at most.</div></div>';
+  html+='</div></div>';
+
+  // Value wizard
+  html+='<div class="helper-card">';
+  html+='<div class="helper-head" onclick="S.bw_open=!S.bw_open;render()">';
+  html+='<span class="helper-icon">💰</span>';
+  html+='<span class="helper-title">Help me estimate the annual value I\'ve received</span>';
+  html+='<span class="helper-toggle">'+(S.bw_open?'▲ hide':'▼ show')+'</span>';
+  html+='</div>';
+  if(S.bw_open){
+    html+='<div class="helper-body">';
+    html+='<div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:12px">Think about what you\'ve saved or gained each year by owning this asset.</div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;min-width:0">';
+    html+='<div><div class="helper-label">Annual spend it replaced</div>'
+      +'<div class="ui"><span class="pfx">'+sym+'</span>'
+      +'<input type="text" value="'+(S.bw_val||'')+'" placeholder="0" onblur="S.bw_val=+this.value||0;render()" onfocus="this.style.borderBottomColor=\'var(--green)\'" style="font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none">'
+      +'</div></div>';
+    html+='<div><div class="helper-label">% of that spend you actually saved</div>'
+      +'<div class="ui">'
+      +'<input type="text" value="'+(S.bw_pct||'')+'" placeholder="80" onblur="S.bw_pct=+this.value||0;render()" onfocus="this.style.borderBottomColor=\'var(--green)\'" style="font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none">'
+      +'<span class="sfx">%</span>'
+      +'</div></div>';
+    html+='</div>';
+    if(S.bw_val&&S.bw_pct){
+      var sug=Math.round(S.bw_val*S.bw_pct/100);
+      html+='<div class="helper-result">'
+        +'<div style="font-size:13px;color:var(--t2)">Estimated annual value: <strong style="color:var(--green)">'+fmtM(sug)+'</strong></div>'
+        +'<button class="helper-use" onclick="S.benefits='+sug+';S.bw_open=false;render()">Use this ›</button>'
+        +'</div>';
+    }
+    html+='</div>';
+  }
+  html+='</div>';
+
+
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">About the Asset</div></div><div class="field-grid">';
+  html+=field("What did you pay for it?",uIn(sym,S.cost,"inp-cost","S.cost=+this.value||0","",false),false,false,"The original purchase price");
+  html+=field("How long have you owned it?",uIn("",S.age,"inp-age","S.age=+this.value||0","years",false));
+  html+=field("Annual value you've received",uIn(sym,S.benefits,"inp-ben","S.benefits=+this.value||0","/ yr",false),false,true,"Money saved or value of use each year — use the estimator above if unsure");
+  html+='</div></div>';
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Your Target Return</div></div><div class="field-grid">';
+  html+=field("Target return on your money",uIn("",S.coc,"inp-coc","S.coc=+this.value||0","%",false),true,true,"What you'd expect to earn investing elsewhere — 5–8% is a typical range");
+  html+='</div></div>';
+
+  html+='<div class="panel" style="margin-top:14px">';
+  html+='<div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Tax (Optional)</div></div>';
+  html+='<div class="field-grid" style="grid-template-columns:1fr">';
+  html+=field("Tax rate on sale proceeds",uIn("",S.taxRate,"inp-tx","S.taxRate=+this.value||0","%",false),false,false,"");
+  html+='</div>';
+  html+='<div style="font-size:11px;color:var(--t3);line-height:1.5;padding:0 18px 12px 18px">Tax rarely applies to personal asset transactions. Leave at 0% unless a tax professional has advised otherwise. If tax applies, it will be deducted from your sale proceeds. Because you keep less of the sale price after tax, your minimum acceptable asking price will be higher.</div>';
+  html+='</div>';
+
+  if(S.missingFields&&S.missingFields.length>0)html+='<div style="background:var(--warn-soft);border:1.5px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)"><strong>Please fill in:</strong> '+S.missingFields.join(", ")+'.</div>';
+  html+='<div class="action-row" style="justify-content:space-between;align-items:center"><span style="font-size:11.5px;color:var(--t3)">New here? Try <strong style="color:var(--t2)">Load Example</strong></span><div style="display:flex;gap:10px"><button class="btn-ghost" onclick="loadExample()">Load Example</button><button class="btn-ghost" onclick="resetInputs()">Reset</button><button class="btn-primary" onclick="goToResults()">Calculate ›</button></div></div>';
+  html+='</main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES1,"bn-list1");
+  var _cl=document.getElementById("cur-label");if(_cl)_cl.textContent="$ USD";
+}
+
+function renderPage2(){
+  var res=S.res,sym=getSym();
+  var html='<div class="page"><div class="p2-grid"><aside>';
+  html+='<div class="section-label">Understanding your results</div><div class="panel" style="margin-bottom:14px"><div id="bn-list2"></div></div><div style="display:flex;flex-direction:column;gap:10px;align-items:center"><button class="btn-ghost" onclick="S.page=1;render()" style="width:180px;text-align:center">‹ Change my numbers</button><button class="print-btn" onclick="printSummary()" style="width:180px;text-align:center">🗶 Print my results</button><div style="font-size:10px;color:#8A96A6;margin-top:2px;text-align:center">Use this button to print correctly</div></div></aside><main>';
+  html+='<div class="result-banner good"><div><div style="font-family:Georgia,serif;font-size:22px;color:var(--green);line-height:1.3">Don\'t accept less than <strong>'+fmtM(res.minPrice)+'</strong>.</div><div style="font-size:13px;color:var(--t2);margin-top:8px;line-height:1.6">This is your private floor price — don\'t reveal it. List higher and negotiate down. Accepting less means earning less than your '+S.coc+'% target return.</div></div><div class="result-box" style="background:var(--green)"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.75)">Floor price</div><div style="font-family:monospace;font-size:26px;font-weight:800;color:white;margin-top:4px">'+fmtM(res.minPrice)+'</div></div></div>';
+  html+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 18px;margin-bottom:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);flex-shrink:0">Also on this page:</span><div style="display:flex;gap:8px;flex-wrap:wrap"><span style="font-size:12px;color:var(--t2);background:white;border:1px solid var(--border);border-radius:5px;padding:3px 10px">📊 Floor by target return</span><span style="font-size:12px;color:var(--t2);background:white;border:1px solid var(--border);border-radius:5px;padding:3px 10px">📅 Floor by age at sale</span></div></div>';
+  html+='<div class="metrics"><div class="metric"><div class="metric-label">Your floor price</div><div class="metric-val good">'+fmtM(res.minPrice)+'</div><div class="metric-sub">Minimum to earn '+S.coc+'% return</div></div><div class="metric"><div class="metric-label">Financial position now</div><div class="metric-val '+(res.finPos<0?"warn":"good")+'">'+fmtM(res.finPos)+'</div><div class="metric-sub">'+(res.finPos<0?"The asset still owes you this amount — your investment minus value received so far":"Your investment has been fully recovered through use")+'</div></div><div class="metric"><div class="metric-label">Value received so far</div><div class="metric-val">'+fmtM(res.pvBen)+'</div><div class="metric-sub">Over '+S.age+' year'+(+S.age>1?"s":"")+' in today\'s money</div></div></div>';
+  html+='<div style="font-size:12px;color:var(--t2);line-height:1.6;padding:10px 14px;background:var(--surface);border-radius:8px;margin-bottom:14px">'+(res.tx>0?'After '+fmt(res.tx*100,1)+'% tax on sale proceeds. Tax raises your floor price — you need to ask more to net the same after tax.':'This is the minimum price at which selling is worthwhile at your required return. At 0% tax, enter your tax rate above if applicable.')+'</div>';
+
+  // Show me the maths
+  html+='<div class="collapsible" style="margin-top:14px">';
+  html+='<div class="coll-head" onclick="S.show_maths=!S.show_maths;renderPage2()">';
+  html+='<span class="coll-title">Show me the maths</span>';
+  html+='<span style="font-size:12px;font-weight:600;color:var(--blue)">'+(S.show_maths?'Hide':'Show')+'</span></div>';
+  if(S.show_maths){
+  var _r12=+S.coc/100;
+  var _pvBen12=res.pvBen;
+  var _netCost=+S.cost-_pvBen12;
+  html+='<div class="coll-body open">';
+  html+='<div style="font-size:12px;color:var(--t3);padding:8px 18px 6px">At your '+S.coc+'% target return, here is why your floor price is '+fmtM(res.minPrice)+'.</div>';
+  html+='<table><tbody>';
+  html+='<tr><td class="left">What you paid for it</td><td class="sub">Your original outlay</td><td style="color:var(--warn)">'+fmtM(-+S.cost)+'</td></tr>';
+  html+='<tr><td class="left">Value you\'ve already received, in today\'s money</td><td class="sub">'+S.benefits+'/yr × '+S.age+' yrs at '+S.coc+'%</td><td style="color:var(--green)">+'+fmtM(_pvBen12)+'</td></tr>';
+  html+='<tr style="border-top:1px solid var(--border)"><td class="left">What you still need to recover</td><td></td><td style="font-weight:700;color:'+(_netCost>0?'var(--warn)':'var(--green)')+'">'+fmtM(_netCost)+'</td></tr>';
+  if(res.tx>0)html+='<tr><td class="left">Tax adds '+fmt(res.tx*100,1)+'% to your floor price</td><td class="sub">You keep less of the sale price</td><td style="color:var(--warn)">+'+fmtM(res.minPrice-_netCost*Math.pow(1+_r12,+S.age))+'</td></tr>';
+  html+='<tr style="border-top:2px solid var(--border)"><td class="left" colspan="2"><strong>Your floor price</strong></td>'
+    +'<td style="font-weight:800;color:var(--green)">'+fmtM(res.minPrice)+'</td></tr>';
+  html+='</tbody></table></div>';
+  }
+  html+='</div>';
+
+  html+='<div class="chart-box"><div class="chart-title">Floor price by target return</div><div class="chart-sub">Higher target = higher floor price needed</div><canvas id="coc-chart" width="700" height="200" style="width:100%;height:auto;display:block"></canvas></div>';
+  html+='<div class="collapsible"><div class="coll-head" onclick="S.show_age_sens=!S.show_age_sens;renderPage2()"><span class="coll-title">How does timing affect my floor price?</span><span style="font-size:12px;font-weight:600;color:var(--blue)">'+(S.show_age_sens?'Hide':'Show')+'</span></div>';
+  if(S.show_age_sens){
+    html+='<div class="coll-body open" style="padding:4px 0"><div style="padding:10px 18px 6px;font-size:12px;color:var(--t2)">Selling earlier means less value extracted, so you need a higher price. Selling later means more value received and a lower floor.</div><table><thead><tr><th class="left">Age at sale</th><th>Floor price</th><th>vs now</th></tr></thead><tbody>';
+    res.ageSens.forEach(function(row){var isCur=row.age===+S.age;var diff=row.price-res.minPrice;html+='<tr'+(isCur?' class="highlight"':'')+'><td class="left">'+(isCur?"★ ":"")+row.age+' year'+(row.age>1?"s":"")+'</td><td>'+fmtM(row.price)+'</td><td style="color:'+(isCur?"var(--t3)":diff>0?"var(--warn)":"var(--green)")+'\">'+(isCur?"current":(diff>0?"+":"")+fmtM(diff))+'</td></tr>';});
+    html+='</tbody></table></div></div>';
+  }
+  html+='</div></main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES2,"bn-list2");
+  setTimeout(function(){drawChart("coc-chart",res.cocSens,+S.coc)},50);
+  initChartTooltip("coc-chart",res.cocSens,function(d){return d.coc+"% return → floor price "+fmtM(d.price);});
+  var _cl=document.getElementById("cur-label");if(_cl)_cl.textContent="$ USD";
+}
+function printSummary(){
+  var res=S.res;if(!res)return;
+  var pd0=S.show_age_sens,pd1=S.show_maths;
+  S.show_age_sens=true;S.show_maths=true;
+  var _mc=document.getElementById('main-content');
+  var _saved=_mc.innerHTML;
+  var _savedPage=S.page;
+  var _title='CapPlan Personal — What\'s the Least I Should Accept?';
+  var _hdr='<div style="background:#1B3F6E;padding:8px 24px;margin-bottom:14px">'
+    +'<span style="color:white;font-family:Georgia,serif;font-weight:600;font-size:15px">'
+    +_title+'</span></div>';
+  var _pl=['Summary','Sensitivity Chart','Details'];
+  var _styleText='._pg{width:100%;padding:0.2in;overflow:visible;box-sizing:border-box}'
+    +'aside,.print-btn,.btn-ghost,.btn-primary,#masthead,#stepper,#nav{display:none!important}'
+    +'body{background:white!important}'
+    +'.p2-grid,.page-grid{display:block!important}'
+    +'.coll-body{display:block!important}'
+    +'.result-banner,.metric,.chart-box{box-shadow:none!important;border:1px solid #ccc!important}'
+    +'.collapsible{box-shadow:none!important;border:1px solid #ccc!important;overflow:visible!important}'
+    +'table{width:100%;border-collapse:collapse}'
+    +'th,td{border-bottom:1px solid #E2E6EC}'
+    +'th.left,td.left{text-align:left}'
+    +'@media print{'
+    +'body{margin:0;padding:0;background:white!important}#main-content{display:block!important}'
+    +'.panel,.chart-box,.collapsible,.result-banner,.metric{break-inside:auto!important;page-break-inside:auto!important}'
+    +'.coll-body,table,tbody,tr,td,th{break-inside:auto!important;page-break-inside:auto!important}'
+    +'._pg:last-of-type{page-break-after:avoid!important;break-after:avoid!important}'
+    +'@page{margin:0.6in 0.3in 0.3in 0.3in;size:landscape}}';
+  var _pages=[];
+  function _lbl(i){return '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8A96A6;margin-bottom:8px">'+_pl[i]+'</div>';}
+  function _pg(html,i){return '<div class="_pg"'+(i>0?' style="page-break-before:always;break-before:page"':'')+'>'+( i===0?_hdr:_lbl(i))+html+'</div>';}
+  renderPage2();
+  setTimeout(function(){
+    drawChart("coc-chart",res.cocSens,+S.coc);
+    setTimeout(function(){
+      var _m=document.querySelector('#main-content main');
+      if(!_m)_m=document.getElementById('main-content');
+      // Page 1: banner + metrics only
+      _m.querySelectorAll('canvas').forEach(function(cv){
+        var p=cv.parentNode;while(p&&p!==_m){if(p.parentNode===_m){p.dataset.h1='1';p.style.display='none';break;}p=p.parentNode;}
+      });
+      _m.querySelectorAll('.collapsible').forEach(function(el){el.dataset.h1='1';el.style.display='none';});
+      _pages.push(_pg(_m.innerHTML,0));
+      _m.querySelectorAll('[data-h1]').forEach(function(el){el.style.display='';delete el.dataset.h1;});
+      // Page 2: chart only
+      _m.querySelectorAll('.result-banner,.metrics,.robustness-bar,.collapsible').forEach(function(el){el.dataset.h2='1';el.style.display='none';});
+      // Hide direct children of _m that aren't the canvas container or collapsible
+      Array.from(_m.children).forEach(function(el){
+        if(!el.dataset.h2&&!el.querySelector('canvas')){el.dataset.h2='1';el.style.display='none';}
+      });
+      _m.querySelectorAll('canvas').forEach(function(cv){
+        var img=document.createElement('img');
+        img.src=cv.toDataURL('image/png');
+        img.style.cssText='width:100%;height:auto;display:block';
+        cv.parentNode.replaceChild(img,cv);
+      });
+      _pages.push(_pg(_m.innerHTML,1));
+      _m.querySelectorAll('[data-h2]').forEach(function(el){el.style.display='';delete el.dataset.h2;});
+      // Page 3: collapsibles only
+      Array.from(_m.children).forEach(function(el){
+        if(!el.classList.contains('collapsible')){el.dataset.h3='1';el.style.display='none';}
+      });
+      _pages.push(_pg(_m.innerHTML,2));
+      _m.querySelectorAll('[data-h3]').forEach(function(el){el.style.display='';delete el.dataset.h3;});
+      var _styleEl=document.createElement('style');
+      _styleEl.id='_ps_style';
+      _styleEl.textContent=_styleText;
+      document.head.appendChild(_styleEl);
+      _mc.innerHTML=_pages.join('');
+      var _mast=document.getElementById('masthead');var _nav=document.getElementById('nav');
+      var _step=document.getElementById('stepper');
+      if(_mast)_mast.style.display='none';
+      if(_step)_step.style.display='none';
+      function _restore(){
+        document.body.classList.remove('printing');
+        var _se=document.getElementById('_ps_style');if(_se)_se.remove();
+        if(_mast)_mast.style.display='';
+        if(_step)_step.style.display='';
+        _mc.innerHTML=_saved;
+        S.page=_savedPage;
+        S.show_age_sens=pd0;S.show_maths=pd1;
+        render();
+      }
+      window.onafterprint=function(){window.onafterprint=null;_restore();};
+      document.body.classList.add('printing');
+      window.print();
+    },150);
+  },50);
+}
+function initChartTooltip(canvasId,data,labelFn){
+  setTimeout(function(){
+    var canvas=document.getElementById(canvasId);if(!canvas)return;
+    var par=canvas.parentNode;par.style.position='relative';
+    var old=par.querySelector('.ctip');if(old)old.remove();
+    var tip=document.createElement('div');tip.className='ctip';
+    tip.style.cssText='position:absolute;pointer-events:none;background:rgba(15,29,46,.88);color:white;font-size:11px;font-weight:600;padding:5px 10px;border-radius:5px;white-space:nowrap;display:none;z-index:99;transform:translateX(-50%);top:6px';
+    par.appendChild(tip);
+    canvas.style.cursor='crosshair';
+    canvas.onmousemove=function(e){
+      var r=canvas.getBoundingClientRect();
+      var scaleX=canvas.width/r.width;
+      var mx=(e.clientX-r.left)*scaleX;
+      var W=canvas.width,padL=80,cw=W-96;
+      var n=data.length,gap=cw/n,bw=Math.floor(gap*0.6);
+      var hit=null,hitPct=0;
+      for(var i=0;i<n;i++){
+        var bx=padL+gap*i+(gap-bw)/2;
+        if(mx>=bx&&mx<=bx+bw){hit=data[i];hitPct=((bx+bw/2)/W*100);break;}
+      }
+      if(hit){tip.textContent=labelFn(hit);tip.style.left=hitPct.toFixed(1)+'%';tip.style.display='block';}
+      else tip.style.display='none';
+    };
+    canvas.onmouseleave=function(){tip.style.display='none';};
+  },90);
+}
+
+function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();var cl=document.getElementById("cur-label");if(cl)cl.textContent=getSym()+" "+S.currency;}
+CapPlanAuth.init('personal12').then(function(hasAccess) {
+  if (hasAccess) render();
+});
+</script></body></html>
