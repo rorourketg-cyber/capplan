@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan Business (US) — Implied Cost of Leasing</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#F7F8FA;color:#0F1D2E;font-size:14px}
+input,select,button{font-family:inherit;font-size:14px}
+button{cursor:pointer;background:none;border:none}
+select{-webkit-appearance:none;appearance:none}
+:root{--blue:#1B3F6E;--green:#2E7D52;--surface:#F7F8FA;--panel:#fff;--border:#E2E6EC;--t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;--warn:#C84B31;--blue-soft:rgba(27,63,110,0.08);--green-soft:rgba(46,125,82,0.09);--amber:#F59E0B;--amber-soft:#FFFBEB;--amber-dark:#92400E;--amber-mid:#FEF3C7}
+#masthead{background:var(--blue);min-height:80px;display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 16px;position:sticky;top:0;z-index:100;gap:0}
+.logo{display:flex;align-items:center;gap:12px;margin-right:20px;flex-shrink:0}
+.logo-icon{width:34px;height:34px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:Georgia,serif;font-size:22px;color:white}.logo-text span{color:#A8C5E8}
+
+#stepper{background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px}
+.step{display:flex;align-items:center;gap:8px;padding:13px 4px;border-bottom:2px solid transparent}
+.step.active{border-bottom-color:var(--blue)}.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--border);color:var(--t3)}
+.step.active .step-num{background:var(--blue);color:white}.step.done .step-num{background:var(--green);color:white}
+.step-label{font-size:13px;font-weight:500;color:var(--t3)}.step.active .step-label{color:var(--blue)}.step.done .step-label{color:var(--green)}
+.step-sep{color:var(--border);margin:0 8px;font-size:16px}
+.page{max-width:1100px;margin:0 auto;padding:24px 22px}
+.page-grid{display:grid;grid-template-columns:310px 1fr;gap:22px}
+.p2-grid{display:grid;grid-template-columns:280px 1fr;gap:22px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-bottom:18px}
+.panel-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr}
+.field{padding:13px 18px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.field.full{grid-column:1/-1;border-right:none}.field.last{border-bottom:none}
+.field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:6px}
+.field-note{font-size:10px;color:var(--t3);margin-top:4px}
+.ui{display:flex;align-items:center;gap:6px}
+.ui .pfx,.ui .sfx{font-family:monospace;font-size:12px;color:var(--t3);flex-shrink:0}
+.ui input{font-family:monospace;font-size:15px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none}
+.ui input:focus{border-bottom-color:var(--blue)}
+.ui select{font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:2px 0;outline:none;cursor:pointer}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.pill{display:flex;align-items:center;gap:6px;padding:6px 13px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;user-select:none}
+.pill.active{border-color:var(--blue);background:var(--blue-soft);color:var(--blue)}
+.pill-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--t3);flex-shrink:0}
+.pill.active .pill-dot{border-color:var(--blue);background:var(--blue)}
+.btn-primary{background:var(--blue);color:white;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-ghost{background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn{display:flex;align-items:center;gap:6px;background:transparent;color:var(--t2);border:1.5px solid var(--border);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.print-btn:hover{border-color:var(--blue);color:var(--blue)}
+.action-row{display:flex;gap:10px;margin-top:4px}
+.bn-item{border-bottom:1px solid var(--border)}.bn-item:last-child{border-bottom:none}
+.bn-head{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;cursor:pointer}
+.bn-head:hover{background:var(--surface)}
+.bn-qmark{width:21px;height:21px;border-radius:50%;background:var(--blue-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--blue);flex-shrink:0;margin-top:1px;margin-right:5px}
+.bn-q{font-size:13px;line-height:1.5;color:var(--blue);flex:1}
+.bn-arr{color:var(--t3);font-size:14px;flex-shrink:0;margin-top:2px;transition:transform .2s}
+.bn-body{padding:10px 13px 12px 44px;font-size:12.5px;line-height:1.7;color:var(--t2);background:var(--surface);border-top:1px solid var(--border);display:none}
+.bn-body.open{display:block}
+.watch-btn{margin-top:10px;display:flex;width:fit-content;align-items:center;gap:5px;border:1px solid var(--blue);border-radius:5px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--blue);background:none;cursor:pointer}
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:11px}
+.helper-card{background:var(--amber-soft);border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.helper-head{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--amber-mid)}
+.helper-head:hover{background:#fde68a}
+.helper-icon{font-size:18px;flex-shrink:0}
+.helper-title{font-size:13px;font-weight:700;color:var(--amber-dark);flex:1}
+.helper-toggle{font-size:11px;font-weight:600;color:var(--amber-dark);opacity:.7}
+.helper-body{padding:16px;border-top:1.5px solid var(--amber);display:flex;flex-direction:column;gap:12px}
+.result-banner{border-radius:10px;padding:20px 24px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.result-banner.accept{background:var(--green-soft);border:1.5px solid var(--green)}
+.result-banner.reject{background:rgba(200,75,49,.07);border:1.5px solid var(--warn)}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.metric{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.metric-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:7px}
+.metric-val{font-family:monospace;font-size:18px;font-weight:700;color:var(--t1)}
+.metric-val.ok{color:var(--green)}.metric-val.bad{color:var(--warn)}
+.metric-sub{font-size:10px;color:var(--t3);margin-top:3px}
+.chart-box{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:18px}
+.chart-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:6px}
+.chart-sub{font-size:11px;color:var(--t3);margin-bottom:12px}
+.collapsible{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:14px;overflow:hidden}
+.coll-head{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.coll-head:hover{background:var(--surface)}
+.coll-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.coll-arr{color:var(--t3);font-size:14px;transition:transform .2s}
+.coll-body{display:none;border-top:1px solid var(--border)}.coll-body.open{display:block}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{padding:8px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}
+th.left{text-align:left}
+td{padding:8px 14px;text-align:right;font-family:monospace;border-bottom:1px solid var(--border)}
+td.left{text-align:left;font-family:inherit;color:var(--t1)}
+td.sub{text-align:left;font-family:inherit;color:var(--t3);font-size:11px}
+td.neg{color:var(--warn)}
+tr.total-row td{font-weight:700;background:var(--surface)}
+tr:nth-child(even){background:var(--surface)}
+tr.highlight td{background:var(--blue-soft)!important;font-weight:700;color:var(--blue)}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,29,46,.82);z-index:9999;display:flex;align-items:center;justify-content:center}
+.modal-box{background:white;border-radius:10px;overflow:hidden;width:min(820px,95vw)}
+.modal-head{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.modal-close{font-size:22px;color:var(--t3);line-height:1;cursor:pointer}
+.video-wrap{position:relative;padding-bottom:56.25%;height:0}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{margin:0;padding:0;background:white}
+  #masthead{position:static!important;height:auto!important;padding:8px 0!important}
+  #stepper,.btn-ghost,.print-btn,.coll-arr{display:none!important}
+  .page-grid,.p2-grid{display:block!important}
+  aside{display:none!important}
+  .coll-body{display:block!important}
+  .coll-head{break-after:avoid!important}
+  .result-banner,.metric,.chart-box,.collapsible,.helper-card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid}
+  table{font-size:9px;table-layout:fixed}
+  th,td{padding:3px 5px}
+  thead{display:table-header-group}
+  tr{break-inside:avoid}
+  @page{margin:0.5in;size:landscape}
+  thead tr:last-child{break-after:avoid!important}
+  tbody tr:first-child{break-before:avoid!important}
+  th{break-inside:avoid!important;break-after:avoid!important}
+  tbody{orphans:3;widows:3}
+  .panel{break-inside:avoid}
+  .panel-head{break-after:avoid!important}
+  .compare-card{break-inside:avoid!important}
+  .collapsible{break-inside:avoid!important}
+  .sensitivity-section{break-before:page!important}
+}
+
+/* US-specific additions */
+.macrs-panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-bottom:18px}
+.macrs-class-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.macrs-class-btn{padding:12px 16px;border:none;background:var(--surface);border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:left;cursor:pointer;transition:all .15s}
+.macrs-class-btn:hover{background:var(--blue-soft)}
+.macrs-class-btn.active{background:var(--blue-soft);border-left:3px solid var(--blue)}
+.macrs-class-label{font-size:13px;font-weight:700;color:var(--t1)}
+.macrs-class-sub{font-size:10px;color:var(--t3);margin-top:2px}
+.bonus-toggle{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--green-soft);border-radius:8px;border:1.5px solid var(--green)}
+
+
+.model-overview {
+  background: var(--amber-soft);
+  border: 1.5px solid var(--amber);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--amber-dark);
+  line-height: 1.6;
+}
+.model-overview strong { color: var(--amber-dark); }
+.mast-title-block{display:flex;flex-direction:column;justify-content:center;gap:3px;flex:1;min-width:0;padding-right:16px}
+.mast-title{font-size:17px;font-weight:800;color:white;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mast-question{font-size:12px;font-weight:700;font-style:italic;color:rgba(255,255,255,.82);font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+.sl-group{display:flex;align-items:center;gap:6px;margin-left:20px}
+
+.sl-btn{display:flex;align-items:center;gap:5px;background:none;border:1px solid rgba(255,255,255,.35);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;color:white;cursor:pointer;white-space:nowrap;transition:background .15s}
+.sl-btn:hover{background:rgba(255,255,255,.15)}
+.sl-btn svg{flex-shrink:0;pointer-events:none}
+.sl-group{display:flex;align-items:center;gap:6px;margin-left:20px}
+.sl-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#8a96a6;margin-bottom:4px}
+#save-label-input{width:100%;font-size:13px;padding:6px 8px;border:1px solid #d1d9e0;border-radius:6px;background:#f8f9fa;color:#1a2332;margin-bottom:10px;box-sizing:border-box}
+.sl-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px);cursor:default}
+.sl-modal{background:#ffffff;border-radius:12px;padding:24px;width:340px;max-width:90vw;box-shadow:0 4px 6px rgba(0,0,0,.07),0 16px 48px rgba(0,0,0,.22);border:1px solid rgba(0,0,0,.08)}
+.sl-modal-title{font-size:15px;font-weight:700;color:#1a2332;margin-bottom:16px}
+.sl-modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.sl-modal-btn{padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none}
+.sl-modal-btn.primary{background:var(--blue);color:white}
+.sl-modal-btn.secondary{background:#f8f9fa;color:#4a5568;border:1px solid #d1d9e0}
+.sl-auto-badge{font-size:10px;background:var(--green-soft);color:var(--green);border-radius:4px;padding:2px 6px;font-weight:700}
+.sl-help-btn{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;border:1.5px solid rgba(255,255,255,.5);background:none;color:white;font-size:12px;font-weight:700;cursor:pointer;line-height:1;flex-shrink:0;transition:background .15s}
+.sl-help-btn:hover{background:rgba(255,255,255,.2)}
+.sl-help-panel{font-size:13px;color:#2d3748;line-height:1.6}
+.sl-help-panel h3{font-size:14px;font-weight:700;color:#1a2332;margin:0 0 12px}
+.sl-help-panel ul{margin:0;padding:0 0 0 18px}
+.sl-help-panel li{margin-bottom:8px}
+.sl-help-panel li strong{color:#1a2332}
+.sl-help-panel .sl-help-note{margin-top:14px;padding:10px 12px;background:#f0f4ff;border-left:3px solid #3b82f6;border-radius:0 6px 6px 0;font-size:12px;color:#4a5568}
+
+.sl-list-row{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border)}
+.helper-result{background:var(--green-soft);border:1.5px solid var(--green);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.helper-use{background:var(--green);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.helper-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dark)}
+.borrow{background:var(--green-soft);border:1.5px solid var(--green)}
+.lease{background:var(--blue-soft);border:1.5px solid var(--blue)}
+.neutral{background:var(--surface);border:1.5px solid var(--border)}
+.neutral{color:var(--blue)}
+.mode-toggle{display:flex;gap:0;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:18px}
+.mode-toggle{display:none!important}
+.mode-btn{flex:1;padding:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .15s}
+.mode-btn:not(.active){background:white;color:var(--t2)}
+@media print{body:not(.printing){display:none!important}}
+</style>
+</head>
+<body>
+<div id="masthead">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,10 7,14 15,4"/></svg>
+    </div>
+    <div class="logo-text">Cap<span>Plan</span></div>
+  </div>
+  <div class="mast-title-block">
+    <div class="mast-title">Implied Cost of Leasing (US)</div>
+    <div class="mast-question">What is this lease actually costing us as a financing rate?</div>
+  </div>
+  <div style="position:relative"><button onclick="toggleCur()"><span id="cur-label">$ USD</span> ▾</button><div id="cur-dropdown"></div></div>
+
+  <div class="sl-group">
+    <button class="sl-help-btn" id="sl-help-btn" title="Save &amp; Load help">?</button>
+    <button class="sl-btn" id="sl-save-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Save
+    </button>
+    <button class="sl-btn" id="sl-load-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Load
+    </button>
+  </div>
+</div>
+<div id="stepper">
+  <div class="step active" id="step1"><div class="step-num" id="sn1">1</div><div class="step-label">Asset &amp; Lease</div></div>
+  <div class="step-sep">›</div>
+  <div class="step" id="step2"><div class="step-num" id="sn2">2</div><div class="step-label">Results</div></div>
+</div>
+<div id="main-content"></div>
+<!-- Auth0 SPA SDK + CapPlan auth library -->
+<script src="/capplan-auth.js"></script>
+<script>
+// ============================================================================
+// CapPlan MACRS Data Layer
+// Source: IRS Revenue Procedure 87-57, IRS Publication 946 (Appendix A, Table A-1)
+// Last verified: June 2026
+// These percentage tables are fixed by Rev. Proc. 87-57 and have not changed
+// since 1987. What changes periodically is tax policy layered on top (bonus
+// depreciation, Section 179 limits) — handled separately below.
+// ============================================================================
+
+// ── GDS MACRS PERCENTAGE TABLES (Half-Year Convention) ──────────────────────
+// Each array entry is [year, percentage] for years 1 through N+1
+// (the half-year convention creates one extra recovery year for all classes)
+// Source: IRS Publication 946, Appendix A, Table A-1
+
+var MACRS_TABLES = {
+  "3-year": {
+    label: "3-Year Property (200% DB)",
+    method: "200% Declining Balance",
+    examples: "Tractor units (over-the-road), qualified rent-to-own property",
+    rates: [33.33, 44.45, 14.81, 7.41]  // 4 rows: years 1-3 + half-year tail
+  },
+  "5-year": {
+    label: "5-Year Property (200% DB)",
+    method: "200% Declining Balance",
+    examples: "Automobiles, taxis, buses, trucks, computers, office machinery, appliances",
+    rates: [20.00, 32.00, 19.20, 11.52, 11.52, 5.76]  // 6 rows
+  },
+  "7-year": {
+    label: "7-Year Property (200% DB)",
+    method: "200% Declining Balance",
+    examples: "Office furniture & fixtures, agricultural machinery, railroad track",
+    rates: [14.29, 24.49, 17.49, 12.49, 8.93, 8.92, 8.93, 4.46]  // 8 rows
+  },
+  "10-year": {
+    label: "10-Year Property (200% DB)",
+    method: "200% Declining Balance",
+    examples: "Vessels, barges, tugs, single-purpose agricultural structures, fruit/nut trees",
+    rates: [10.00, 18.00, 14.40, 11.52, 9.22, 7.37, 6.55, 6.55, 6.56, 6.55, 3.28]  // 11 rows
+  },
+  "15-year": {
+    label: "15-Year Property (150% DB)",
+    method: "150% Declining Balance",
+    examples: "Land improvements (fences, roads, sidewalks, landscaping), qualified leasehold improvements, retail motor fuels outlets",
+    rates: [5.00, 9.50, 8.55, 7.70, 6.93, 6.23, 5.90, 5.90, 5.91, 5.90, 5.91, 5.90, 5.91, 5.90, 5.91, 2.95]  // 16 rows
+  },
+  "20-year": {
+    label: "20-Year Property (150% DB)",
+    method: "150% Declining Balance",
+    examples: "Farm buildings (not single-purpose), municipal sewers, initial land clearing/grading",
+    rates: [3.750, 7.219, 6.677, 6.177, 5.713, 5.285, 4.888, 4.522, 4.462, 4.461,
+            4.462, 4.461, 4.462, 4.461, 4.462, 4.461, 4.462, 4.461, 4.462, 4.461, 2.231]  // 21 rows
+  },
+  "27.5-year": {
+    label: "27.5-Year Residential Rental Property (SL)",
+    method: "Straight-Line / Mid-Month Convention",
+    examples: "Residential rental property (apartments, houses) where 80%+ of income is from dwelling units",
+    // Full-year rate = 3.636%. First/last year prorated by month placed in service.
+    // For simplicity in capital planning (not tax filing), use the full-year rate.
+    fullYearRate: 3.636,
+    convention: "mid-month",
+    rates: null  // computed dynamically based on month placed in service
+  },
+  "39-year": {
+    label: "39-Year Nonresidential Real Property (SL)",
+    method: "Straight-Line / Mid-Month Convention",
+    examples: "Office buildings, stores, warehouses, commercial buildings",
+    fullYearRate: 2.564,
+    convention: "mid-month",
+    rates: null  // computed dynamically based on month placed in service
+  }
+};
+
+// ── ASSET-TO-PROPERTY-CLASS LOOKUP ─────────────────────────────────────────
+// Based on IRS Publication 946, Table B-1 and Table B-2
+// Grouped by common small business asset categories for the dropdown
+// Users can always override; this is a starting-point suggestion only.
+// Last updated: June 2026
+
+var MACRS_ASSET_CLASSES = [
+  // ── Vehicles & Transportation ──────────────────────────────────────────────
+  { name: "— Select asset type for suggested property class —", class: null, note: null },
+  { group: "Vehicles & Transportation" },
+  { name: "Automobile / Passenger Car", class: "5-year",
+    note: "IRS Table B-1 class 00.22. Subject to listed property luxury auto limits." },
+  { name: "Light-Duty Truck / Van (≤ 6,000 lbs GVW)", class: "5-year",
+    note: "IRS Table B-1 class 00.22. Subject to listed property limits." },
+  { name: "Heavy Truck / Commercial Vehicle (> 6,000 lbs)", class: "5-year",
+    note: "IRS Table B-1 class 00.23. Not subject to luxury auto limits." },
+  { name: "Tractor Unit (over-the-road)", class: "3-year",
+    note: "IRS Table B-1 class 00.26." },
+  { name: "Trailer / Container", class: "5-year",
+    note: "IRS Table B-1 class 00.27." },
+  { name: "Aircraft (general aviation)", class: "5-year",
+    note: "IRS Table B-2. May be listed property if personal use > 0." },
+  { name: "Vessel / Barge / Tug", class: "10-year",
+    note: "IRS Table B-1 class 00.28." },
+  // ── Computers & Technology ─────────────────────────────────────────────────
+  { group: "Computers & Technology" },
+  { name: "Computer / Laptop / Tablet", class: "5-year",
+    note: "IRS Table B-1 class 00.12. Listed property — business use must be > 50%." },
+  { name: "Computer Peripheral / Printer", class: "5-year",
+    note: "IRS Table B-1 class 00.12." },
+  { name: "Point-of-Sale System / POS Hardware", class: "5-year",
+    note: "IRS Table B-1 class 00.12." },
+  { name: "Telephone / Communications Equipment", class: "5-year",
+    note: "IRS class 00.12. Cell phones no longer listed property after 2010." },
+  // ── Office Equipment & Furniture ───────────────────────────────────────────
+  { group: "Office Equipment & Furniture" },
+  { name: "Office Furniture & Fixtures", class: "7-year",
+    note: "IRS Table B-1 class 00.11." },
+  { name: "Office Equipment (copiers, fax machines)", class: "5-year",
+    note: "IRS Table B-1 class 00.12." },
+  { name: "Appliances / Carpeting / Furniture (rental)", class: "5-year",
+    note: "Used in residential rental property; IRS Table B-1." },
+  // ── Manufacturing & Industrial ─────────────────────────────────────────────
+  { group: "Manufacturing & Industrial" },
+  { name: "Manufacturing Machinery & Equipment", class: "7-year",
+    note: "IRS Table B-2 (varies by industry). 7-year is the default for unclassified property." },
+  { name: "Industrial Steam / Electric Generation Equipment", class: "15-year",
+    note: "IRS Table B-1 class 00.4." },
+  { name: "Distributive Trades / Services Equipment", class: "5-year",
+    note: "IRS Table B-2 class 57.0. Includes restaurant/food service equipment." },
+  // ── Restaurant & Food Service ──────────────────────────────────────────────
+  { group: "Restaurant & Food Service" },
+  { name: "Restaurant Equipment (ovens, fryers, refrigerators)", class: "5-year",
+    note: "IRS Table B-2 class 57.0 (distributive trades and services)." },
+  { name: "Restaurant Furniture / Fixtures", class: "7-year",
+    note: "IRS Table B-1 class 00.11. Chairs, tables, bar stools." },
+  // ── Agriculture ────────────────────────────────────────────────────────────
+  { group: "Agriculture" },
+  { name: "Agricultural Machinery & Equipment", class: "7-year",
+    note: "IRS Table B-2 class 01.1." },
+  { name: "Single-Purpose Agricultural / Horticultural Structure", class: "10-year",
+    note: "IRS Table B-1. Structure used only for a specific agricultural purpose." },
+  { name: "Farm Building (general-purpose)", class: "20-year",
+    note: "IRS Table B-2 class 01.3. Excludes single-purpose structures." },
+  { name: "Fruit / Nut-Bearing Trees & Vines", class: "10-year",
+    note: "IRS Table B-2 class 01.23–01.25. Placed in service after planting/grafting." },
+  // ── Real Property ──────────────────────────────────────────────────────────
+  { group: "Real Property" },
+  { name: "Residential Rental Property", class: "27.5-year",
+    note: "Apartments, houses, mobile homes where 80%+ of rent is from dwelling units. Straight-line, mid-month convention." },
+  { name: "Nonresidential Real Property", class: "39-year",
+    note: "Office buildings, retail stores, warehouses. Straight-line, mid-month convention." },
+  { name: "Qualified Improvement Property (QIP)", class: "15-year",
+    note: "Interior improvements to nonresidential buildings placed in service after building. Eligible for bonus depreciation." },
+  { name: "Land Improvements (fences, roads, parking lots, landscaping)", class: "15-year",
+    note: "IRS Table B-1 class 00.3. Excludes land itself (not depreciable)." },
+  // ── HVAC & Mechanical ──────────────────────────────────────────────────────
+  { group: "HVAC & Mechanical Systems" },
+  { name: "HVAC System (standalone / not structural)", class: "5-year",
+    note: "Freestanding units qualify as 5-year. HVAC installed as part of a building = 39-year. Qualified improvement property rules may apply." },
+  { name: "HVAC as Qualified Improvement Property", class: "15-year",
+    note: "HVAC, roofing, fire protection, alarm/security systems in nonresidential buildings. Eligible for bonus depreciation." },
+  // ── Other Common Assets ────────────────────────────────────────────────────
+  { group: "Other Common Assets" },
+  { name: "Rental Property / Any Property Not Listed Above", class: "7-year",
+    note: "IRS default: property with no designated class life defaults to 7-year under MACRS GDS." },
+];
+
+// ── CURRENT TAX POLICY (as of June 2026) ────────────────────────────────────
+// This section captures the policy layer — things that change with legislation.
+// Update this section when tax law changes; the MACRS tables above do not change.
+
+var MACRS_POLICY = {
+  // One Big Beautiful Bill Act (OBBBA), signed July 4, 2025
+  bonusDepreciation: {
+    rate: 1.00,  // 100% for qualified property acquired and placed in service after Jan 19, 2025
+    qualifiedDate: "January 20, 2025",
+    note: "100% bonus depreciation restored by OBBBA. Applies to most new and used tangible personal property. Does NOT apply to 27.5-year or 39-year real property (except qualified improvement property).",
+    canElectOut: true,  // taxpayer can elect out on a class-by-class basis
+    phasedown: [
+      { year: 2023, rate: 0.80 },
+      { year: 2024, rate: 0.60 },
+      // 2025 pre-OBBBA: 40% for property acquired before Jan 20, 2025
+      // 2025 post-OBBBA: 100% for property acquired after Jan 19, 2025
+    ]
+  },
+  section179: {
+    limit: 2500000,  // OBBBA doubled from $1,250,000 to $2,500,000
+    phaseoutThreshold: null,  // check current pub 946 for exact phaseout start
+    note: "Section 179 limit doubled to $2,500,000 by OBBBA. Cannot exceed taxable income from active business. Applies to tangible personal property and qualified real property improvements."
+  },
+  lastUpdated: "June 2026",
+  source: "IRS Publication 946 (2025), OBBBA (P.L. 119-21, July 4, 2025)"
+};
+
+// ── HELPER FUNCTIONS ────────────────────────────────────────────────────────
+
+// Get MACRS depreciation schedule for a given property class and cost
+// Returns array of {year, rate, amount} for each recovery year
+function getMACRSSchedule(propertyClass, cost, bonusElected, monthPlacedInService) {
+  var table = MACRS_TABLES[propertyClass];
+  if (!table) return [];
+
+  // Bonus depreciation (year 1 full expensing if elected)
+  if (bonusElected && table.convention !== "mid-month") {
+    return [{ year: 1, rate: 100.00, amount: cost }];
+  }
+
+  // Real property: straight-line with mid-month convention
+  if (table.convention === "mid-month") {
+    var schedule = [];
+    var fullRate = table.fullYearRate / 100;
+    var life = propertyClass === "27.5-year" ? 27.5 : 39;
+    var month = monthPlacedInService || 1;  // default to January
+    // First year: prorated by month (mid-month: months remaining + 0.5)
+    var firstYearMonths = (12 - month + 0.5) / 12;
+    var firstYearRate = firstYearMonths / life;
+    schedule.push({ year: 1, rate: +(firstYearRate * 100).toFixed(3), amount: cost * firstYearRate });
+    // Full years
+    var fullYears = Math.floor(life);
+    for (var y = 2; y <= fullYears; y++) {
+      schedule.push({ year: y, rate: table.fullYearRate, amount: cost * fullRate });
+    }
+    // Last partial year (remaining months)
+    var lastYearMonths = 1 - firstYearMonths;
+    if (lastYearMonths > 0.001) {
+      var lastRate = lastYearMonths / life;
+      schedule.push({ year: fullYears + 1, rate: +(lastRate * 100).toFixed(3), amount: cost * lastRate });
+    }
+    return schedule;
+  }
+
+  // Standard MACRS table lookup (personal property, half-year convention)
+  var rates = table.rates;
+  return rates.map(function(rate, i) {
+    return { year: i + 1, rate: rate, amount: +(cost * rate / 100).toFixed(2) };
+  });
+}
+
+// Get property class info for display
+function getMACRSClass(propertyClass) {
+  return MACRS_TABLES[propertyClass] || null;
+}
+
+// Get suggested property class from asset type name
+function suggestPropertyClass(assetTypeName) {
+  var match = MACRS_ASSET_CLASSES.find(function(a) {
+    return a.name === assetTypeName && a.class;
+  });
+  return match ? match.class : "7-year";  // default to 7-year if not found
+}
+
+// Get all property classes as options for a select dropdown
+function getMACRSClassOptions(includeRealProperty) {
+  var classes = ["3-year", "5-year", "7-year", "10-year", "15-year", "20-year"];
+  if (includeRealProperty) {
+    classes.push("27.5-year", "39-year");
+  }
+  return classes;
+}
+
+function fmt(n,d){if(n==null||isNaN(n))return'--';d=d||0;return n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmtM(n){if(n==null||isNaN(n))return'--';return n<0?'-$'+fmt(Math.abs(n)):'$'+fmt(n)}
+function fmtPct(n,d){if(n==null||isNaN(n))return'--';return fmt(n,d||2)+'%'}
+
+var S={
+  page:1,res:null,res_tab:0,missingFields:null,show_pmt_sens:false,show_dcf:false,show_depr:false,
+  coc_open:false,coc_eq_mode:"gordon",coc_kd:6,coc_tax:35,coc_div:0,coc_price:0,coc_g:5,coc_rf:4.5,coc_beta:1.0,coc_mrp:5.5,coc_wd:50,
+  price:"",propertyClass:"",assetTypeSel:"",bonusElected:false,section179:"",
+  life:"",salvage:"",term:"",deposit:true,depositAmt:"",freq:1,leasePmt:"",
+  taxRate:"",borrowRate:""
+};
+
+function calcDeprSchedule(price){
+  var base=Math.max(0,price-(+S.section179||0));
+  if(!S.propertyClass)return[];
+  return getMACRSSchedule(S.propertyClass,base,S.bonusElected,1);
+}
+function pvPurchase(price,life,salvage,depr,tx,r){
+  var s179=+S.section179||0;
+  var pvS179=s179*tx/(1+r);
+  var pvTS=depr.reduce(function(s,d){return s+d.amount*tx/Math.pow(1+r,d.year)},0);
+  var totalDepr=depr.reduce(function(s,d){return s+d.amount},0)+s179;
+  var remainBasis=Math.max(0,price-totalDepr);
+  var recapTax=Math.max(0,(salvage-remainBasis)*tx);
+  var pvSalv=(salvage-recapTax)/Math.pow(1+r,life);
+  return price-pvS179-pvTS-pvSalv;
+}
+function pvLease(term,depAmt,freq,leasePmt,tx,r){
+  var rp=Math.pow(1+r,1/freq)-1;
+  var totalN=term*freq;
+  var hasDep=S.deposit&&depAmt>0;
+  var n=hasDep?(totalN-1):totalN;
+  var afPmt=rp>0&&n>0?(1-Math.pow(1+rp,-n))/rp:n;
+  var pvDep=hasDep?depAmt:0;
+  var pvDepTS=hasDep?-depAmt*tx/(1+r):0;
+  var pvPmts=leasePmt*afPmt;
+  var pvPmtTS=-leasePmt*tx*((1-Math.pow(1+r,-term))/r);
+  return pvDep+pvDepTS+pvPmts+pvPmtTS;
+}
+function solveImpliedRate(price,life,salvage,depAmt,freq,leasePmt,term){
+  // Pre-tax implied rate: rate at which PV(lease cash flows) = price - PV(salvage)
+  var lo=-0.5,hi=5.0,mid;
+  for(var i=0;i<120;i++){
+    mid=(lo+hi)/2;
+    var rp=Math.pow(1+mid,1/freq)-1;
+    var n=term*freq;
+    var af=Math.abs(rp)>0.0001?(1-Math.pow(1+rp,-n))/rp:n;
+    var hasDep=S.deposit&&depAmt>0;
+    var pvL=hasDep?depAmt+leasePmt*af-depAmt/Math.pow(1+mid,term):leasePmt*af;
+    var pvP=price-salvage/Math.pow(1+mid,term);
+    if(pvL>pvP)lo=mid;else hi=mid;
+  }
+  return mid*100;
+}
+function calcAll(){
+  var price=+S.price,life=+S.life||1,salvage=+S.salvage||0;
+  var term=+S.term||life,pmt=+S.leasePmt,freq=+S.freq;
+  var depAmt=S.deposit?(+S.depositAmt||0):0;
+  var tx=+S.taxRate/100,borrow=+S.borrowRate;
+  var depr=calcDeprSchedule(price);
+  var implied=solveImpliedRate(price,life,salvage,depAmt,freq,pmt,term);
+  var diff=implied-borrow;
+  var pmtSens=[-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4].map(function(delta){
+    var p2=pmt*(1+delta);
+    var ir=solveImpliedRate(price,life,salvage,depAmt,freq,p2,term);
+    return{delta:delta,pmt:p2,ir:ir,implied:ir};
+  });
+  return{implied:implied,diff:diff,depr:depr,pmtSens:pmtSens};
+}
+
+function updateStepper(){for(var i=1;i<=2;i++){var step=document.getElementById("step"+i),sn=document.getElementById("sn"+i);step.className="step";if(i<S.page){step.classList.add("done");sn.textContent="✓"}else if(i===S.page){step.classList.add("active");sn.textContent=String(i)}else sn.textContent=String(i);var n=i;(function(n,step){step.onclick=function(){if(n<S.page||(n===2&&S.res)){S.page=n;render()}}})(n,step);step.style.cursor=(i<S.page||(i===2&&S.res))?"pointer":"default";}}
+
+function renderCoC(){
+  var box=document.getElementById('coc-box');if(!box)return;box.innerHTML='';
+
+  // ── Collapsed button ──
+  if(!S.coc_open){
+    box.innerHTML='<button onclick="S.coc_open=true;renderCoC()" style="display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;background:none;border:none;cursor:pointer;text-align:left"><div style="width:34px;height:34px;background:var(--green-soft);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="9" r="3"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2"/></svg></div><div><div style="font-size:13px;font-weight:700;color:var(--blue)">Cost of Capital Calculator</div><div style="font-size:11px;color:var(--t3);margin-top:2px">After-tax debt · Cost of equity · WACC</div></div><span style="margin-left:auto;color:var(--t3)">›</span></button>';
+    return;
+  }
+
+  // ── Calculations ──
+  var kd_at = +(S.coc_kd*(1-S.coc_tax/100)).toFixed(2);
+  var ke_gordon = S.coc_price>0 ? +((S.coc_div/S.coc_price*100)+S.coc_g).toFixed(2) : 0;
+  var ke_capm   = +(S.coc_rf+S.coc_beta*S.coc_mrp).toFixed(2);
+  var ke        = S.coc_eq_mode==='gordon' ? ke_gordon : ke_capm;
+  var we        = Math.max(0,100-S.coc_wd);
+  var wacc      = +(kd_at*S.coc_wd/100 + ke*we/100).toFixed(2);
+
+  function tip(t){return '<div style="font-size:10px;color:var(--t3);line-height:1.5;margin-top:3px;font-style:italic">'+t+'</div>';}
+  function row(label,key,val,suffix,tipText,readOnly){
+    var input=readOnly
+      ? '<span style="font-family:monospace;font-size:15px;font-weight:700;color:var(--blue)">'+val+(suffix?'&thinsp;'+suffix:'')+'</span>'
+      : '<div class="ui"><input type="text" value="'+val+'" onchange="S.'+key+'=+this.value||0;renderCoC()" style="font-family:monospace;font-size:15px;font-weight:600;border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;outline:none;padding:2px 0">'+(suffix?'<span style="font-size:12px;color:var(--t3)">'+suffix+'</span>':'')+'</div>';
+    return '<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:4px">'+label+'</div>'+input+(tipText?tip(tipText):'')+'</div>';
+  }
+  function sectionHead(n,title,color){
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:20px;height:20px;border-radius:50%;background:'+color+';color:white;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+n+'</div><div style="font-size:12px;font-weight:700;color:var(--t1)">'+title+'</div></div>';
+  }
+  function result(label,val,suffix){
+    return '<div style="background:var(--surface);border-radius:6px;padding:8px 10px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:var(--t2)">'+label+'</span><span style="font-family:monospace;font-size:15px;font-weight:700;color:var(--blue)">'+val+(suffix?'&thinsp;'+suffix:'')+'</span></div>';
+  }
+
+  var html='<div style="border:1px solid var(--blue);border-radius:10px;overflow:hidden">';
+  html+='<div style="background:var(--blue);padding:11px 14px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:700;color:white">Cost of Capital Calculator</span><button onclick="S.coc_open=false;renderCoC()" style="color:rgba(255,255,255,.7);background:none;border:none;font-size:20px;cursor:pointer;line-height:1">×</button></div>';
+  html+='<div style="padding:14px">';
+
+  // ── Section 1: After-tax cost of borrowing ──
+  html+=sectionHead(1,'After-tax cost of borrowing','var(--blue)');
+  html+=row('Interest rate on your debt','coc_kd',S.coc_kd,'%','The annual rate your bank or lender charges on loans or lines of credit.');
+  html+=row('Your business tax rate','coc_tax',S.coc_tax,'%','Because interest payments are tax-deductible, the government covers part of your borrowing cost. Your true cost is the interest rate minus the tax saving.');
+  html+=result('After-tax cost of borrowing',kd_at,'%');
+
+  // ── Section 2: Cost of equity ──
+  html+=sectionHead(2,'Cost of equity','#9F7AEA');
+  // Toggle Gordon / CAPM
+  html+='<div style="display:flex;gap:6px;margin-bottom:12px">';
+  ['gordon','capm'].forEach(function(m,i){
+    var active=S.coc_eq_mode===m;
+    var label=m==='gordon'?'Growth model':'CAPM';
+    var sub=m==='gordon'?'Dividend / earnings growth':'Market risk';
+    html+='<button onclick="S.coc_eq_mode=\''+m+'\';renderCoC()" style="flex:1;padding:7px 8px;border-radius:7px;border:1.5px solid '+(active?'var(--blue)':'var(--border)')+';background:'+(active?'var(--blue-soft)':'transparent')+';cursor:pointer;text-align:left"><div style="font-size:11px;font-weight:700;color:'+(active?'var(--blue)':'var(--t2)')+'">'+label+'</div><div style="font-size:10px;color:var(--t3)">'+sub+'</div></button>';
+  });
+  html+='</div>';
+
+  if(S.coc_eq_mode==='gordon'){
+    html+=row('Expected dividend or profit distribution next year ($)','coc_div',S.coc_div,'$','The cash you expect to pay out to owners or shareholders in the coming year. For an owner-managed business, this is the return you expect to take out.');
+    html+=row('Current value of the business ($)','coc_price',S.coc_price,'$','What the business is worth today — the price a willing buyer would pay. If you are unsure, use book value or a recent valuation.');
+    html+=row('Expected annual growth rate of the firm','coc_g',S.coc_g,'%','How fast do you expect revenues and earnings to grow each year? A stable, mature business might use 2–3%. A growing business might use 5–8%.');
+    var formula=S.coc_price>0?'('+S.coc_div+' ÷ '+S.coc_price+' × 100) + '+S.coc_g+'% growth':'Enter a business value above';
+    html+='<div style="font-size:10px;color:var(--t3);margin-bottom:10px;font-style:italic">Formula: (annual distribution ÷ business value) + growth rate &nbsp;→&nbsp; '+formula+'</div>';
+  } else {
+    html+=row('Risk-free rate','coc_rf',S.coc_rf,'%','The return on a risk-free investment such as a government bond. Use the current rate on a 10-year government bond.');
+    html+=row('Beta (business risk factor)','coc_beta',S.coc_beta,'','A measure of how risky your business is relative to the overall market. 1.0 = average market risk. Higher values mean more risk. Most small businesses fall between 0.8 and 1.5.');
+    html+=row('Market risk premium','coc_mrp',S.coc_mrp,'%','The extra return investors demand for taking on business risk rather than holding safe government bonds. Typically 5–6% for most markets.');
+    html+='<div style="font-size:10px;color:var(--t3);margin-bottom:10px;font-style:italic">Formula: risk-free rate + (beta × market risk premium) = '+S.coc_rf+' + ('+S.coc_beta+' × '+S.coc_mrp+')</div>';
+  }
+  html+=result('Cost of equity',ke,'%');
+
+  // ── Section 3: Overall cost of capital ──
+  html+=sectionHead(3,'Overall cost of capital (WACC)','var(--green)');
+  html+='<div style="background:var(--surface);border-radius:6px;padding:8px 10px;margin-bottom:12px;font-size:11px;color:var(--t2)">Carried from above — after-tax cost of borrowing <strong>'+kd_at+'%</strong>, cost of equity <strong>'+ke+'%</strong></div>';
+  html+=row('Debt as % of total financing','coc_wd',S.coc_wd,'%','What proportion of your business is funded by loans vs. owner investment? For example, if you borrowed $60 of every $100 invested, enter 60.');
+  html+='<div style="font-size:11px;color:var(--t3);margin-bottom:10px">Equity portion: '+(100-S.coc_wd)+'%</div>';
+  html+='<div style="font-size:10px;color:var(--t3);margin-bottom:10px;font-style:italic">Formula: ('+kd_at+'% × '+S.coc_wd+'%) + ('+ke+'% × '+we+'%) = '+wacc+'%</div>';
+
+  // ── Final result ──
+  html+='<div style="margin-top:4px;padding:12px 14px;background:var(--green-soft);border-radius:8px;border:1px solid var(--green);display:flex;justify-content:space-between;align-items:center">';
+  html+='<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--green)">Cost of Capital</div><div style="font-family:monospace;font-size:24px;font-weight:700;color:var(--green)">'+wacc+'%</div></div>';
+  html+='<button onclick="S.coc='+wacc+';S.coc_open=false;renderCoC();var el=document.getElementById(\'inp-coc\');if(el){el.value='+wacc+';}" style="background:var(--green);color:white;border:none;border-radius:7px;padding:10px 14px;font-size:12px;font-weight:700;cursor:pointer">Use this rate →</button>';
+  html+='</div>';
+
+  html+='</div></div>';
+  box.innerHTML=html;
+}
+
+function cR(l,k,v,s){return'<div style="margin-bottom:11px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:5px">'+l+'</div><div class="ui"><input type="text" value="'+v+'" onchange="S.'+k+'=+this.value||0;renderCoC()" style="font-family:monospace;font-size:15px;font-weight:600;border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;outline:none;padding:2px 0">'+(s?'<span style="font-size:12px;color:var(--t3)">'+s+'</span>':'')+'</div></div>'}
+function field(l,h,fw,last,note){return'<div class="field'+(fw?" full":"")+(last?" last":"")+'"><div class="field-label">'+l+'</div>'+h+(note?'<div class="field-note">'+note+'</div>':'')+'</div>';}
+function uInput(pfx,val,id,ob,sfx){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--blue)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
+function selectPropertyClass(cls){S.propertyClass=cls;render();}
+function selectAssetType(name){S.assetTypeSel=name;S.propertyClass=suggestPropertyClass(name);render();}
+
+var NOTES1=[
+  {q:"How does MACRS affect the implied rate?",a:"MACRS tax shields reduce the after-tax cost of purchasing, making it relatively cheaper than a pre-tax cash comparison would suggest. The implied rate from a MACRS comparison is generally lower than from a straight-line comparison, because the purchase alternative is more attractive."},
+  {q:"Why is the implied rate discounting both sides?",a:"The implied rate is the unknown being solved for. Both the lease payments and the purchase costs must be discounted at the same rate to find it. Your borrowing rate appears only as a benchmark after the implied rate is found."}
+];
+var NOTES2=[
+  {q:"What does the implied rate tell me?",a:"If it exceeds your borrowing rate, you could finance the purchase more cheaply than leasing. If it is lower, the lease is better value than borrowing to buy."},
+  {q:"What is the payment sensitivity table?",a:"Shows how the implied rate changes at different payment levels. Use it to identify what payment level makes the lease competitive with your borrowing rate."}
+];
+
+function makeBNList(notes,id){var list=document.getElementById(id);if(!list)return;list.innerHTML="";notes.forEach(function(n,i){var item=document.createElement("div");item.className="bn-item";var head=document.createElement("div");head.className="bn-head";head.innerHTML='<div class="bn-qmark">?</div><div class="bn-q">'+n.q+'</div><div class="bn-arr" id="arr'+id+i+'">›</div>';var body=document.createElement("div");body.className="bn-body";body.textContent=n.a;head.onclick=function(){var open=body.classList.contains("open");body.classList.toggle("open");document.getElementById("arr"+id+i).style.transform=open?"rotate(0deg)":"rotate(90deg)";head.style.background=open?"":"var(--surface)";};item.appendChild(head);item.appendChild(body);list.appendChild(item);});}
+
+function validateInputs(){
+  var errs=[];
+  if(+S.price<=0) errs.push("Asset price must be greater than zero");
+  if(!S.propertyClass) errs.push("MACRS property class must be selected");
+  if(+S.life<=0) errs.push("Asset life must be greater than zero");
+  if(S.salvage!==''&&+S.salvage<0) errs.push("Salvage value cannot be negative");
+  if(S.salvage!==''&&+S.salvage>=+S.price) errs.push("Salvage cannot equal or exceed the asset price");
+  if(+S.term<=0) errs.push("Lease term must be greater than zero");
+  if(+S.term>+S.life) errs.push("Lease term cannot exceed asset life");
+  if(S.deposit&&+S.depositAmt<0) errs.push("Deposit amount cannot be negative");
+  if(+S.leasePmt<=0) errs.push("Lease payment must be greater than zero");
+  if(+S.taxRate<0||+S.taxRate>=100) errs.push("Tax rate must be between 0 and 100");
+  if(+S.borrowRate<=0) errs.push("Borrowing rate must be greater than zero");
+  return errs;
+}
+function goToResults(){
+  var missing=[];
+  if(!S.price)missing.push("Asset Price");if(!S.propertyClass)missing.push("MACRS Property Class");
+  if(!S.life)missing.push("Asset Life");if(!S.salvage&&S.salvage!==0)missing.push("Salvage Value");
+  if(!S.term)missing.push("Lease Term");if(!S.leasePmt)missing.push("Lease Payment");
+  if(!S.taxRate)missing.push("Tax Rate");if(!S.borrowRate)missing.push("Borrowing Rate");
+  if(missing.length>0){S.missingFields=missing;render();return;}
+  S.missingFields=null;
+  var valErrs=validateInputs();if(valErrs.length>0){S.missingFields=valErrs;render();return;}
+  try{S.res=calcAll();S.page=2;render();}catch(e){alert("Error: "+e.message)}
+}
+function resetInputs(){
+  S.price="";S.propertyClass="";S.assetTypeSel="";S.bonusElected=false;S.section179="";
+  S.life="";S.salvage="";S.term="";S.deposit=true;S.depositAmt="";S.freq=1;S.leasePmt="";
+  S.taxRate="";S.borrowRate="";S.missingFields=null;S.res=null;S.page=1;render();
+}
+function loadExample(){
+  S.price=80000;S.assetTypeSel="Manufacturing Machinery & Equipment";S.propertyClass="7-year";
+  S.bonusElected=false;S.section179="";S.life=7;S.salvage=8000;
+  S.term=5;S.deposit=true;S.depositAmt=5000;S.freq=1;S.leasePmt=16000;
+  S.taxRate=35;S.borrowRate=8;S.missingFields=null;render();
+}
+function renderPage1(){
+  var html='<div class="page"><div class="page-grid"><aside><div class="section-label">Briefing Notes</div><div class="panel" style="margin-bottom:14px"><div id="bn-list1"></div></div><div class="section-label">Tools</div><div class="panel"><div id="coc-box"></div></div></aside><main>';
+
+  // How this works
+  html+='<div style="background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  html+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-dark);margin-bottom:10px">How this works</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What it does.</strong> Finds the effective annual financing rate embedded in a lease by comparing its after-tax cost to the purchase alternative with depreciation tax shields.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you need.</strong> Asset price, life, salvage, lease term, payment amount, deposit if any, tax rate, and your borrowing rate. MACRS depreciation applies — select the property class for your asset type.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">What you get.</strong> The implied lease rate compared to your borrowing rate — so you can see at a glance whether the lease is cheap or expensive financing.</div></div>';
+  html+='<div style="display:flex;gap:10px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div><div style="font-size:12px;color:var(--t2);line-height:1.5"><strong style="color:var(--amber-dark)">Try the example.</strong> To see how the program works, click the <strong>Load Example</strong> button at the bottom of this page.</div></div></div></div>';
+
+    html+='<div class="panel"><div class="panel-head"><div class="panel-dot"></div><div class="panel-title">Asset</div></div><div class="field-grid">';
+  html+=field("Asset Purchase Price",uInput("$",S.price,"inp-price","S.price=+this.value||0",""));
+  html+=field("Asset Life",uInput("",S.life,"inp-life","S.life=+this.value||0","years"));
+  html+=field("Salvage Value",uInput("$",S.salvage,"inp-salv","S.salvage=+this.value||0",""),false,true);
+  html+='</div></div>';
+  html+='<div class="macrs-panel"><div class="panel-head"><div class="panel-dot" style="background:var(--green)"></div><div class="panel-title">MACRS Depreciation (Purchase Benchmark)</div></div>';
+  html+='<div style="padding:14px 18px"><select class="asset-sel" style="width:100%;font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;padding:6px 0;outline:none;cursor:pointer" onchange="selectAssetType(this.value)" id="asset-type-sel">';
+  MACRS_ASSET_CLASSES.forEach(function(a){if(a.group){html+='</optgroup><optgroup label="'+a.group+'">';}else if(a.name&&a.class){html+='<option value="'+a.name+'"'+(S.assetTypeSel===a.name?" selected":"")+'>'+a.name+'</option>';}else if(a.name){html+='<option value="">'+a.name+'</option>';}});
+  html+='</optgroup></select></div>';
+  html+='<div style="padding:0 18px 14px"><div class="macrs-class-grid" style="border:1px solid var(--border);border-radius:8px;overflow:hidden">';
+  ["3-year","5-year","7-year","10-year","15-year","20-year"].forEach(function(c){var t=MACRS_TABLES[c];html+='<button class="macrs-class-btn'+(S.propertyClass===c?" active":"")+'" onclick="selectPropertyClass(\''+c+'\')"><div class="macrs-class-label">'+c.replace("-year"," Year")+'</div><div class="macrs-class-sub">'+t.method+'</div></button>';});
+  html+='</div></div>';
+  html+='<div style="padding:0 18px 14px"><div class="pills"><div class="pill'+(S.bonusElected?" active":"")+'" onclick="S.bonusElected=true;render()"><div class="pill-dot"></div>Bonus depreciation (100% — OBBBA permanent)</div><div class="pill'+(!S.bonusElected?" active":"")+'" onclick="S.bonusElected=false;render()"><div class="pill-dot"></div>Standard MACRS</div></div></div>';
+  html+='<div style="padding:0 18px 18px">'+field("Section 179 (optional)",uInput("$",S.section179,"inp-179","S.section179=+this.value||0",""))+'</div></div>';
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--blue)"></div><div class="panel-title">Lease Terms</div></div><div class="field-grid">';
+  html+=field("Lease Term",uInput("",S.term,"inp-term","S.term=+this.value||0","years"));
+  html+=field("Payment Frequency",'<select style="font-family:monospace;font-size:14px;font-weight:600;color:var(--t1);border:none;border-bottom:2px solid var(--border);background:transparent;padding:4px 0;outline:none;width:100%" onchange="S.freq=+this.value"><option value="1"'+(S.freq===1?" selected":"")+'>Annual</option><option value="4"'+(S.freq===4?" selected":"")+'>Quarterly</option><option value="12"'+(S.freq===12?" selected":"")+'>Monthly</option></select>');
+  html+=field("Deposit",'<div class="pills"><div class="pill'+(S.deposit?" active":"")+'" onclick="S.deposit=true;render()"><div class="pill-dot"></div>Yes</div><div class="pill'+(!S.deposit?" active":"")+'" onclick="S.deposit=false;render()"><div class="pill-dot"></div>No</div></div>');
+  if(S.deposit)html+=field("Deposit Amount",uInput("$",S.depositAmt,"inp-dep","S.depositAmt=+this.value||0",""));
+  var pmtLbl={1:"per year",4:"per quarter",12:"per month"}[+S.freq]||"per period";
+  html+=field("Lease Payment",uInput("$",S.leasePmt,"inp-pmt","S.leasePmt=+this.value||0",pmtLbl),false,true);
+  html+='</div></div>';
+  html+='<div class="panel"><div class="panel-head"><div class="panel-dot" style="background:var(--t3)"></div><div class="panel-title">Firm Data</div></div><div class="field-grid">';
+  html+=field("Tax Rate",uInput("",S.taxRate,"inp-tax","S.taxRate=+this.value||0","%"));
+  html+=field("Your Borrowing Rate",uInput("",S.borrowRate,"inp-borrow","S.borrowRate=+this.value||0","%"),false,true,"Pre-tax — used as the comparison benchmark");
+  html+='</div></div>';
+  if(S.missingFields&&S.missingFields.length>0)html+='<div style="background:rgba(200,75,49,.07);border:1.5px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)"><strong>Please complete:</strong> '+S.missingFields.join(", ")+'.</div>';
+  html+='<div class="action-row" style="justify-content:space-between;align-items:center"><span style="font-size:11.5px;color:var(--t3)">New here? Try <strong style="color:var(--t2)">Load Example</strong></span><div style="display:flex;gap:10px"><button class="btn-ghost" onclick="loadExample()">Load Example</button><button class="btn-ghost" onclick="resetInputs()">Reset</button><button class="btn-primary" onclick="goToResults()">Calculate ›</button></div></div>';
+  html+='</main></div></div>';
+  document.getElementById("main-content").innerHTML=html;
+  makeBNList(NOTES1,"bn-list1");renderCoC();
+  var as=document.getElementById("asset-type-sel");if(as)as.value=S.assetTypeSel||"";
+}
+function renderPage2(){
+  var res=S.res;
+  var expensive=res.implied>+S.borrowRate;
+  var freqLabel={1:'year',4:'quarter',12:'month'}[+S.freq]||'period';
+  var tabLabels=['Summary','Sensitivity','Detail'];
+  if(S.res_tab>=tabLabels.length)S.res_tab=0;
+  var html='<div class="page"><div class="p2-grid" style="grid-template-columns:220px 1fr">';
+  html+='<aside>';
+  html+='<div class="section-label">Understanding Results</div>';
+  if(S.res_tab===0)html+='<div class="panel" style="margin-bottom:14px"><div id="bn-list2"></div></div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px;align-items:center">';
+  html+='<button class="btn-ghost" onclick="S.page=1;render()" style="width:148px;text-align:center">‹ Edit Inputs</button>';
+  html+='<button class="print-btn" onclick="printSummary()" style="width:148px;text-align:center">🗶 Print Summary</button>';
+  html+='<div style="font-size:10px;color:#8A96A6;margin-top:6px;text-align:center">Use this button to print correctly</div>';
+  html+='</div></aside>';
+  html+='<main>';
+  html+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;border-bottom:2px solid var(--border);padding-bottom:0">';
+  tabLabels.forEach(function(label,t){
+    html+=renderResTab(t,S.res_tab===t)+label+'</div>';
+  });
+  html+='</div>';
+  if(S.res_tab===0){
+    var bannerColor=expensive?'var(--warn)':'var(--green)';
+    var bannerBg=expensive?'rgba(200,75,49,.07)':'var(--green-soft)';
+    html+='<div class="result-banner" style="background:'+bannerBg+';border:1.5px solid '+bannerColor+'">';
+    html+='<div><div class="banner-headline" style="color:'+bannerColor+'">'+(expensive?'Leasing is expensive':'Leasing is cheap')+'</div>';
+    html+='<div style="font-size:13px;color:var(--t2);margin-top:6px;line-height:1.6">The implied cost of leasing is '+(expensive?'above':'below')+' your borrowing rate of '+S.borrowRate+'%.</div></div>';
+    html+='<div style="background:'+bannerColor+';border-radius:10px;padding:14px 18px;text-align:center;flex-shrink:0">';
+    html+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.7)">Implied Rate</div>';
+    html+='<div style="font-family:monospace;font-size:24px;font-weight:800;color:white;margin-top:4px">'+fmtPct(res.implied,2)+'%</div>';
+    html+='</div></div>';
+    html+='<div class="metrics">';
+    html+='<div class="metric"><div class="metric-label">Implied Lease Rate</div><div class="metric-val '+(expensive?'warn':'ok')+'">'+fmtPct(res.implied,2)+'%</div></div>';
+    html+='<div class="metric"><div class="metric-label">Borrowing Rate</div><div class="metric-val">'+S.borrowRate+'%</div></div>';
+    html+='<div class="metric"><div class="metric-label">Difference</div><div class="metric-val '+(expensive?'warn':'ok')+'">'+fmtPct(res.diff,2)+'%</div><div class="metric-sub">'+(expensive?'leasing costs more':'leasing saves')+'</div></div>';
+    html+='</div>';
+  }
+  else if(S.res_tab===1){
+    html+='<div class="collapsible">';
+    html+='<div class="coll-head" onclick="S.show_pmt_sens=!S.show_pmt_sens;renderPage2()">';
+    html+='<span class="coll-title">Implied Rate by Payment Level</span>';
+    html+='<span style="font-size:12px;font-weight:600;color:var(--blue)">'+(S.show_pmt_sens?'Hide':'Show')+'</span></div>';
+    if(S.show_pmt_sens){
+      html+='<div class="coll-body open"><table><thead><tr>'
+        +'<th class="left">Payment/'+freqLabel+'</th><th>Implied Rate</th><th class="left">vs Borrow Rate</th>'
+        +'</tr></thead><tbody>';
+      res.pmtSens.forEach(function(row){
+        var isCur=Math.abs(row.delta)<0.001;
+        var exp2=row.ir>+S.borrowRate;
+        html+='<tr'+(isCur?' class="highlight"':'')+'>'
+          +'<td class="left">'+(isCur?'★ ':'')+fmtM(row.pmt)+'</td>'
+          +'<td style="color:'+(exp2?'var(--warn)':'var(--green)')+'">'+fmtPct(row.ir,2)+'%</td>'
+          +'<td class="left" style="color:'+(exp2?'var(--warn)':'var(--green)')+'">'+(exp2?'Expensive':'Cheap')+'</td></tr>';
+      });
+      html+='</tbody></table></div>';
+    }
+    html+='</div>';
+    html+='<div class="panel" style="margin-top:14px"><div class="chart-box"><div class="chart-title">Implied Rate by Lease Payment</div>';
+    html+='<canvas id="pmt-chart" width="700" height="240" style="width:100%;height:auto;display:block"></canvas>';
+    html+='</div></div>';
+  }
+  else if(S.res_tab===2){
+    html+='<div class="collapsible">';
+    html+='<div class="coll-head" onclick="S.show_depr=!S.show_depr;renderPage2()">';
+    html+='<span class="coll-title">MACRS Depreciation Schedule</span>';
+    html+='<span style="font-size:12px;font-weight:600;color:var(--blue)">'+(S.show_depr?'Hide':'Show')+'</span></div>';
+    if(S.show_depr){
+      var tx=+S.taxRate/100;
+      var _depr=res.depr||[];
+      html+='<div class="coll-body open"><table><thead><tr><th class="left">Year</th><th>Depreciation</th><th>Tax Shield</th></tr></thead><tbody>';
+      _depr.forEach(function(d){
+        html+='<tr><td class="left">'+d.year+'</td><td>'+fmtM(d.amount)+'</td><td>'+fmtM(d.amount*tx)+'</td></tr>';
+      });
+      html+='</tbody></table></div>';
+    }
+    html+='</div>';
+  }
+  html+='</main></div></div>';
+  document.getElementById('main-content').innerHTML=html;
+  if(S.res_tab===0)makeBNList(NOTES2,'bn-list2');
+  if(S.res_tab===1)setTimeout(function(){drawChart('pmt-chart',res.pmtSens,'pmt','ir','$');},50);
+}
+function printSummary(){
+  var res=S.res;if(!res)return;
+  var savedTab=S.res_tab;
+  var pd0=S.show_pmt_sens,pd1=S.show_depr;
+  S.show_pmt_sens=true;S.show_depr=true;
+  var _mc=document.getElementById('main-content');
+  var _saved=_mc.innerHTML;
+  var _savedPage=S.page;
+  var pageLabels=['Summary','Sensitivity — Table','Sensitivity — Chart','Detail'];
+  var _hdr='<div style="background:#1B3F6E;padding:8px 24px;margin-bottom:0">'
+    +'<span style="color:white;font-family:Georgia,serif;font-weight:600;font-size:15px">'
+    +'CapPlan Business (US) — Implied Cost of Leasing</span></div>';
+  var _styleText='._pg{width:100%;padding:0.2in;overflow:visible;box-sizing:border-box}'
+    +'aside,.print-btn,.btn-ghost,.btn-primary,#masthead,#stepper{display:none!important}'
+    +'body{background:white!important}'
+    +'.p2-grid,.page-grid{display:block!important}'
+    +'.coll-body{display:block!important}'
+    +'.result-banner,.metric,.chart-box{box-shadow:none!important;border:1px solid #ccc!important}'
+    +'.collapsible{box-shadow:none!important;border:1px solid #ccc!important;overflow:visible!important}'
+    +'table{width:100%;border-collapse:collapse}'
+    +'th,td{border-bottom:1px solid #E2E6EC}'
+    +'th.left,td.left{text-align:left}'
+    +'@media print{'
+    +'body{margin:0;padding:0;background:white!important}#main-content{display:block!important}'
+    +'.panel,.chart-box,.collapsible,.result-banner,.metric{break-inside:auto!important;page-break-inside:auto!important}'
+    +'.coll-body,table,tbody,tr,td,th{break-inside:auto!important;page-break-inside:auto!important}'
+    +'._pg:last-of-type{page-break-after:avoid!important;break-after:avoid!important}'
+    +'@page{margin:0.6in 0.3in 0.3in 0.3in;size:landscape}}';
+  var _pages=[];
+  function getMain(){
+    var m=document.querySelector('#main-content main');
+    return m?m.innerHTML:document.getElementById('main-content').innerHTML;
+  }
+  function finish(){
+    var _styleEl=document.createElement('style');
+    _styleEl.id='_ps_style';
+    _styleEl.textContent=_styleText;
+    document.head.appendChild(_styleEl);
+    var _combined=_pages.map(function(html,i){
+      var hdr=i===0?_hdr:'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8A96A6;margin-bottom:8px">'+pageLabels[i]+'</div>';
+      return '<div class="_pg"'+(i>0?' style="page-break-before:always;break-before:page"':'')+'>'+hdr+html+'</div>';
+    }).join('');
+    _mc.innerHTML=_combined;
+    var _mast=document.getElementById('masthead');
+    var _step=document.getElementById('stepper');
+    if(_mast)_mast.style.display='none';
+    if(_step)_step.style.display='none';
+    function _restore(){
+      document.body.classList.remove('printing');
+      var _se=document.getElementById('_ps_style');if(_se)_se.remove();
+      if(_mast)_mast.style.display='';
+      if(_step)_step.style.display='';
+      _mc.innerHTML=_saved;
+      S.page=_savedPage;
+      S.res_tab=savedTab;
+      S.show_pmt_sens=pd0;S.show_depr=pd1;
+      render();
+    }
+    window.onafterprint=function(){window.onafterprint=null;_restore();};
+    document.body.classList.add('printing');
+    window.print();
+  }
+  // Page 0: Summary
+  S.res_tab=0;renderPage2();
+  setTimeout(function(){
+    _pages.push(getMain());
+    // Page 1: Sensitivity table only - hide chart panel
+    S.res_tab=1;renderPage2();
+    document.querySelectorAll('#main-content .panel').forEach(function(el){el.style.display='none';});
+    setTimeout(function(){
+      _pages.push(getMain());
+      // Page 2: Chart only - render, wait for draw, hide collapsibles
+      S.res_tab=1;renderPage2();
+      setTimeout(function(){
+        var cv=document.getElementById('pmt-chart');
+        if(cv)drawChart('pmt-chart',res.pmtSens,'pmt','ir','$');
+        setTimeout(function(){
+          document.querySelectorAll('canvas').forEach(function(cv2){
+            var img=document.createElement('img');
+            img.src=cv2.toDataURL('image/png');
+            img.style.cssText='width:100%;height:auto;display:block';
+            cv2.parentNode.replaceChild(img,cv2);
+          });
+          document.querySelectorAll('#main-content .collapsible').forEach(function(el){el.style.display='none';});
+          _pages.push(getMain());
+          // Page 3: Detail
+          S.res_tab=2;renderPage2();
+          setTimeout(function(){
+            _pages.push(getMain());
+            finish();
+          },100);
+        },150);
+      },50);
+    },50);
+  },50);
+}
+function drawChart(canvasId,data,xkey,ykey,xfmt,xLabel){
+  var canvas=document.getElementById(canvasId);if(!canvas)return;
+  var fresh=canvas.cloneNode(true);canvas.parentNode.replaceChild(fresh,canvas);canvas=fresh;
+  var ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
+  var pad={top:20,bottom:50,left:80,right:16};
+  if(xLabel){pad.bottom=66;}
+  var cw=W-pad.left-pad.right,ch=H-pad.top-pad.bottom;
+  var vals=data.map(function(d){return d[ykey]});
+  var minV=Math.min.apply(null,vals),maxV=Math.max.apply(null,vals);
+  var rng=maxV-minV||Math.abs(maxV||1)*0.4;
+  var lo=minV>=0?0:minV-rng*0.15,hi=maxV+rng*0.15;
+  var gap=cw/data.length,bw=Math.floor(gap*0.6);
+  var midIdx=Math.floor(data.length/2);
+  function toY(v){return(hi===lo)?pad.top+ch/2:pad.top+ch*(hi-v)/(hi-lo);}
+  var zeroY=toY(0);
+  function drawBase(){
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='#E2E6EC';ctx.lineWidth=1;
+    for(var i=0;i<=4;i++){
+      var y=pad.top+ch*(i/4);
+      ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();
+      var v=hi-(hi-lo)*(i/4);
+      ctx.fillStyle='#8A96A6';ctx.font='10px system-ui';ctx.textAlign='right';
+      var isPctY=(ykey==='implied'||ykey==='rate'||ykey==='coc'||ykey==='ir');
+      var yLblTxt=isPctY?(v>=0?'':'-')+fmt(Math.abs(v),2)+'%':(v>=0?'$':'-$')+fmt(Math.abs(v)/1000,1)+'k';
+      ctx.fillText(yLblTxt,pad.left-4,y+3);
+    }
+    ctx.strokeStyle='#C8D0DA';ctx.lineWidth=1.5;ctx.setLineDash([5,3]);
+    ctx.beginPath();ctx.moveTo(pad.left,zeroY);ctx.lineTo(pad.left+cw,zeroY);ctx.stroke();
+    ctx.setLineDash([]);
+    data.forEach(function(d,i){
+      var x=pad.left+gap*i+(gap-bw)/2;
+      var y0=zeroY,y1=toY(d[ykey]),barH=Math.abs(y1-y0),top=Math.min(y0,y1);
+      ctx.fillStyle=d[ykey]>=0?(i===midIdx?'#2E7D52':'#6DBF8A'):(i===midIdx?'#C84B31':'#E88A8A');
+      ctx.fillRect(x,top,bw,Math.max(barH,1));
+      ctx.fillStyle=i===midIdx?'#1B3F6E':'#8A96A6';
+      ctx.font=(i===midIdx?'bold ':'')+'10px system-ui';ctx.textAlign='center';
+      ctx.fillText(String(d[xkey])+(xfmt||''),x+bw/2,H-pad.bottom+14);
+    });
+    ctx.strokeStyle='#4A5568';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(pad.left,pad.top);ctx.lineTo(pad.left,pad.top+ch);ctx.lineTo(pad.left+cw,pad.top+ch);ctx.stroke();
+    if(xLabel){ctx.fillStyle='#4A5568';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillText(xLabel,pad.left+cw/2,H-4);}
+  }
+  function drawTooltip(i){
+    var d=data[i],x=pad.left+gap*i+(gap-bw)/2+bw/2,y=toY(d[ykey]);
+    ctx.strokeStyle='rgba(27,63,110,0.3)';ctx.lineWidth=1;ctx.setLineDash([3,2]);
+    ctx.beginPath();ctx.moveTo(x,pad.top);ctx.lineTo(x,pad.top+ch);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#1B3F6E';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='white';ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fill();
+    var xLbl=String(d[xkey])+(xfmt||'');
+    var yVal=d[ykey];
+    var isPct=(ykey==='rate'||ykey==='coc'||ykey==='implied');
+    var yLbl=(yVal>=0?'':'-')+(isPct?fmt(Math.abs(yVal),2)+'%':'$'+fmt(Math.abs(yVal)/1000,2)+'k');
+    var text=xLbl+' \u2192 '+yLbl;
+    ctx.font='bold 11px system-ui';
+    var tw=ctx.measureText(text).width+16,th=22,r2=4;
+    var tx=Math.min(Math.max(x-tw/2,pad.left),pad.left+cw-tw);
+    var ty=y-th-8;if(ty<pad.top)ty=y+8;
+    ctx.fillStyle='rgba(15,29,46,0.88)';
+    ctx.beginPath();ctx.moveTo(tx+r2,ty);ctx.lineTo(tx+tw-r2,ty);ctx.arcTo(tx+tw,ty,tx+tw,ty+r2,r2);
+    ctx.lineTo(tx+tw,ty+th-r2);ctx.arcTo(tx+tw,ty+th,tx+tw-r2,ty+th,r2);
+    ctx.lineTo(tx+r2,ty+th);ctx.arcTo(tx,ty+th,tx,ty+th-r2,r2);
+    ctx.lineTo(tx,ty+r2);ctx.arcTo(tx,ty,tx+r2,ty,r2);ctx.closePath();ctx.fill();
+    ctx.fillStyle='white';ctx.textAlign='left';ctx.fillText(text,tx+8,ty+15);
+  }
+  function hitIdx(cx){
+    var rect=canvas.getBoundingClientRect(),scaleX=canvas.width/rect.width;
+    var px=(cx-rect.left)*scaleX;
+    if(px<pad.left||px>pad.left+cw)return -1;
+    return Math.max(0,Math.min(data.length-1,Math.floor((px-pad.left)/gap)));
+  }
+  canvas.addEventListener('mousemove',function(e){drawBase();var i=hitIdx(e.clientX);if(i>=0)drawTooltip(i);});
+  canvas.addEventListener('mouseleave',function(){drawBase();});
+  canvas.addEventListener('touchstart',function(e){e.preventDefault();},{passive:false});
+  canvas.addEventListener('touchmove',function(e){e.preventDefault();var t=e.touches[0];drawBase();var i=hitIdx(t.clientX);if(i>=0)drawTooltip(i);},{passive:false});
+  canvas.addEventListener('touchend',function(){drawBase();});
+  drawBase();
+}
+
+
+
+function render(){updateStepper();if(S.page===1)renderPage1();else if(S.page===2&&S.res)renderPage2();autoSave();}
+// ── Storage: localStorage primary, IndexedDB secondary ───────────────────
+var IDB_NAME='capplan';
+var IDB_STORE='analyses';
+var IDB_MODEL='US11';
+var LS_STORE_KEY='capplan_us11_analyses';  // stores all named analyses
+var _idb=null;
+
+// localStorage helpers
+function lsGetAll(){
+  if(!LS_OK)return [];
+  try{
+    var obj=JSON.parse(localStorage.getItem(LS_STORE_KEY)||'{}');
+    var rows=[];
+    Object.keys(obj).forEach(function(k){rows.push(obj[k]);});
+    rows.sort(function(a,b){return b.saved>a.saved?1:-1;});
+    return rows;
+  }catch(e){return [];}
+}
+
+function lsSave(payload){
+  if(!LS_OK)return false;
+  try{
+    var obj=JSON.parse(localStorage.getItem(LS_STORE_KEY)||'{}');
+    obj[payload.label]=payload;
+    localStorage.setItem(LS_STORE_KEY,JSON.stringify(obj));
+    console.log('[CapPlan] lsSave: saved label='+payload.label+' total='
+      +Object.keys(obj).length);
+    return true;
+  }catch(e){console.error('[CapPlan] lsSave error',e);return false;}
+}
+
+function lsLoad(label){
+  if(!LS_OK)return null;
+  try{
+    var obj=JSON.parse(localStorage.getItem(LS_STORE_KEY)||'{}');
+    return obj[label]||null;
+  }catch(e){return null;}
+}
+
+function lsDelete(label){
+  if(!LS_OK)return;
+  try{
+    var obj=JSON.parse(localStorage.getItem(LS_STORE_KEY)||'{}');
+    delete obj[label];
+    localStorage.setItem(LS_STORE_KEY,JSON.stringify(obj));
+  }catch(e){}
+}
+
+// IndexedDB (used when deployed to a persistent origin)
+function openIDB(cb){
+  if(_idb){return cb(_idb);}
+  var req=indexedDB.open(IDB_NAME,1);
+  req.onupgradeneeded=function(e){
+    var db=e.target.result;
+    if(!db.objectStoreNames.contains(IDB_STORE)){
+      db.createObjectStore(IDB_STORE,{keyPath:'id',autoIncrement:true});
+    }
+  };
+  req.onsuccess=function(e){
+    _idb=e.target.result;
+    console.log('[CapPlan] openIDB: success, stores:',Array.from(_idb.objectStoreNames));
+    cb(_idb);
+  };
+  req.onerror=function(){console.error('[CapPlan] openIDB error');cb(null);};
+}
+
+function idbSave(payload,cb){
+  openIDB(function(db){
+    if(!db)return cb&&cb(null);
+    var rtx=db.transaction(IDB_STORE,'readonly');
+    var rreq=rtx.objectStore(IDB_STORE).getAll();
+    rreq.onsuccess=function(){
+      var rows=rreq.result||[];
+      var existing=rows.filter(function(r){
+        return r.model===IDB_MODEL&&r.label===payload.label;
+      });
+      if(existing.length)payload.id=existing[0].id;
+      var wtx=db.transaction(IDB_STORE,'readwrite');
+      var store=wtx.objectStore(IDB_STORE);
+      if(existing.length){
+        store.put(payload);
+      } else {
+        store.add(payload);
+      }
+      wtx.oncomplete=function(){
+        cb&&cb(true);
+      };
+      wtx.onerror=function(){console.error('[CapPlan] idbSave tx error');cb&&cb(false);};
+    };
+    rreq.onerror=function(){
+      var wtx=db.transaction(IDB_STORE,'readwrite');
+      wtx.objectStore(IDB_STORE).add(payload);
+      wtx.oncomplete=function(){cb&&cb(true);};
+    };
+  });
+}
+
+function idbGetAll(cb){
+  openIDB(function(db){
+    if(!db)return cb([]);
+    var tx=db.transaction(IDB_STORE,'readonly');
+    var req=tx.objectStore(IDB_STORE).getAll();
+    req.onsuccess=function(){
+      var all=req.result||[];
+      var rows=all.filter(function(r){return r.model===IDB_MODEL;});
+      rows.sort(function(a,b){return b.saved>a.saved?1:-1;});
+      cb(rows);
+    };
+    req.onerror=function(){console.error('[CapPlan] idbGetAll error');cb([]);};
+  });
+}
+
+function idbDelete(id,label,cb){
+  lsDelete(label);
+  openIDB(function(db){
+    if(!db)return cb&&cb();
+    var tx=db.transaction(IDB_STORE,'readwrite');
+    tx.objectStore(IDB_STORE).delete(id);
+    tx.oncomplete=function(){cb&&cb();};
+  });
+}
+
+// Primary save: localStorage. Secondary: IndexedDB.
+function storeSave(payload,cb){
+  var lsOk=lsSave(payload);
+  idbSave(payload,function(idbOk){
+    cb&&cb(lsOk||idbOk);
+  });
+}
+
+// Primary read: localStorage (reliable on localhost).
+// Falls back to IndexedDB if localStorage is empty.
+function storeGetAll(cb){
+  var lsRows=lsGetAll();
+  if(lsRows.length>0){
+    cb(lsRows);
+  } else {
+    idbGetAll(cb);
+  }
+}
+
+
+// ── Auto-save (localStorage fallback, IndexedDB primary) ─────────────────
+var AUTO_SAVE_KEY='capplan_us11_autosave';
+var LS_OK=(function(){try{localStorage.setItem('__t','1');localStorage.removeItem('__t');return true;}catch(e){return false;}})();
+var IDB_OK=(location.protocol!=='file:');
+
+
+function autoSave(){
+  var payload=buildPayload('\u2605 Last session');
+  // IndexedDB auto-save slot
+  // localStorage-primary save (persists reliably on localhost)
+  storeSave(payload,null);
+}
+
+function buildPayload(label){
+  var fields=['currency', 'coc_open', 'coc_eq_mode', 'coc_kd', 'coc_tax', 'coc_div', 'coc_price', 'coc_g', 'coc_rf', 'coc_beta', 'coc_mrp', 'coc_wd', 'cost', 'itcPct', 'life', 'salvage', 'method', 'hyr', 'ddbRate', 'workingCapital', 'annuity', 'annuityAmount', 'yearlyBenefits', 'taxRate', 'coc'];
+  var st={};fields.forEach(function(k){st[k]=S[k];});
+  return {capplan_version:'1.0',model:IDB_MODEL,saved:new Date().toISOString(),
+          label:label||'Untitled',state:st};
+}
+
+function applyPayload(p){
+  if(!p||!p.state)return false;
+  Object.keys(p.state).forEach(function(k){if(k in S)S[k]=p.state[k];});
+  S.res=null;S.page=1;S.show_dcf=false;S.show_table=false;
+  return true;
+}
+
+// ── Modal helper ──────────────────────────────────────────────────────────
+function getSLModal(){
+  var ov=document.getElementById('sl-modal');
+  if(!ov){ov=document.createElement('div');ov.id='sl-modal';document.body.appendChild(ov);}
+  ov.style.display='flex';ov.className='sl-modal-overlay';
+  return ov;
+}
+function closeSLModal(){
+  var el=document.getElementById('sl-modal');
+  if(el){el.style.display='none';el.innerHTML='';}
+}
+
+function showSLHelp(){
+  var ov=getSLModal();
+  ov.innerHTML='<div class="sl-modal" style="width:440px">'
+    +'<div class="sl-modal-title">Saving &amp; Loading Your Work</div>'
+    +'<div class="sl-help-panel">'
+    +'<ul>'
+    +'<li><strong>Auto-save:</strong> CapPlan automatically saves your work as you type. '
+    +'If you close the tab by accident, your data will still be there when you reopen it.</li>'
+    +'<li><strong>Save:</strong> Gives your analysis a name so you can find it later. '
+    +'Use this when you want to keep a permanent named copy &mdash; for example, '
+    +'&ldquo;City Hall HVAC&rdquo; or &ldquo;Warehouse Solar&rdquo;.</li>'
+    +'<li><strong>Load:</strong> Opens a list of all your saved analyses for this model. '
+    +'Click Load next to any entry to restore it. '
+    +'The &starf; Last session entry is your most recent auto-save.</li>'
+    +'<li><strong>Export file:</strong> Downloads your analysis as a .json file. '
+    +'Use this to back it up, move it to another computer, or share it with a colleague.</li>'
+    +'<li><strong>Import file:</strong> Loads a .json file that was previously exported. '
+    +'Available inside the Load dialog.</li>'
+    +'</ul>'
+    +'<div class="sl-help-note">'
+    +'Saved analyses are stored in this browser on this device. '
+    +'They are not affected by clearing your Downloads folder. '
+    +'Use <strong>Export</strong> to keep a copy outside the browser.'
+    +'</div>'
+    +'</div>'
+    +'<div class="sl-modal-btns">'
+    +'<button class="sl-modal-btn primary" onclick="closeSLModal()">Got it</button>'
+    +'</div>'
+    +'</div>';
+}
+
+// ── Save ──────────────────────────────────────────────────────────────────
+function saveAnalysis(){
+  var lbl='';
+  if(LS_OK)try{var ex=JSON.parse(localStorage.getItem(AUTO_SAVE_KEY)||'{}');
+    if(ex.label&&ex.label!=='★ Last session')lbl=ex.label;}catch(e){}
+  var inp=document.getElementById('save-label-input');
+  if(inp){inp.value=lbl;}
+  var m=document.getElementById('sl-save-modal');
+  if(m){m.style.display='flex';}
+  setTimeout(function(){if(inp){inp.focus();inp.select();}},50);
+}
+
+
+function confirmSave(){
+  var el=document.getElementById('save-label-input');
+  var label=(el?el.value.trim():'')||'Untitled analysis';
+  var payload=buildPayload(label);
+  function afterSave(){
+    var sm=document.getElementById('sl-save-modal');
+    if(sm)sm.style.display='none';
+    closeSLModal();
+    var btn=document.getElementById('sl-save-btn');
+    if(btn){var orig=btn.innerHTML;
+      btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Saved';
+      setTimeout(function(){btn.innerHTML=orig;},1800);}
+  }
+  storeSave(payload,function(ok){
+    afterSave();
+  });
+}
+
+// ── Export (download file) ────────────────────────────────────────────────
+function exportAnalysis(){
+  var el=document.getElementById('save-label-input');
+  var label=(el?el.value.trim():'')||'CapPlan Analysis';
+  var payload=buildPayload(label);
+  if(LS_OK)try{localStorage.setItem(AUTO_SAVE_KEY,JSON.stringify(payload));}catch(e){}
+  var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;
+  a.download=label.replace(/[^a-z0-9_\- ]/gi,'_').replace(/\s+/g,'_')+'.json';
+  a.click();URL.revokeObjectURL(url);
+  closeSLModal();
+}
+
+// ── Load ──────────────────────────────────────────────────────────────────
+function loadAnalysis(){
+  var ov=getSLModal();
+  if(!IDB_OK){
+    ov.innerHTML='<div class="sl-modal" style="width:400px">'
+      +'<div class="sl-modal-title">Load Analysis</div>'
+      +'<div style="padding:12px 14px;background:rgba(245,158,11,.1);border:1px solid var(--amber);border-radius:8px;font-size:13px;line-height:1.6;margin-bottom:16px">'
+      +'<strong>Saved analyses unavailable.</strong><br>'
+      +'You are opening this file directly from your hard drive. '
+      +'To use Save &amp; Load, open a terminal in your capplan folder and run:<br><br>'
+      +'<code style="background:var(--surface);padding:4px 8px;border-radius:4px;font-size:12px">python3 -m http.server 8080</code><br><br>'
+      +'Then open in your browser: <code>http://localhost:8080/capplan_model1.html</code>'
+      +'</div>'
+      +'<div class="sl-label" style="margin-bottom:6px">Or import a previously exported file</div>'
+      +'<button class="sl-modal-btn primary" style="width:100%" '
+      +'onclick="document.getElementById(\'sl-file-input\').click()">Import file\u2026</button>'
+      +'<div class="sl-modal-btns"><button class="sl-modal-btn secondary" onclick="closeSLModal()">Close</button></div>'
+      +'</div>';
+    return;
+  }
+  ov.innerHTML='<div class="sl-modal" style="width:420px"><div class="sl-modal-title">Load Analysis</div>'
+    +'<div id="sl-list-area"><div style="font-size:13px;color:var(--t2);padding:12px 0">Loading saved analyses\u2026</div></div>'
+    +'<div class="sl-modal-btns" style="margin-top:10px">'
+    +'<button class="sl-modal-btn secondary" onclick="closeSLModal()">Cancel</button>'
+    +'<button class="sl-modal-btn secondary" onclick="document.getElementById(\'sl-file-input\').click()">Import file</button>'
+    +'</div></div>';
+  storeGetAll(function(rows){
+    var area=document.getElementById('sl-list-area');
+    if(!area)return;
+    if(!rows.length){
+      area.innerHTML='<div style="font-size:13px;color:var(--t2);padding:12px 0;text-align:center">'
+        +'No saved analyses yet.<br>Fill in the form and click Save to store one.</div>';
+      return;
+    }
+    var html='<div style="max-height:280px;overflow-y:auto;margin:0 -4px">';
+    rows.forEach(function(row){
+      var d=new Date(row.saved);
+      var dateStr=d.toLocaleDateString(undefined,{month:'short',day:'numeric'})
+        +' '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+      var isAuto=row.label==='\u2605 Last session';
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border)">'
+        +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'
+        +(isAuto?'<span style="color:var(--t3);font-size:11px;margin-right:4px">&#9733;</span>':'')+row.label+'</div>'
+        +'<div style="font-size:11px;color:var(--t3)">'+dateStr+'</div>'
+        +'</div>'
+        +'<button class="sl-modal-btn primary" style="padding:5px 12px;font-size:12px" '
+        +'onclick="loadFromIDB('+row.id+',\''+row.label+'\')"  >Load</button>'
+        +'<button class="sl-modal-btn secondary" style="padding:5px 10px;font-size:12px;color:var(--warn)" '
+        +'onclick="deleteFromIDB('+row.id+',\''+row.label+'\')"  style="padding:5px 10px;font-size:12px;color:var(--warn)">&#128465;</button>'
+        +'</div>';
+    });
+    html+='</div>';
+    area.innerHTML=html;
+  });
+}
+
+function loadFromIDB(id,label){
+  // Try localStorage first (primary store)
+  if(label){
+    var p=lsLoad(label);
+    if(p){
+      if(applyPayload(p)){render();closeSLModal();return;}
+    }
+  }
+  // Fall back to IndexedDB
+  if(!id){console.error('[CapPlan] loadFromIDB: no id or label found');return;}
+  openIDB(function(db){
+    if(!db)return;
+    var tx=db.transaction(IDB_STORE,'readonly');
+    var req=tx.objectStore(IDB_STORE).get(id);
+    req.onsuccess=function(){
+      var p=req.result;
+      if(p&&applyPayload(p)){render();closeSLModal();}
+    };
+  });
+}
+
+function deleteFromIDB(id,label){
+  idbDelete(id,label,function(){
+    loadAnalysis();
+  });
+}
+
+// ── Import from file ──────────────────────────────────────────────────────
+function handleFileLoad(event){
+  var file=event.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var p=JSON.parse(e.target.result);
+      if(p.model&&p.model!==IDB_MODEL){
+        alert('This file is from '+p.model+', not M1. Please load it in the correct model.');return;
+      }
+      if(applyPayload(p)){
+        // also save it into IDB so it appears in the list
+        idbSave(p,null);
+        render();closeSLModal();
+      }
+    }catch(err){alert('Could not read file. Please check it is a valid CapPlan JSON file.');}
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+
+
+function getSym(){return '$';}
+function toggleCur(){}
+function calcDepr(base,life,method,hyr,ddbRate){
+  var d=[];
+  if(method==="Double-declining"){var rate=ddbRate/100;d.push(base*rate*(hyr?0.5:1));for(var y=2;y<=life;y++)d.push((base-d.reduce(function(s,v){return s+v},0))*rate);}
+  else if(method==="Straight-line"){var y1=base/life*(hyr?0.5:1);d.push(y1);for(var y=2;y<=life;y++)d.push(hyr?(base-y1)/(life-1):base/life);}
+  return d;
+}
+
+function uIn(pfx,val,id,ob,sfx,dis){return'<div class="ui">'+(pfx?'<span class="pfx">'+pfx+'</span>':'')+'<input type="text" id="'+id+'" value="'+(val==null?"":val)+'" '+(dis?'disabled ':'')+' onblur="'+ob+'" onfocus="this.style.borderBottomColor=\'var(--blue)\'">'+(sfx?'<span class="sfx">'+sfx+'</span>':'')+'</div>';}
+
+function renderResTab(t,active){
+  var s='<div onclick="S.res_tab='+t+';renderPage2()" ';
+  s+='style="padding:9px 16px;cursor:pointer;font-size:13px;font-weight:600;';
+  s+='border-radius:8px 8px 0 0;border:1.5px solid '+(active?'var(--blue)':'var(--border)')+';';
+  s+='border-bottom:'+(active?'2px solid white':'1.5px solid var(--border)')+';';
+  s+='background:'+(active?'white':'transparent')+';';
+  s+='color:'+(active?'var(--blue)':'var(--t2)')+';margin-bottom:-2px">';
+  return s;
+}
+
+CapPlanAuth.init('us_model11').then(function(hasAccess) {
+  if (hasAccess) render();
+};
+
+// Attach masthead button listeners after DOM is ready
+document.addEventListener("DOMContentLoaded",function(){
+  var hb=document.getElementById("sl-help-btn");
+  var sb=document.getElementById("sl-save-btn");
+  var lb=document.getElementById("sl-load-btn");
+  console.log("[CapPlan] masthead listeners attached: help="+!!hb+" save="+!!sb+" load="+!!lb);
+  // Use event delegation — catches clicks on button OR any child (SVG, text)
+  document.getElementById("masthead").addEventListener("click",function(e){
+    var t=e.target;
+    // Walk up to find the button in case click landed on SVG or span child
+    while(t&&t.tagName!=="BUTTON")t=t.parentElement;
+    if(!t)return;
+    if(t.id==="sl-save-btn"){console.log("[CapPlan] save btn clicked");saveAnalysis();}
+    else if(t.id==="sl-load-btn"){console.log("[CapPlan] load btn clicked");loadAnalysis();}
+    else if(t.id==="sl-help-btn"){console.log("[CapPlan] help btn clicked");showSLHelp();}
+  });
+  // Static save modal buttons
+  var csb=document.getElementById('sl-confirm-save-btn');
+  var cab=document.getElementById('sl-cancel-save-btn');
+  var exb=document.getElementById('sl-export-btn');
+  if(csb)csb.addEventListener('click',function(e){e.stopPropagation();confirmSave();});
+  if(cab)cab.addEventListener('click',function(e){
+    e.stopPropagation();
+    var sm=document.getElementById('sl-save-modal');
+    if(sm)sm.style.display='none';
+  });
+  if(exb)exb.addEventListener('click',function(e){e.stopPropagation();exportAnalysis();});
+  // Stop clicks inside the modal box from reaching the overlay
+  var smInner=document.querySelector('#sl-save-modal .sl-modal');
+  if(smInner)smInner.addEventListener('click',function(e){e.stopPropagation();});
+  // Click on overlay background closes modal
+  var smOv=document.getElementById('sl-save-modal');
+  if(smOv)smOv.addEventListener('click',function(){
+    smOv.style.display='none';
+  });
+});
+
+</script>
+
+<div id="sl-save-modal" class="sl-modal-overlay" style="display:none">
+  <div class="sl-modal" style="width:380px">
+    <div class="sl-modal-title">Save Analysis</div>
+    <div class="sl-label">Analysis name</div>
+    <input id="save-label-input" type="text" placeholder="e.g. City Hall HVAC replacement">
+    <div style="font-size:12px;color:#4a5568;margin-bottom:14px">Saves to this browser. Use <strong>Export</strong> to download a portable file.</div>
+    <button class="sl-modal-btn primary" style="width:100%;margin-bottom:8px" id="sl-confirm-save-btn">Save</button>
+    <div class="sl-modal-btns">
+      <button class="sl-modal-btn secondary" id="sl-cancel-save-btn">Cancel</button>
+      <button class="sl-modal-btn secondary" style="font-size:11px;color:#8a96a6" id="sl-export-btn">↓ Export to file</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="sl-file-input" accept=".json" style="display:none" onchange="handleFileLoad(event)">
+</body>
+</html>
