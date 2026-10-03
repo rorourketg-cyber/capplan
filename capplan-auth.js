@@ -44,7 +44,7 @@ const CapPlanAuth = (() => {
     return new Promise((resolve, reject) => {
       if (window.auth0) return resolve();
       const s = document.createElement('script');
-      s.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.min.js';
+      s.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.min.js';
       s.onload = resolve;
       s.onerror = reject;
       document.head.appendChild(s);
