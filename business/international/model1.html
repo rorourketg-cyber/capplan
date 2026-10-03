@@ -394,7 +394,7 @@ tr:nth-child(even) { background: #F7F8FA; }
 
 <div id="main-content"></div>
 <!-- Auth0 SPA SDK + CapPlan auth library -->
-<script src="../../capplan-auth.js"></script>
+<script src="/capplan-auth.js"></script>
 
 
 <script>
@@ -1761,8 +1761,9 @@ function handleFileLoad(event){
 }
 
 
-CapPlanAuth.init('model1');
-   render();
+CapPlanAuth.init('model1').then(function(hasAccess) {
+  if (hasAccess) render();
+};
 
 // Attach masthead button listeners after DOM is ready
 document.addEventListener("DOMContentLoaded",function(){

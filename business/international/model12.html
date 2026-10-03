@@ -188,7 +188,7 @@ tr.highlight td{background:var(--blue-soft)!important;font-weight:700;color:var(
 </div>
 <div id="main-content"></div>
 <!-- Auth0 SPA SDK + CapPlan auth library -->
-<script src="../../capplan-auth.js"></script>
+<script src="/capplan-auth.js"></script>
 <script>
 var CURRENCIES=[{code:"USD",symbol:"$",label:"US Dollar"},{code:"EUR",symbol:"€",label:"Euro"},{code:"JPY",symbol:"¥",label:"Japanese Yen"},{code:"GBP",symbol:"£",label:"British Pound"},{code:"INR",symbol:"₹",label:"Indian Rupee"},{code:"CHF",symbol:"CHF",label:"Swiss Franc"},{code:"CAD",symbol:"CA$",label:"Canadian Dollar"},{code:"AUD",symbol:"AU$",label:"Australian Dollar"},{code:"NZD",symbol:"NZ$",label:"New Zealand Dollar"}];
 function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
@@ -1049,8 +1049,9 @@ function handleFileLoad(event){
 }
 
 
-CapPlanAuth.init('model12');
-   render();
+CapPlanAuth.init('model12').then(function(hasAccess) {
+  if (hasAccess) render();
+};
 
 // Attach masthead button listeners after DOM is ready
 document.addEventListener("DOMContentLoaded",function(){

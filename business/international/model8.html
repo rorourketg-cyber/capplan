@@ -213,7 +213,7 @@ tr.highlight td{background:var(--blue-soft)!important;font-weight:700;color:var(
 </div>
 <div id="main-content"></div>
 <!-- Auth0 SPA SDK + CapPlan auth library -->
-<script src="../../capplan-auth.js"></script>
+<script src="/capplan-auth.js"></script>
 <script>
 var CURRENCIES=[
   {code:"USD",symbol:"$",label:"US Dollar"},{code:"EUR",symbol:"€",label:"Euro"},
@@ -1379,8 +1379,9 @@ function handleFileLoad(event){
 }
 
 
-CapPlanAuth.init('model8');
-   render();
+CapPlanAuth.init('model8').then(function(hasAccess) {
+  if (hasAccess) render();
+};
 
 // Attach masthead button listeners after DOM is ready
 document.addEventListener("DOMContentLoaded",function(){
