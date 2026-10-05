@@ -30,6 +30,18 @@ const CapPlanAuth = (() => {
                    'model8','model9','model10','model11','model12','model13'],
   };
 
+  // Display names for personal models
+  const PERSONAL_MODEL_NAMES = {
+    personal2:  'Which Option Should I Buy?',
+    personal3:  'Should I Replace What I Own?',
+    personal4:  'Which Replacement is Best?',
+    personal5:  'When Should I Replace It?',
+    personal9:  'Lease or Buy?',
+    personal11: 'What is This Lease Costing Me?',
+    personal12: 'What is the Least I Should Accept?',
+    personal13: 'What is the Most I Should Pay?',
+  };
+
   // Pricing labels for upgrade overlay
   const SUITE_META = {
     personal:      { name: 'Personal',                    price: '$12/month' },
@@ -99,6 +111,22 @@ const CapPlanAuth = (() => {
   function showUpgradeOverlay(modelId) {
     const suite = suiteForModel(modelId);
     const meta  = SUITE_META[suite] || { name: 'Full Suite', price: '$37/month' };
+    const modelName = PERSONAL_MODEL_NAMES[modelId] || null;
+    const isPersonal = suite === 'personal';
+
+    // Build the description sentence
+    const modelNameHtml = modelName
+      ? `The model, <strong><em>${modelName}</em></strong>, is part of the Full Suite.`
+      : 'This model is part of the Full Suite.';
+
+    // Subtext under buttons
+    const trialSubtext = modelName
+      ? `<div style="color:#777;font-size:.8rem;margin-top:-6px;margin-bottom:10px">(${modelName})</div>`
+      : '';
+    const annualSubtext = isPersonal
+      ? `<div style="color:#777;font-size:.8rem;margin-top:-6px;margin-bottom:10px">(All nine programs)</div>`
+      : '';
+
     document.body.style.overflow = 'hidden';
     const el = document.createElement('div');
     el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:9999';
@@ -106,16 +134,18 @@ const CapPlanAuth = (() => {
       <div style="background:#fff;border-radius:12px;padding:40px 36px;max-width:440px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.2);text-align:center">
         <div style="font-size:2rem;margin-bottom:12px">🔒</div>
         <h2 style="margin:0 0 10px;font-size:1.25rem;color:#111">CapPlan ${meta.name} — Full Suite</h2>
-        <p style="margin:0 0 8px;color:#555;line-height:1.6">This model is part of the Full Suite. Start a free 14-day trial — no credit card required until it ends.</p>
+        <p style="margin:0 0 8px;color:#555;line-height:1.6">${modelNameHtml} Start a free 30-day trial — no credit card required until it ends.</p>
         <p style="font-weight:700;font-size:1.1rem;margin:0 0 24px;color:#111">${meta.price} &nbsp;·&nbsp; cancel anytime</p>
         <button onclick="CapPlanAuth.startCheckout('${suite}','monthly')"
-          style="background:#2E7D52;color:#fff;border:none;border-radius:8px;padding:13px 32px;font-size:1rem;cursor:pointer;width:100%;margin-bottom:10px">
+          style="background:#2E7D52;color:#fff;border:none;border-radius:8px;padding:13px 32px;font-size:1rem;cursor:pointer;width:100%;margin-bottom:6px">
           Start free trial
         </button>
+        ${trialSubtext}
         <button onclick="CapPlanAuth.startCheckout('${suite}','annual')"
-          style="background:#1B3F6E;color:#fff;border:none;border-radius:8px;padding:10px 32px;font-size:.9rem;cursor:pointer;width:100%;margin-bottom:10px">
+          style="background:#1B3F6E;color:#fff;border:none;border-radius:8px;padding:10px 32px;font-size:.9rem;cursor:pointer;width:100%;margin-bottom:6px">
           Annual plan (save 20%)
         </button>
+        ${annualSubtext}
         <a href="/" style="color:#888;font-size:.875rem;text-decoration:none">← Back to home</a>
       </div>`;
     document.body.appendChild(el);
