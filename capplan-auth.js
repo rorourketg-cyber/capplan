@@ -119,14 +119,6 @@ const CapPlanAuth = (() => {
       ? `The model, <strong><em>${modelName}</em></strong>, is part of the Full Suite.`
       : 'This model is part of the Full Suite.';
 
-    // Subtext under buttons
-    const trialSubtext = modelName
-      ? `<div style="color:#777;font-size:.8rem;margin-top:-6px;margin-bottom:10px">(${modelName})</div>`
-      : '';
-    const annualSubtext = isPersonal
-      ? `<div style="color:#777;font-size:.8rem;margin-top:-6px;margin-bottom:10px">(All nine programs)</div>`
-      : '';
-
     document.body.style.overflow = 'hidden';
     const el = document.createElement('div');
     el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:9999';
@@ -137,15 +129,13 @@ const CapPlanAuth = (() => {
         <p style="margin:0 0 8px;color:#555;line-height:1.6">${modelNameHtml} Start a free 30-day trial — no credit card required until it ends.</p>
         <p style="font-weight:700;font-size:1.1rem;margin:0 0 24px;color:#111">${meta.price} &nbsp;·&nbsp; cancel anytime</p>
         <button onclick="CapPlanAuth.startCheckout('${suite}','monthly')"
-          style="background:#2E7D52;color:#fff;border:none;border-radius:8px;padding:13px 32px;font-size:1rem;cursor:pointer;width:100%;margin-bottom:6px">
-          Start free trial
+          style="background:#2E7D52;color:#fff;border:none;border-radius:8px;padding:13px 32px;font-size:1rem;cursor:pointer;width:100%;margin-bottom:16px;line-height:1.4">
+          Start free trial${modelName ? `<br><span style="font-size:.8rem;opacity:.85">(${modelName})</span>` : ''}
         </button>
-        ${trialSubtext}
         <button onclick="CapPlanAuth.startCheckout('${suite}','annual')"
-          style="background:#1B3F6E;color:#fff;border:none;border-radius:8px;padding:10px 32px;font-size:.9rem;cursor:pointer;width:100%;margin-bottom:6px">
-          Annual plan (save 20%)
+          style="background:#1B3F6E;color:#fff;border:none;border-radius:8px;padding:10px 32px;font-size:.9rem;cursor:pointer;width:100%;margin-bottom:16px;line-height:1.4">
+          Annual plan (save 20%)${isPersonal ? `<br><span style="font-size:.8rem;opacity:.85">(All nine programs)</span>` : ''}
         </button>
-        ${annualSubtext}
         <a href="/" style="color:#888;font-size:.875rem;text-decoration:none">← Back to home</a>
       </div>`;
     document.body.appendChild(el);
