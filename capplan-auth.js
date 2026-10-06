@@ -162,6 +162,14 @@ const CapPlanAuth = (() => {
           await client.handleRedirectCallback();
           window.history.replaceState({}, document.title, window.location.pathname);
         }
+        // After Stripe checkout, force a fresh login to get updated token
+        if (params.has('subscribed')) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+          await client.loginWithRedirect({
+            authorizationParams: { redirect_uri: window.location.origin + window.location.pathname },
+          });
+          return;
+        }
 
         const isAuth = await client.isAuthenticated();
         if (!isAuth) { showLoginPrompt(); return; }
@@ -215,7 +223,7 @@ const CapPlanAuth = (() => {
             suiteId,
             billing: billing || 'monthly',
             userEmail,
-            successUrl: window.location.href,
+            successUrl: window.location.origin + window.location.pathname + '?subscribed=1',
             cancelUrl:  window.location.href,
           }),
         });
