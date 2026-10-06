@@ -148,10 +148,11 @@ const CapPlanAuth = (() => {
      * Call on model page load.
      * Free models: pass-through immediately (no auth check).
      * Paid models: check Auth0 session + app_metadata.active_suites.
+     * Returns true (access granted) or false (showing overlay / redirecting).
      */
     async init(modelId) {
       // Free models always pass through
-      if (FREE_MODELS.includes(modelId)) return;
+      if (FREE_MODELS.includes(modelId)) return true;
 
       try {
         const client = await getClient();
@@ -162,17 +163,18 @@ const CapPlanAuth = (() => {
           await client.handleRedirectCallback();
           window.history.replaceState({}, document.title, window.location.pathname);
         }
+
         // After Stripe checkout, force a fresh login to get updated token
         if (params.has('subscribed')) {
           window.history.replaceState({}, document.title, window.location.pathname);
           await client.loginWithRedirect({
             authorizationParams: { redirect_uri: window.location.origin + window.location.pathname },
           });
-          return;
+          return false;
         }
 
         const isAuth = await client.isAuthenticated();
-        if (!isAuth) { showLoginPrompt(); return; }
+        if (!isAuth) { showLoginPrompt(); return false; }
 
         // Check active_suites in app_metadata (set by Auth0 Action on Stripe webhook)
         const user = await client.getUser();
@@ -181,11 +183,15 @@ const CapPlanAuth = (() => {
 
         if (!activeSuites.includes(suite)) {
           showUpgradeOverlay(modelId);
+          return false;
         }
+
+        return true;
 
       } catch (e) {
         console.warn('CapPlanAuth.init error:', e);
         // Fail open — don't block the model on auth errors
+        return true;
       }
     },
 
