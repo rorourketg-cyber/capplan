@@ -12,7 +12,7 @@
 
 const CapPlanAuth = (() => {
 
-  const AUTH0_DOMAIN    = 'dev-7g0nuvl1fuufbeyn.us.auth0.com';
+  const AUTH0_DOMAIN    = 'dev-74uhps8oq6hjgk8o.us.auth0.com';
   const AUTH0_CLIENT_ID = '1oCZLeLb8rcdIPvQKHOplADLcdFX87T0';
   const CHECKOUT_WORKER = 'https://patient-base-51d4.rorourketg.workers.dev';
 
