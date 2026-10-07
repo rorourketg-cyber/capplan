@@ -23,8 +23,27 @@ a{color:inherit;text-decoration:none}
 .logo-mark{width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:16px;font-weight:700;color:#fff}
 .logo-text{font-family:Georgia,serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.2px}
 .logo-sub{font-size:11px;color:rgba(255,255,255,0.65);font-weight:400;letter-spacing:0.5px;margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:16px}
 .hdr-back{font-size:13px;color:rgba(255,255,255,0.75);display:flex;align-items:center;gap:5px;transition:color 0.15s}
 .hdr-back:hover{color:#fff}
+/* Member header actions — hidden until auth check completes */
+.hdr-member{display:none;align-items:center;gap:12px}
+.hdr-member.visible{display:flex}
+.hdr-member-name{font-size:13px;color:rgba(255,255,255,0.85)}
+.hdr-manage-btn{font-size:13px;color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:5px 12px;transition:all 0.15s;background:none;cursor:pointer}
+.hdr-manage-btn:hover{color:#fff;border-color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.1)}
+.hdr-signout-btn{font-size:13px;color:rgba(255,255,255,0.55);background:none;border:none;cursor:pointer;padding:0;transition:color 0.15s}
+.hdr-signout-btn:hover{color:rgba(255,255,255,0.85)}
+
+/* MEMBER WELCOME BANNER — shown instead of edition banner for subscribers */
+.member-banner{display:none;background:var(--panel);border-bottom:2px solid var(--blue);padding:24px 24px 20px}
+.member-banner.visible{display:block}
+.member-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.member-greeting h1{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.member-greeting p{font-size:14px;color:var(--t2)}
+.member-status{display:flex;align-items:center;gap:8px;background:rgba(27,63,110,0.07);border:1px solid rgba(27,63,110,0.18);border-radius:8px;padding:10px 16px}
+.member-status-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.member-status-text{font-size:13px;color:var(--blue-warm);font-weight:600}
 
 /* EDITION BANNER */
 .edition-banner{background:var(--panel);border-bottom:1px solid var(--border);padding:28px 24px 24px}
@@ -142,13 +161,37 @@ a{color:inherit;text-decoration:none}
       <div class="logo-sub">Business &middot; International Edition</div>
     </div>
   </div>
-  <a href="../index.html" class="hdr-back">
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8.5 2L4 7l4.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Change edition
-  </a>
+  <div class="hdr-right">
+    <!-- Shown only for active subscribers -->
+    <div class="hdr-member" id="hdr-member">
+      <span class="hdr-member-name" id="hdr-member-name"></span>
+      <button class="hdr-manage-btn" onclick="manageSubscription()">Manage subscription</button>
+      <button class="hdr-signout-btn" onclick="signOut()">Sign out</button>
+    </div>
+    <!-- Shown for non-members -->
+    <a href="../index.html" class="hdr-back" id="hdr-back">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8.5 2L4 7l4.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Change edition
+    </a>
+  </div>
 </header>
 
-<div class="edition-banner">
+<!-- MEMBER WELCOME BANNER (subscribers only) -->
+<div class="member-banner" id="member-banner">
+  <div class="member-inner">
+    <div class="member-greeting">
+      <h1>Welcome back</h1>
+      <p>Use the finder below to open any model in your Business International Suite.</p>
+    </div>
+    <div class="member-status">
+      <div class="member-status-dot"></div>
+      <span class="member-status-text">Business International Suite — Active</span>
+    </div>
+  </div>
+</div>
+
+<!-- EDITION BANNER (non-members) -->
+<div class="edition-banner" id="edition-banner">
   <div class="edition-inner">
     <h1>CapPlan Business &mdash; International Edition</h1>
     <p class="desc">Capital investment models using classical depreciation methods, with support for 9 currencies. Built for businesses outside the US tax system.</p>
@@ -164,16 +207,16 @@ a{color:inherit;text-decoration:none}
 
 <div class="finder-section">
   <div class="finder-inner">
-    <div class="finder-headline">Find your CapPlan model</div>
-    <p class="finder-sub">Answer two questions to see exactly which model handles your decision &mdash; and what it does.</p>
+    <div class="finder-headline" id="finder-headline">Find your CapPlan model</div>
+    <p class="finder-sub" id="finder-sub">Answer two questions to see exactly which model handles your decision &mdash; and what it does.</p>
     <div id="bc" class="breadcrumb" style="display:none"></div>
     <div id="finder" class="step-panel"></div>
   </div>
 </div>
 
-<div class="divider"></div>
+<div class="divider" id="pricing-divider"></div>
 
-<div class="pricing-section">
+<div class="pricing-section" id="pricing-section">
   <div class="pricing-inner">
     <div class="pricing-headline">Simple, transparent pricing</div>
     <p class="pricing-sub">Start free with the core model. Upgrade when you need the full suite.</p>
@@ -227,29 +270,30 @@ a{color:inherit;text-decoration:none}
     <a href="#">Terms</a>
     <a href="#">Support</a>
   </div>
-  <div class="footer-copy">&copy; 2025 CapPlan. All rights reserved.</div>
+  <div class="footer-copy">&copy; 2026 CapPlan. All rights reserved.</div>
 </footer>
 
 <script src="../../capplan-auth.js"></script>
 <script>
 var SUITE_ID = 'business_intl';
-var FREE_MODEL_FILE = 'model1.html';
+var FREE_MODEL_FILE = '../../capplan_model1.html';
 var billing = 'monthly';
+var isMember = false; // set true after auth check confirms active subscription
 
 var MODELS = {
-  M1: {id:'M1', file:'model1.html',  title:'Asset Purchase Analysis',       tagline:'Does this capital investment meet our required return?',              desc:'Full investment appraisal using classical depreciation (SL, DDB, or SYD): NPV, benefit-cost ratio, IRR, and payback. Choose your depreciation method and currency.', free:true,  methods:['SL','DDB','SYD'], also:['M2','M12','M13']},
-  M2: {id:'M2', file:'model2.html',  title:'Which Option?',                 tagline:'Which asset option delivers the best return on investment?',          desc:'Compares multiple options on NPV. Choose SL, DDB, or SYD per run. Supports all 9 currencies.', free:false, methods:['SL','DDB','SYD'], also:['M1','M4']},
-  M3: {id:'M3', file:'model3.html',  title:'Replace This Asset?',           tagline:'Does replacing this asset now make financial sense?',                 desc:'Calculates the NPV of replacing an existing asset using classical depreciation. Supports all 9 currencies.', free:false, methods:['SL','DDB','SYD'], also:['M4','M5']},
-  M4: {id:'M4', file:'model4.html',  title:'Which Replacement?',            tagline:'Which replacement option gives us the best financial outcome?',       desc:'Compares multiple replacement options against your current asset on an NPV basis. SL, DDB, or SYD.', free:false, methods:['SL','DDB','SYD'], also:['M3','M5']},
-  M5: {id:'M5', file:'model5.html',  title:'Optimal Replacement Year',      tagline:'What is the optimal year to replace this asset?',                    desc:'Finds the year that minimises equivalent annual cost, balancing declining capital cost against rising operating cost.', free:false, methods:['SL','DDB','SYD'], also:['M3','M4']},
-  M6: {id:'M6', file:'model6.html',  title:'Minimum Lease Payment',         tagline:'What is the minimum lease payment that covers our costs?',           desc:"Calculates the minimum annual lease payment that recovers the lessor's cost including tax shields at a target return.", free:false, methods:['SL'], also:['M7','M8']},
-  M7: {id:'M7', file:'model7.html',  title:'Minimum Hourly Rate',           tagline:'What is the minimum rate we need to charge per hour?',               desc:'Calculates the minimum charge-out rate per hour to recover the cost of an asset at a target return, including operating costs.', free:false, methods:['SL','DDB','SYD'], also:['M6','M8']},
-  M8: {id:'M8', file:'model8.html',  title:'Minimum Tender Price',          tagline:'What is the minimum we should quote on this contract?',              desc:'Calculates the minimum contract price for work performed with an asset, ensuring full cost recovery at a target return.', free:false, methods:['SL','DDB','SYD'], also:['M6','M7']},
-  M9: {id:'M9', file:'model9.html',  title:'Lease vs Purchase',             tagline:'Should we lease or purchase this asset?',                            desc:'Compares the after-tax present value of leasing versus purchasing, and calculates the pre-tax implied lease rate.', free:false, methods:['SL','DDB','SYD'], also:['M10','M11']},
-  M10:{id:'M10',file:'model10.html', title:'Sale and Leaseback',            tagline:'Does selling and leasing back this asset make financial sense?',     desc:'Calculates whether a sale and leaseback creates value, weighing cash released against forfeited tax shields and lease obligations.', free:false, methods:['SL'], also:['M9','M11']},
-  M11:{id:'M11',file:'model11.html', title:'Implied Cost of Leasing',       tagline:'What is this lease actually costing us as a financing rate?',        desc:'Finds the pre-tax financing rate embedded in the lease by comparing lease cash flows to the purchase alternative.', free:false, methods:['SL','DDB','SYD'], also:['M9','M10']},
-  M12:{id:'M12',file:'model12.html', title:'Minimum Selling Price',         tagline:'What is the minimum we should accept if we sell this asset?',        desc:'Calculates the minimum acceptable sale price for an asset you own, accounting for tax shields already claimed and your target return.', free:false, methods:['SL','DDB','SYD'], also:['M13','M1']},
-  M13:{id:'M13',file:'model13.html', title:'Maximum Purchase Price',        tagline:'What is the maximum we should pay for this asset?',                  desc:'Calculates the maximum you should pay for an asset and earn your target return, using depreciation and salvage value analytically.', free:false, methods:['SL','DDB','SYD'], also:['M12','M1']},
+  M1: {id:'M1', file:'../../capplan_model1.html',  title:'Asset Purchase Analysis',       tagline:'Does this capital investment meet our required return?',              desc:'Full investment appraisal using classical depreciation (SL, DDB, or SYD): NPV, benefit-cost ratio, IRR, and payback. Choose your depreciation method and currency.', free:true,  methods:['SL','DDB','SYD'], also:['M2','M12','M13']},
+  M2: {id:'M2', file:'../../capplan_model2.html',  title:'Which Option?',                 tagline:'Which asset option delivers the best return on investment?',          desc:'Compares multiple options on NPV. Choose SL, DDB, or SYD per run. Supports all 9 currencies.', free:false, methods:['SL','DDB','SYD'], also:['M1','M4']},
+  M3: {id:'M3', file:'../../capplan_model3.html',  title:'Replace This Asset?',           tagline:'Does replacing this asset now make financial sense?',                 desc:'Calculates the NPV of replacing an existing asset using classical depreciation. Supports all 9 currencies.', free:false, methods:['SL','DDB','SYD'], also:['M4','M5']},
+  M4: {id:'M4', file:'../../capplan_model4.html',  title:'Which Replacement?',            tagline:'Which replacement option gives us the best financial outcome?',       desc:'Compares multiple replacement options against your current asset on an NPV basis. SL, DDB, or SYD.', free:false, methods:['SL','DDB','SYD'], also:['M3','M5']},
+  M5: {id:'M5', file:'../../capplan_model5.html',  title:'Optimal Replacement Year',      tagline:'What is the optimal year to replace this asset?',                    desc:'Finds the year that minimises equivalent annual cost, balancing declining capital cost against rising operating cost.', free:false, methods:['SL','DDB','SYD'], also:['M3','M4']},
+  M6: {id:'M6', file:'../../capplan_model6.html',  title:'Minimum Lease Payment',         tagline:'What is the minimum lease payment that covers our costs?',           desc:"Calculates the minimum annual lease payment that recovers the lessor's cost including tax shields at a target return.", free:false, methods:['SL'], also:['M7','M8']},
+  M7: {id:'M7', file:'../../capplan_model7.html',  title:'Minimum Hourly Rate',           tagline:'What is the minimum rate we need to charge per hour?',               desc:'Calculates the minimum charge-out rate per hour to recover the cost of an asset at a target return, including operating costs.', free:false, methods:['SL','DDB','SYD'], also:['M6','M8']},
+  M8: {id:'M8', file:'../../capplan_model8.html',  title:'Minimum Tender Price',          tagline:'What is the minimum we should quote on this contract?',              desc:'Calculates the minimum contract price for work performed with an asset, ensuring full cost recovery at a target return.', free:false, methods:['SL','DDB','SYD'], also:['M6','M7']},
+  M9: {id:'M9', file:'../../capplan_model9.html',  title:'Lease vs Purchase',             tagline:'Should we lease or purchase this asset?',                            desc:'Compares the after-tax present value of leasing versus purchasing, and calculates the pre-tax implied lease rate.', free:false, methods:['SL','DDB','SYD'], also:['M10','M11']},
+  M10:{id:'M10',file:'../../capplan_model10.html', title:'Sale and Leaseback',            tagline:'Does selling and leasing back this asset make financial sense?',     desc:'Calculates whether a sale and leaseback creates value, weighing cash released against forfeited tax shields and lease obligations.', free:false, methods:['SL'], also:['M9','M11']},
+  M11:{id:'M11',file:'../../capplan_model11.html', title:'Implied Cost of Leasing',       tagline:'What is this lease actually costing us as a financing rate?',        desc:'Finds the pre-tax financing rate embedded in the lease by comparing lease cash flows to the purchase alternative.', free:false, methods:['SL','DDB','SYD'], also:['M9','M10']},
+  M12:{id:'M12',file:'../../capplan_model12.html', title:'Minimum Selling Price',         tagline:'What is the minimum we should accept if we sell this asset?',        desc:'Calculates the minimum acceptable sale price for an asset you own, accounting for tax shields already claimed and your target return.', free:false, methods:['SL','DDB','SYD'], also:['M13','M1']},
+  M13:{id:'M13',file:'../../capplan_model13.html', title:'Maximum Purchase Price',        tagline:'What is the maximum we should pay for this asset?',                  desc:'Calculates the maximum you should pay for an asset and earn your target return, using depreciation and salvage value analytically.', free:false, methods:['SL','DDB','SYD'], also:['M12','M1']},
 };
 
 var TREE = {
@@ -298,6 +342,44 @@ var path = [];
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
+/* ── AUTH INIT ─────────────────────────────────────────────── */
+async function initPage() {
+  if (typeof CapPlanAuth === 'undefined') { renderFinder(); return; }
+
+  try {
+    var suites = await CapPlanAuth.getActiveSuites(); // returns array or null
+
+    if (suites && suites.includes('business_intl')) {
+      // ── MEMBER MODE ──
+      isMember = true;
+
+      // Header
+      document.getElementById('hdr-member').classList.add('visible');
+      document.getElementById('hdr-back').style.display = 'none';
+      var displayName = await CapPlanAuth.getDisplayName();
+      if (displayName) document.getElementById('hdr-member-name').textContent = displayName;
+
+      // Banners
+      document.getElementById('member-banner').classList.add('visible');
+      document.getElementById('edition-banner').style.display = 'none';
+
+      // Finder copy
+      document.getElementById('finder-headline').textContent = 'Open a model';
+      document.getElementById('finder-sub').textContent = 'Choose a decision type and open the model — your subscription covers all 13 models.';
+
+      // Hide pricing
+      document.getElementById('pricing-section').style.display = 'none';
+      document.getElementById('pricing-divider').style.display = 'none';
+    }
+    // else: not logged in or no business_intl subscription — keep default marketing view
+  } catch(e) {
+    console.warn('initPage error:', e);
+  }
+
+  renderFinder();
+}
+
+/* ── FINDER RENDER ─────────────────────────────────────────── */
 function renderFinder(){
   var nodeKey = path.length ? path[path.length-1].next : 'root';
   var bcEl = document.getElementById('bc');
@@ -363,6 +445,21 @@ function renderResult(mid, el, isAlso){
     ? '<button class="back-inline" onclick="renderFinder()">&#8592; Back to my result</button>'
     : '<button class="back-inline" onclick="goBack()">&#8592; Different decision</button>';
 
+  var actionHtml;
+  if (m.free) {
+    // Free model — always just open it
+    actionHtml = '<button class="btn-primary" onclick="openFreeModel()">Open free model &rarr;</button>';
+  } else if (isMember) {
+    // Subscriber — open directly, no Stripe
+    actionHtml = '<button class="btn-primary" onclick="openModel(\''+esc(m.file)+'\')">Open '+esc(m.title)+' &rarr;</button>';
+  } else {
+    // Non-subscriber — show subscribe CTA
+    actionHtml =
+      '<div class="suite-badge">This model is included in Full Suite</div><br>'+
+      '<button class="btn-primary" onclick="startCheckout(\''+esc(m.file)+'\')">Subscribe and open '+esc(m.title)+' &rarr;</button>'+
+      '<p class="free-note">Not ready to subscribe? <a href="'+FREE_MODEL_FILE+'">M1 &mdash; Asset Purchase Analysis</a> is always free.</p>';
+  }
+
   el.innerHTML =
     '<div class="result-card">'+
     '<div class="result-card-header">'+
@@ -373,10 +470,7 @@ function renderResult(mid, el, isAlso){
     '<div class="result-body">'+
     '<p class="result-desc">'+esc(m.desc)+'</p>'+
     methodsHtml+
-    '<div class="suite-badge">This model is included in Full Suite</div>'+
-    '<br>'+
-    '<button class="btn-primary" onclick="startCheckout(\''+esc(m.file)+'\')">Subscribe and open '+esc(m.title)+' &rarr;</button>'+
-    '<p class="free-note">Not ready to subscribe? <a href="'+FREE_MODEL_FILE+'">M1 &mdash; Asset Purchase Analysis</a> is always free.</p>'+
+    actionHtml+
     alsoHtml+
     '<div>'+backBtn+'</div>'+
     '</div></div>';
@@ -407,14 +501,32 @@ function renderBreadcrumb(el){
 function goToStep(i){path=path.slice(0,i+1);renderFinder();}
 function resetFinder(){path=[];renderFinder();}
 
+/* ── ACTIONS ───────────────────────────────────────────────── */
+function openModel(modelFile) {
+  window.location.href = modelFile;
+}
+
 async function startCheckout(modelFile){
   if(typeof CapPlanAuth!=='undefined'){
     await CapPlanAuth.startCheckout(SUITE_ID,billing);
     window.location.href=modelFile;
   }
 }
+
 function openFreeModel(){window.location.href=FREE_MODEL_FILE;}
 function checkoutFromPricing(){startCheckout(FREE_MODEL_FILE);}
+
+async function manageSubscription(){
+  if(typeof CapPlanAuth!=='undefined'){
+    await CapPlanAuth.openPortal();
+  }
+}
+
+async function signOut(){
+  if(typeof CapPlanAuth!=='undefined'){
+    await CapPlanAuth.logout();
+  }
+}
 
 function onBillingToggle(){
   var chk=document.getElementById('billing-chk').checked;
@@ -426,7 +538,1098 @@ function onBillingToggle(){
   document.getElementById('suite-note').innerHTML=chk?'$360 / year, billed annually':'&nbsp;';
 }
 
-renderFinder();
+/* ── START ─────────────────────────────────────────────────── */
+initPage();
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan · Business · International Edition</title>
+<style>
+:root {
+  --blue:#1B3F6E; --blue-mid:#2A5298; --blue-warm:#1E4880; --blue-soft:rgba(27,63,110,0.09);
+  --green:#2E7D52; --green-warm:#3D8B5A; --green-soft:rgba(46,125,82,0.09);
+  --gold:#C9A84C;
+  --surface:#F7F8FA; --panel:#ffffff; --border:#E2E6EC;
+  --t1:#0F1D2E; --t2:#4A5568; --t3:#8A96A6;
+  --acc:#1B3F6E; --acc-mid:#2A5298; --acc-soft:rgba(27,63,110,0.09);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--surface);color:var(--t1);line-height:1.5}
+a{color:inherit;text-decoration:none}
+
+/* HEADER */
+.site-header{position:sticky;top:0;z-index:100;background:var(--blue);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;box-shadow:0 2px 8px rgba(0,0,0,0.18)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:16px;font-weight:700;color:#fff}
+.logo-text{font-family:Georgia,serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.2px}
+.logo-sub{font-size:11px;color:rgba(255,255,255,0.65);font-weight:400;letter-spacing:0.5px;margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:16px}
+.hdr-back{font-size:13px;color:rgba(255,255,255,0.75);display:flex;align-items:center;gap:5px;transition:color 0.15s}
+.hdr-back:hover{color:#fff}
+/* Member header actions — hidden until auth check completes */
+.hdr-member{display:none;align-items:center;gap:12px}
+.hdr-member.visible{display:flex}
+.hdr-member-name{font-size:13px;color:rgba(255,255,255,0.85)}
+.hdr-manage-btn{font-size:13px;color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:5px 12px;transition:all 0.15s;background:none;cursor:pointer}
+.hdr-manage-btn:hover{color:#fff;border-color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.1)}
+.hdr-signout-btn{font-size:13px;color:rgba(255,255,255,0.55);background:none;border:none;cursor:pointer;padding:0;transition:color 0.15s}
+.hdr-signout-btn:hover{color:rgba(255,255,255,0.85)}
+
+/* MEMBER WELCOME BANNER — shown instead of edition banner for subscribers */
+.member-banner{display:none;background:var(--panel);border-bottom:2px solid var(--blue);padding:24px 24px 20px}
+.member-banner.visible{display:block}
+.member-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.member-greeting h1{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.member-greeting p{font-size:14px;color:var(--t2)}
+.member-status{display:flex;align-items:center;gap:8px;background:rgba(27,63,110,0.07);border:1px solid rgba(27,63,110,0.18);border-radius:8px;padding:10px 16px}
+.member-status-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.member-status-text{font-size:13px;color:var(--blue-warm);font-weight:600}
+
+/* EDITION BANNER */
+.edition-banner{background:var(--panel);border-bottom:1px solid var(--border);padding:28px 24px 24px}
+.edition-inner{max-width:900px;margin:0 auto}
+.edition-banner h1{font-family:Georgia,serif;font-size:26px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.edition-banner .desc{font-size:15px;color:var(--t2);margin-bottom:14px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{display:inline-block;padding:4px 12px;background:var(--acc-soft);color:var(--acc-mid);border:1px solid rgba(27,63,110,0.18);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:0.2px}
+.currency-note{font-size:13px;color:var(--t3);margin-top:10px}
+.currency-note span{font-weight:600;color:var(--t2)}
+
+/* FINDER */
+.finder-section{background:rgba(27,63,110,0.05);border-bottom:1px solid rgba(27,63,110,0.10);padding:40px 24px}
+.finder-inner{max-width:780px;margin:0 auto}
+.finder-headline{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.finder-sub{font-size:15px;color:var(--t2);margin-bottom:28px}
+.breadcrumb{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:var(--t3);flex-wrap:wrap}
+.bc-item{color:var(--acc-mid);cursor:pointer}
+.bc-item:hover{text-decoration:underline}
+.bc-sep{color:var(--border)}
+
+/* STEP PANEL */
+.step-panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(27,63,110,0.07)}
+.step-header{background:var(--blue);color:#fff;padding:18px 24px}
+.step-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:4px}
+.step-q{font-family:Georgia,serif;font-size:18px;font-weight:700}
+.step-sub{font-size:13px;color:rgba(255,255,255,0.75);margin-top:4px}
+.choices-list{padding:12px;display:flex;flex-direction:column;gap:8px}
+.choice-btn{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border:1.5px solid var(--border);border-radius:9px;background:var(--surface);cursor:pointer;text-align:left;transition:border-color 0.15s,background 0.15s,box-shadow 0.15s;width:100%}
+.choice-btn:hover{border-color:var(--acc-mid);background:var(--acc-soft);box-shadow:0 2px 8px rgba(27,63,110,0.09)}
+.choice-icon{font-size:22px;flex-shrink:0;margin-top:1px}
+.choice-title{font-size:15px;font-weight:600;color:var(--t1);display:block}
+.choice-desc{font-size:13px;color:var(--t2);margin-top:2px;display:block}
+
+/* RESULT CARD */
+.result-card{border-radius:12px;overflow:hidden;border:1.5px solid var(--border);box-shadow:0 4px 20px rgba(27,63,110,0.10);background:var(--panel)}
+.result-card-header{background:var(--blue);color:#fff;padding:20px 24px;display:flex;align-items:flex-start;gap:14px}
+.model-badge{background:rgba(255,255,255,0.18);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;letter-spacing:0.5px;flex-shrink:0;margin-top:3px;font-family:system-ui,sans-serif}
+.model-name{font-family:Georgia,serif;font-size:20px;font-weight:700}
+.model-tagline{font-size:13px;color:rgba(255,255,255,0.80);margin-top:4px}
+.result-body{padding:22px 24px}
+.result-desc{font-size:15px;color:var(--t2);margin-bottom:16px;line-height:1.6}
+.method-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.method-pill{display:inline-block;padding:3px 10px;background:var(--acc-soft);color:var(--acc-mid);border:1px solid rgba(27,63,110,0.18);border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.3px}
+.suite-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(27,63,110,0.07);color:var(--acc-mid);border:1px solid rgba(27,63,110,0.15);border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600;margin-bottom:16px}
+.suite-badge::before{content:'✓';font-weight:700}
+.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;border:none;width:100%;background:var(--blue);color:#fff;box-shadow:0 4px 16px rgba(27,63,110,0.25);transition:filter 0.15s,transform 0.1s}
+.btn-primary:hover{filter:brightness(1.10);transform:translateY(-1px)}
+.free-note{text-align:center;font-size:13px;color:var(--t3);margin-top:12px}
+.free-note a{color:var(--acc-mid);font-weight:600}
+.free-note a:hover{text-decoration:underline}
+.also-suite{margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.also-label{font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px}
+.also-chips{display:flex;flex-wrap:wrap;gap:8px}
+.also-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:13px;font-weight:500;background:var(--acc-soft);color:var(--acc-mid);border:1px solid rgba(27,63,110,0.18);cursor:pointer;transition:background 0.15s}
+.also-chip:hover{background:rgba(27,63,110,0.15)}
+.chip-id{font-weight:700;font-size:11px}
+.back-inline{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--t3);cursor:pointer;background:none;border:none;padding:0;margin-top:14px}
+.back-inline:hover{color:var(--acc-mid)}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border)}
+
+/* PRICING */
+.pricing-section{background:var(--panel);padding:44px 24px}
+.pricing-inner{max-width:820px;margin:0 auto}
+.pricing-headline{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--t1);text-align:center;margin-bottom:6px}
+.pricing-sub{font-size:15px;color:var(--t2);text-align:center;margin-bottom:24px}
+.billing-toggle{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px}
+.toggle-label{font-size:14px;color:var(--t2);font-weight:500}
+.toggle-label.active{color:var(--t1);font-weight:700}
+.toggle-wrap{position:relative;width:48px;height:26px;cursor:pointer}
+.toggle-wrap input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;border-radius:13px;background:#CBD5E0;transition:background 0.2s}
+.toggle-wrap input:checked + .toggle-track{background:var(--blue)}
+.toggle-knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:transform 0.2s;pointer-events:none}
+.toggle-wrap input:checked ~ .toggle-knob{transform:translateX(22px)}
+.annual-badge{background:#ECFDF5;color:#166534;border:1px solid #BBF7D0;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700}
+.pricing-tiles{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:620px){.pricing-tiles{grid-template-columns:1fr}}
+.tile{border:1.5px solid var(--border);border-radius:14px;padding:28px 24px;background:var(--surface);display:flex;flex-direction:column}
+.tile.featured{border-color:var(--blue);background:var(--panel);box-shadow:0 4px 24px rgba(27,63,110,0.12);position:relative}
+.popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;padding:3px 16px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap}
+.tile-tier{font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
+.tile-price{font-family:Georgia,serif;font-size:36px;font-weight:700;color:var(--t1)}
+.tile-period{font-size:14px;color:var(--t3)}
+.tile-note{font-size:13px;color:var(--t3);margin-bottom:18px;min-height:20px}
+.feat-list{list-style:none;margin-bottom:24px;flex:1;display:flex;flex-direction:column;gap:9px}
+.feat-list li{display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--t2)}
+.feat-list .chk{color:var(--blue);font-weight:700;flex-shrink:0}
+.feat-name{font-weight:600;color:var(--t1)}
+.btn-tile{display:block;width:100%;padding:13px 20px;border-radius:8px;font-size:15px;font-weight:700;text-align:center;cursor:pointer;border:none;transition:filter 0.15s,transform 0.1s}
+.btn-tile.primary{background:var(--blue);color:#fff;box-shadow:0 3px 12px rgba(27,63,110,0.22)}
+.btn-tile.primary:hover{filter:brightness(1.10);transform:translateY(-1px)}
+.btn-tile.secondary{background:var(--panel);color:var(--t2);border:1.5px solid var(--border)}
+.btn-tile.secondary:hover{border-color:var(--acc-mid);color:var(--acc-mid)}
+.free-forever{font-size:12px;color:var(--t3);text-align:center;margin-top:10px}
+
+/* FOOTER */
+.site-footer{background:#0F1D2E;padding:28px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-brand{font-family:Georgia,serif;font-size:15px;font-weight:700;color:#fff}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:13px;color:rgba(255,255,255,0.5)}
+.footer-links a:hover{color:rgba(255,255,255,0.85)}
+.footer-copy{font-size:12px;color:rgba(255,255,255,0.35)}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">
+    <div class="logo-mark">C</div>
+    <div>
+      <div class="logo-text">CapPlan</div>
+      <div class="logo-sub">Business &middot; International Edition</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <!-- Shown only for active subscribers -->
+    <div class="hdr-member" id="hdr-member">
+      <span class="hdr-member-name" id="hdr-member-name"></span>
+      <button class="hdr-manage-btn" onclick="manageSubscription()">Manage subscription</button>
+      <button class="hdr-signout-btn" onclick="signOut()">Sign out</button>
+    </div>
+    <!-- Shown for non-members -->
+    <a href="../index.html" class="hdr-back" id="hdr-back">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8.5 2L4 7l4.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Change edition
+    </a>
+  </div>
+</header>
+
+<!-- MEMBER WELCOME BANNER (subscribers only) -->
+<div class="member-banner" id="member-banner">
+  <div class="member-inner">
+    <div class="member-greeting">
+      <h1>Welcome back</h1>
+      <p>Use the finder below to open any model in your Business International Suite.</p>
+    </div>
+    <div class="member-status">
+      <div class="member-status-dot"></div>
+      <span class="member-status-text">Business International Suite — Active</span>
+    </div>
+  </div>
+</div>
+
+<!-- EDITION BANNER (non-members) -->
+<div class="edition-banner" id="edition-banner">
+  <div class="edition-inner">
+    <h1>CapPlan Business &mdash; International Edition</h1>
+    <p class="desc">Capital investment models using classical depreciation methods, with support for 9 currencies. Built for businesses outside the US tax system.</p>
+    <div class="pills">
+      <span class="pill">Straight-Line (SL)</span>
+      <span class="pill">Double-Declining Balance (DDB)</span>
+      <span class="pill">Sum-of-Years-Digits (SYD)</span>
+      <span class="pill">9 Currency Options</span>
+    </div>
+    <p class="currency-note">Currencies: <span>USD &middot; CAD &middot; GBP &middot; EUR &middot; AUD &middot; NZD &middot; CHF &middot; JPY &middot; SGD</span></p>
+  </div>
+</div>
+
+<div class="finder-section">
+  <div class="finder-inner">
+    <div class="finder-headline" id="finder-headline">Find your CapPlan model</div>
+    <p class="finder-sub" id="finder-sub">Answer two questions to see exactly which model handles your decision &mdash; and what it does.</p>
+    <div id="bc" class="breadcrumb" style="display:none"></div>
+    <div id="finder" class="step-panel"></div>
+  </div>
+</div>
+
+<div class="divider" id="pricing-divider"></div>
+
+<div class="pricing-section" id="pricing-section">
+  <div class="pricing-inner">
+    <div class="pricing-headline">Simple, transparent pricing</div>
+    <p class="pricing-sub">Start free with the core model. Upgrade when you need the full suite.</p>
+
+    <div class="billing-toggle">
+      <span class="toggle-label active" id="lbl-mo">Monthly</span>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="billing-chk" onchange="onBillingToggle()">
+        <div class="toggle-track"></div>
+        <div class="toggle-knob"></div>
+      </label>
+      <span class="toggle-label" id="lbl-yr">Annual &nbsp;<span class="annual-badge">Save $84/year</span></span>
+    </div>
+
+    <div class="pricing-tiles">
+      <div class="tile">
+        <div class="tile-tier">Starter</div>
+        <div><span class="tile-price">$0</span><span class="tile-period"> / always free</span></div>
+        <p class="tile-note">Always free &mdash; no card required</p>
+        <ul class="feat-list">
+          <li><span class="chk">&#10003;</span><span><span class="feat-name">M1 &mdash; Asset Purchase Analysis</span><br><span style="font-size:12px;color:var(--t3)">Straight-Line (SL) &middot; Double-Declining Balance (DDB) &middot; Sum-of-Years-Digits (SYD)</span></span></li>
+        </ul>
+        <button class="btn-tile secondary" onclick="openFreeModel()">Open free model</button>
+        <p class="free-forever">Free forever &mdash; no trial, no expiry</p>
+      </div>
+
+      <div class="tile featured">
+        <span class="popular-badge">Most popular</span>
+        <div class="tile-tier">Full Suite</div>
+        <div><span class="tile-price" id="suite-price">$37</span><span class="tile-period" id="suite-period"> / month</span></div>
+        <p class="tile-note" id="suite-note">&nbsp;</p>
+        <ul class="feat-list">
+          <li><span class="chk">&#10003;</span><span><span class="feat-name">All 13 capital models</span></span></li>
+          <li><span class="chk">&#10003;</span><span>SL &middot; DDB &middot; SYD depreciation methods</span></li>
+          <li><span class="chk">&#10003;</span><span>9 currencies: USD, CAD, GBP, EUR, AUD, NZD, CHF, JPY, SGD</span></li>
+          <li><span class="chk">&#10003;</span><span>NPV, IRR, BCR, payback &amp; optimal replacement</span></li>
+          <li><span class="chk">&#10003;</span><span>Lease vs purchase, pricing &amp; valuation models</span></li>
+          <li><span class="chk">&#10003;</span><span>Save &amp; revisit analyses</span></li>
+        </ul>
+        <button class="btn-tile primary" onclick="checkoutFromPricing()">Get Full Suite</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-brand">CapPlan</div>
+  <div class="footer-links">
+    <a href="../../index.html">Home</a>
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Support</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 CapPlan. All rights reserved.</div>
+</footer>
+
+<script src="../../capplan-auth.js"></script>
+<script>
+var SUITE_ID = 'business_intl';
+var FREE_MODEL_FILE = '../../capplan_model1.html';
+var billing = 'monthly';
+var isMember = false; // set true after auth check confirms active subscription
+
+var MODELS = {
+  M1: {id:'M1', file:'../../capplan_model1.html',  title:'Asset Purchase Analysis',       tagline:'Does this capital investment meet our required return?',              desc:'Full investment appraisal using classical depreciation (SL, DDB, or SYD): NPV, benefit-cost ratio, IRR, and payback. Choose your depreciation method and currency.', free:true,  methods:['SL','DDB','SYD'], also:['M2','M12','M13']},
+  M2: {id:'M2', file:'../../capplan_model2.html',  title:'Which Option?',                 tagline:'Which asset option delivers the best return on investment?',          desc:'Compares multiple options on NPV. Choose SL, DDB, or SYD per run. Supports all 9 currencies.', free:false, methods:['SL','DDB','SYD'], also:['M1','M4']},
+  M3: {id:'M3', file:'../../capplan_model3.html',  title:'Replace This Asset?',           tagline:'Does replacing this asset now make financial sense?',                 desc:'Calculates the NPV of replacing an existing asset using classical depreciation. Supports all 9 currencies.', free:false, methods:['SL','DDB','SYD'], also:['M4','M5']},
+  M4: {id:'M4', file:'../../capplan_model4.html',  title:'Which Replacement?',            tagline:'Which replacement option gives us the best financial outcome?',       desc:'Compares multiple replacement options against your current asset on an NPV basis. SL, DDB, or SYD.', free:false, methods:['SL','DDB','SYD'], also:['M3','M5']},
+  M5: {id:'M5', file:'../../capplan_model5.html',  title:'Optimal Replacement Year',      tagline:'What is the optimal year to replace this asset?',                    desc:'Finds the year that minimises equivalent annual cost, balancing declining capital cost against rising operating cost.', free:false, methods:['SL','DDB','SYD'], also:['M3','M4']},
+  M6: {id:'M6', file:'../../capplan_model6.html',  title:'Minimum Lease Payment',         tagline:'What is the minimum lease payment that covers our costs?',           desc:"Calculates the minimum annual lease payment that recovers the lessor's cost including tax shields at a target return.", free:false, methods:['SL'], also:['M7','M8']},
+  M7: {id:'M7', file:'../../capplan_model7.html',  title:'Minimum Hourly Rate',           tagline:'What is the minimum rate we need to charge per hour?',               desc:'Calculates the minimum charge-out rate per hour to recover the cost of an asset at a target return, including operating costs.', free:false, methods:['SL','DDB','SYD'], also:['M6','M8']},
+  M8: {id:'M8', file:'../../capplan_model8.html',  title:'Minimum Tender Price',          tagline:'What is the minimum we should quote on this contract?',              desc:'Calculates the minimum contract price for work performed with an asset, ensuring full cost recovery at a target return.', free:false, methods:['SL','DDB','SYD'], also:['M6','M7']},
+  M9: {id:'M9', file:'../../capplan_model9.html',  title:'Lease vs Purchase',             tagline:'Should we lease or purchase this asset?',                            desc:'Compares the after-tax present value of leasing versus purchasing, and calculates the pre-tax implied lease rate.', free:false, methods:['SL','DDB','SYD'], also:['M10','M11']},
+  M10:{id:'M10',file:'../../capplan_model10.html', title:'Sale and Leaseback',            tagline:'Does selling and leasing back this asset make financial sense?',     desc:'Calculates whether a sale and leaseback creates value, weighing cash released against forfeited tax shields and lease obligations.', free:false, methods:['SL'], also:['M9','M11']},
+  M11:{id:'M11',file:'../../capplan_model11.html', title:'Implied Cost of Leasing',       tagline:'What is this lease actually costing us as a financing rate?',        desc:'Finds the pre-tax financing rate embedded in the lease by comparing lease cash flows to the purchase alternative.', free:false, methods:['SL','DDB','SYD'], also:['M9','M10']},
+  M12:{id:'M12',file:'../../capplan_model12.html', title:'Minimum Selling Price',         tagline:'What is the minimum we should accept if we sell this asset?',        desc:'Calculates the minimum acceptable sale price for an asset you own, accounting for tax shields already claimed and your target return.', free:false, methods:['SL','DDB','SYD'], also:['M13','M1']},
+  M13:{id:'M13',file:'../../capplan_model13.html', title:'Maximum Purchase Price',        tagline:'What is the maximum we should pay for this asset?',                  desc:'Calculates the maximum you should pay for an asset and earn your target return, using depreciation and salvage value analytically.', free:false, methods:['SL','DDB','SYD'], also:['M12','M1']},
+};
+
+var TREE = {
+  root:{q:'What kind of decision are you facing?',sub:'Tell us what you are trying to work out.',choices:[
+    {icon:'🛒',title:'Buying or acquiring an asset',desc:'Evaluating a purchase, comparing options, or working out the maximum you should pay',next:'buying'},
+    {icon:'🔄',title:'Replacing an asset we own',desc:'Deciding whether to replace, comparing replacements, or finding the optimal timing',next:'replacing'},
+    {icon:'📋',title:'Leasing — as lessee or lessor',desc:'Comparing lease vs buy, setting a lease rate, or finding out what a lease is costing us',next:'leasing'},
+    {icon:'💰',title:'Pricing our equipment or services',desc:'Setting a minimum hourly rate, tender price, or lease payment to recover our costs',next:'pricing'},
+    {icon:'🏷️',title:'Valuing an asset we own',desc:'Finding the minimum we should accept if selling, or the ceiling for what to pay',next:'valuing'},
+  ]},
+  buying:{q:'What best describes your situation?',choices:[
+    {icon:'✅',title:'Evaluating a single asset purchase',desc:'I want to know whether buying this specific asset makes financial sense',next:'M'},
+    {icon:'⚖️',title:'Comparing two or more options',desc:'I have several candidates and want to pick the one with the best financial return',next:'M_compare'},
+    {icon:'💲',title:'Working out the maximum I should pay',desc:'I know what the asset will return — I want to find my price ceiling',next:'M_maxprice'},
+  ]},
+  replacing:{q:'What best describes your situation?',choices:[
+    {icon:'🔁',title:'Should I replace now?',desc:'I want to know whether replacing my current asset is financially justified',next:'M_replace_now'},
+    {icon:'🏆',title:'Which replacement is best?',desc:'I have multiple replacement options and want to pick the highest NPV',next:'M_replace_which'},
+    {icon:'📅',title:'When is the right time to replace?',desc:'I want to find the year that minimises my total annual cost of ownership',next:'M_replace_when'},
+  ]},
+  leasing:{q:'What best describes your situation?',choices:[
+    {icon:'⚖️',title:'Lease vs buy — which is cheaper?',desc:'I am deciding whether to lease or purchase and want to compare total cost',next:'M_lease_vs_buy'},
+    {icon:'🏦',title:'Should I sell and lease back?',desc:'I am considering releasing capital by selling and leasing back an asset I own',next:'M_leaseback'},
+    {icon:'📊',title:'What is my lease costing me?',desc:'I want to find the effective financing rate embedded in my current lease',next:'M_lease_cost'},
+  ]},
+  pricing:{q:'What type of pricing are you setting?',choices:[
+    {icon:'📝',title:'Minimum lease payment',desc:'I own an asset and want to lease it out — what is the minimum I need to charge?',next:'M_pricing_lease'},
+    {icon:'🕐',title:'Minimum hourly rate',desc:'I rent out equipment by the hour — what is the minimum rate to recover costs?',next:'M_pricing_hourly'},
+    {icon:'📄',title:'Minimum tender price',desc:'I am quoting on a contract — what is my cost floor?',next:'M_pricing_tender'},
+  ]},
+  valuing:{q:'What do you need to know?',choices:[
+    {icon:'🔻',title:'Minimum selling price',desc:'I want to sell an asset I own — what is the lowest price I should accept?',next:'M_minprice'},
+    {icon:'🔺',title:'Maximum purchase price',desc:'I am buying — what is the highest price I should pay to earn my target return?',next:'M_maxprice'},
+  ]},
+};
+
+var RESULTS = {
+  'M':'M1','M_compare':'M2','M_maxprice':'M13',
+  'M_replace_now':'M3','M_replace_which':'M4','M_replace_when':'M5',
+  'M_lease_vs_buy':'M9','M_leaseback':'M10','M_lease_cost':'M11',
+  'M_pricing_lease':'M6','M_pricing_hourly':'M7','M_pricing_tender':'M8',
+  'M_minprice':'M12',
+};
+
+var path = [];
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+/* ── AUTH INIT ─────────────────────────────────────────────── */
+async function initPage() {
+  if (typeof CapPlanAuth === 'undefined') { renderFinder(); return; }
+
+  try {
+    var suites = await CapPlanAuth.getActiveSuites(); // returns array or null
+
+    if (suites && suites.includes('business_intl')) {
+      // ── MEMBER MODE ──
+      isMember = true;
+
+      // Header
+      document.getElementById('hdr-member').classList.add('visible');
+      document.getElementById('hdr-back').style.display = 'none';
+      var displayName = await CapPlanAuth.getDisplayName();
+      if (displayName) document.getElementById('hdr-member-name').textContent = displayName;
+
+      // Banners
+      document.getElementById('member-banner').classList.add('visible');
+      document.getElementById('edition-banner').style.display = 'none';
+
+      // Finder copy
+      document.getElementById('finder-headline').textContent = 'Open a model';
+      document.getElementById('finder-sub').textContent = 'Choose a decision type and open the model — your subscription covers all 13 models.';
+
+      // Hide pricing
+      document.getElementById('pricing-section').style.display = 'none';
+      document.getElementById('pricing-divider').style.display = 'none';
+    }
+    // else: not logged in or no business_intl subscription — keep default marketing view
+  } catch(e) {
+    console.warn('initPage error:', e);
+  }
+
+  renderFinder();
+}
+
+/* ── FINDER RENDER ─────────────────────────────────────────── */
+function renderFinder(){
+  var nodeKey = path.length ? path[path.length-1].next : 'root';
+  var bcEl = document.getElementById('bc');
+  var panelEl = document.getElementById('finder');
+
+  renderBreadcrumb(bcEl);
+
+  if(RESULTS[nodeKey]!==undefined){
+    renderResult(RESULTS[nodeKey], panelEl, false);
+    return;
+  }
+  var node = TREE[nodeKey];
+  if(!node) return;
+
+  var stepNum = path.length + 1;
+  var html = '<div class="step-header">';
+  html += '<div class="step-label">Step '+stepNum+' of 2</div>';
+  html += '<div class="step-q">'+esc(node.q)+'</div>';
+  if(node.sub) html += '<div class="step-sub">'+esc(node.sub)+'</div>';
+  html += '</div><div class="choices-list">';
+  node.choices.forEach(function(c,i){
+    html += '<button class="choice-btn" onclick="pick('+i+')">';
+    html += '<span class="choice-icon">'+c.icon+'</span>';
+    html += '<span><span class="choice-title">'+esc(c.title)+'</span>';
+    html += '<span class="choice-desc">'+esc(c.desc)+'</span></span>';
+    html += '</button>';
+  });
+  html += '</div>';
+  panelEl.innerHTML = html;
+}
+
+function pick(i){
+  var nodeKey = path.length ? path[path.length-1].next : 'root';
+  var c = TREE[nodeKey].choices[i];
+  path.push({title:c.title, next:c.next});
+  renderFinder();
+}
+
+function renderResult(mid, el, isAlso){
+  var m = MODELS[mid];
+
+  var methodsHtml = '';
+  if(m.methods && m.methods.length){
+    methodsHtml = '<div class="method-pills">';
+    m.methods.forEach(function(mth){
+      var labels = {SL:'Straight-Line', DDB:'Double-Declining Balance', SYD:'Sum-of-Years-Digits'};
+      methodsHtml += '<span class="method-pill">'+esc(mth)+' &mdash; '+esc(labels[mth]||mth)+'</span>';
+    });
+    methodsHtml += '</div>';
+  }
+
+  var alsoHtml = '';
+  if(m.also && m.also.length){
+    alsoHtml = '<div class="also-suite"><div class="also-label">Also in Full Suite</div><div class="also-chips">';
+    m.also.forEach(function(aid){
+      var am = MODELS[aid];
+      if(am) alsoHtml += '<button class="also-chip" onclick="showAlso(\''+aid+'\')"><span class="chip-id">'+esc(am.id)+'</span> '+esc(am.title)+'</button>';
+    });
+    alsoHtml += '</div></div>';
+  }
+
+  var backBtn = isAlso
+    ? '<button class="back-inline" onclick="renderFinder()">&#8592; Back to my result</button>'
+    : '<button class="back-inline" onclick="goBack()">&#8592; Different decision</button>';
+
+  var actionHtml;
+  if (m.free) {
+    // Free model — always just open it
+    actionHtml = '<button class="btn-primary" onclick="openFreeModel()">Open free model &rarr;</button>';
+  } else if (isMember) {
+    // Subscriber — open directly, no Stripe
+    actionHtml = '<button class="btn-primary" onclick="openModel(\''+esc(m.file)+'\')">Open '+esc(m.title)+' &rarr;</button>';
+  } else {
+    // Non-subscriber — show subscribe CTA
+    actionHtml =
+      '<div class="suite-badge">This model is included in Full Suite</div><br>'+
+      '<button class="btn-primary" onclick="startCheckout(\''+esc(m.file)+'\')">Subscribe and open '+esc(m.title)+' &rarr;</button>'+
+      '<p class="free-note">Not ready to subscribe? <a href="'+FREE_MODEL_FILE+'">M1 &mdash; Asset Purchase Analysis</a> is always free.</p>';
+  }
+
+  el.innerHTML =
+    '<div class="result-card">'+
+    '<div class="result-card-header">'+
+    '<span class="model-badge">'+esc(m.id)+'</span>'+
+    '<div><div class="model-name">'+esc(m.title)+'</div>'+
+    '<div class="model-tagline">'+esc(m.tagline)+'</div></div>'+
+    '</div>'+
+    '<div class="result-body">'+
+    '<p class="result-desc">'+esc(m.desc)+'</p>'+
+    methodsHtml+
+    actionHtml+
+    alsoHtml+
+    '<div>'+backBtn+'</div>'+
+    '</div></div>';
+}
+
+function showAlso(mid){
+  renderResult(mid, document.getElementById('finder'), true);
+  document.getElementById('bc').style.display = 'none';
+}
+
+function goBack(){
+  if(path.length) path.pop();
+  renderFinder();
+}
+
+function renderBreadcrumb(el){
+  if(!path.length){el.style.display='none';return;}
+  el.style.display='flex';
+  var html='<span class="bc-item" onclick="resetFinder()">Start</span>';
+  path.forEach(function(s,i){
+    html+='<span class="bc-sep">&#8250;</span>';
+    if(i<path.length-1) html+='<span class="bc-item" onclick="goToStep('+i+')">'+esc(s.title)+'</span>';
+    else html+='<span>'+esc(s.title)+'</span>';
+  });
+  el.innerHTML=html;
+}
+
+function goToStep(i){path=path.slice(0,i+1);renderFinder();}
+function resetFinder(){path=[];renderFinder();}
+
+/* ── ACTIONS ───────────────────────────────────────────────── */
+function openModel(modelFile) {
+  window.location.href = modelFile;
+}
+
+async function startCheckout(modelFile){
+  if(typeof CapPlanAuth!=='undefined'){
+    await CapPlanAuth.startCheckout(SUITE_ID,billing);
+    window.location.href=modelFile;
+  }
+}
+
+function openFreeModel(){window.location.href=FREE_MODEL_FILE;}
+function checkoutFromPricing(){startCheckout(FREE_MODEL_FILE);}
+
+async function manageSubscription(){
+  if(typeof CapPlanAuth!=='undefined'){
+    await CapPlanAuth.openPortal();
+  }
+}
+
+async function signOut(){
+  if(typeof CapPlanAuth!=='undefined'){
+    await CapPlanAuth.logout();
+  }
+}
+
+function onBillingToggle(){
+  var chk=document.getElementById('billing-chk').checked;
+  billing=chk?'annual':'monthly';
+  document.getElementById('lbl-mo').classList.toggle('active',!chk);
+  document.getElementById('lbl-yr').classList.toggle('active',chk);
+  document.getElementById('suite-price').textContent=chk?'$30':'$37';
+  document.getElementById('suite-period').textContent=' / month';
+  document.getElementById('suite-note').innerHTML=chk?'$360 / year, billed annually':'&nbsp;';
+}
+
+/* ── START ─────────────────────────────────────────────────── */
+initPage();
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan · Business · International Edition</title>
+<style>
+:root {
+  --blue:#1B3F6E; --blue-mid:#2A5298; --blue-warm:#1E4880; --blue-soft:rgba(27,63,110,0.09);
+  --green:#2E7D52; --green-warm:#3D8B5A; --green-soft:rgba(46,125,82,0.09);
+  --gold:#C9A84C;
+  --surface:#F7F8FA; --panel:#ffffff; --border:#E2E6EC;
+  --t1:#0F1D2E; --t2:#4A5568; --t3:#8A96A6;
+  --acc:#1B3F6E; --acc-mid:#2A5298; --acc-soft:rgba(27,63,110,0.09);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--surface);color:var(--t1);line-height:1.5}
+a{color:inherit;text-decoration:none}
+
+/* HEADER */
+.site-header{position:sticky;top:0;z-index:100;background:var(--blue);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;box-shadow:0 2px 8px rgba(0,0,0,0.18)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:16px;font-weight:700;color:#fff}
+.logo-text{font-family:Georgia,serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.2px}
+.logo-sub{font-size:11px;color:rgba(255,255,255,0.65);font-weight:400;letter-spacing:0.5px;margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:16px}
+.hdr-back{font-size:13px;color:rgba(255,255,255,0.75);display:flex;align-items:center;gap:5px;transition:color 0.15s}
+.hdr-back:hover{color:#fff}
+/* Member header actions — hidden until auth check completes */
+.hdr-member{display:none;align-items:center;gap:12px}
+.hdr-member.visible{display:flex}
+.hdr-member-name{font-size:13px;color:rgba(255,255,255,0.85)}
+.hdr-manage-btn{font-size:13px;color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:5px 12px;transition:all 0.15s;background:none;cursor:pointer}
+.hdr-manage-btn:hover{color:#fff;border-color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.1)}
+.hdr-signout-btn{font-size:13px;color:rgba(255,255,255,0.55);background:none;border:none;cursor:pointer;padding:0;transition:color 0.15s}
+.hdr-signout-btn:hover{color:rgba(255,255,255,0.85)}
+
+/* MEMBER WELCOME BANNER — shown instead of edition banner for subscribers */
+.member-banner{display:none;background:var(--panel);border-bottom:2px solid var(--blue);padding:24px 24px 20px}
+.member-banner.visible{display:block}
+.member-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.member-greeting h1{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.member-greeting p{font-size:14px;color:var(--t2)}
+.member-status{display:flex;align-items:center;gap:8px;background:rgba(27,63,110,0.07);border:1px solid rgba(27,63,110,0.18);border-radius:8px;padding:10px 16px}
+.member-status-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.member-status-text{font-size:13px;color:var(--blue-warm);font-weight:600}
+
+/* EDITION BANNER */
+.edition-banner{background:var(--panel);border-bottom:1px solid var(--border);padding:28px 24px 24px}
+.edition-inner{max-width:900px;margin:0 auto}
+.edition-banner h1{font-family:Georgia,serif;font-size:26px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.edition-banner .desc{font-size:15px;color:var(--t2);margin-bottom:14px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{display:inline-block;padding:4px 12px;background:var(--acc-soft);color:var(--acc-mid);border:1px solid rgba(27,63,110,0.18);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:0.2px}
+.currency-note{font-size:13px;color:var(--t3);margin-top:10px}
+.currency-note span{font-weight:600;color:var(--t2)}
+
+/* FINDER */
+.finder-section{background:rgba(27,63,110,0.05);border-bottom:1px solid rgba(27,63,110,0.10);padding:40px 24px}
+.finder-inner{max-width:780px;margin:0 auto}
+.finder-headline{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.finder-sub{font-size:15px;color:var(--t2);margin-bottom:28px}
+.breadcrumb{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:var(--t3);flex-wrap:wrap}
+.bc-item{color:var(--acc-mid);cursor:pointer}
+.bc-item:hover{text-decoration:underline}
+.bc-sep{color:var(--border)}
+
+/* STEP PANEL */
+.step-panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(27,63,110,0.07)}
+.step-header{background:var(--blue);color:#fff;padding:18px 24px}
+.step-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:4px}
+.step-q{font-family:Georgia,serif;font-size:18px;font-weight:700}
+.step-sub{font-size:13px;color:rgba(255,255,255,0.75);margin-top:4px}
+.choices-list{padding:12px;display:flex;flex-direction:column;gap:8px}
+.choice-btn{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border:1.5px solid var(--border);border-radius:9px;background:var(--surface);cursor:pointer;text-align:left;transition:border-color 0.15s,background 0.15s,box-shadow 0.15s;width:100%}
+.choice-btn:hover{border-color:var(--acc-mid);background:var(--acc-soft);box-shadow:0 2px 8px rgba(27,63,110,0.09)}
+.choice-icon{font-size:22px;flex-shrink:0;margin-top:1px}
+.choice-title{font-size:15px;font-weight:600;color:var(--t1);display:block}
+.choice-desc{font-size:13px;color:var(--t2);margin-top:2px;display:block}
+
+/* RESULT CARD */
+.result-card{border-radius:12px;overflow:hidden;border:1.5px solid var(--border);box-shadow:0 4px 20px rgba(27,63,110,0.10);background:var(--panel)}
+.result-card-header{background:var(--blue);color:#fff;padding:20px 24px;display:flex;align-items:flex-start;gap:14px}
+.model-badge{background:rgba(255,255,255,0.18);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;letter-spacing:0.5px;flex-shrink:0;margin-top:3px;font-family:system-ui,sans-serif}
+.model-name{font-family:Georgia,serif;font-size:20px;font-weight:700}
+.model-tagline{font-size:13px;color:rgba(255,255,255,0.80);margin-top:4px}
+.result-body{padding:22px 24px}
+.result-desc{font-size:15px;color:var(--t2);margin-bottom:16px;line-height:1.6}
+.method-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.method-pill{display:inline-block;padding:3px 10px;background:var(--acc-soft);color:var(--acc-mid);border:1px solid rgba(27,63,110,0.18);border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.3px}
+.suite-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(27,63,110,0.07);color:var(--acc-mid);border:1px solid rgba(27,63,110,0.15);border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600;margin-bottom:16px}
+.suite-badge::before{content:'✓';font-weight:700}
+.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;border:none;width:100%;background:var(--blue);color:#fff;box-shadow:0 4px 16px rgba(27,63,110,0.25);transition:filter 0.15s,transform 0.1s}
+.btn-primary:hover{filter:brightness(1.10);transform:translateY(-1px)}
+.free-note{text-align:center;font-size:13px;color:var(--t3);margin-top:12px}
+.free-note a{color:var(--acc-mid);font-weight:600}
+.free-note a:hover{text-decoration:underline}
+.also-suite{margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.also-label{font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px}
+.also-chips{display:flex;flex-wrap:wrap;gap:8px}
+.also-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:13px;font-weight:500;background:var(--acc-soft);color:var(--acc-mid);border:1px solid rgba(27,63,110,0.18);cursor:pointer;transition:background 0.15s}
+.also-chip:hover{background:rgba(27,63,110,0.15)}
+.chip-id{font-weight:700;font-size:11px}
+.back-inline{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--t3);cursor:pointer;background:none;border:none;padding:0;margin-top:14px}
+.back-inline:hover{color:var(--acc-mid)}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border)}
+
+/* PRICING */
+.pricing-section{background:var(--panel);padding:44px 24px}
+.pricing-inner{max-width:820px;margin:0 auto}
+.pricing-headline{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--t1);text-align:center;margin-bottom:6px}
+.pricing-sub{font-size:15px;color:var(--t2);text-align:center;margin-bottom:24px}
+.billing-toggle{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px}
+.toggle-label{font-size:14px;color:var(--t2);font-weight:500}
+.toggle-label.active{color:var(--t1);font-weight:700}
+.toggle-wrap{position:relative;width:48px;height:26px;cursor:pointer}
+.toggle-wrap input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;border-radius:13px;background:#CBD5E0;transition:background 0.2s}
+.toggle-wrap input:checked + .toggle-track{background:var(--blue)}
+.toggle-knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:transform 0.2s;pointer-events:none}
+.toggle-wrap input:checked ~ .toggle-knob{transform:translateX(22px)}
+.annual-badge{background:#ECFDF5;color:#166534;border:1px solid #BBF7D0;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700}
+.pricing-tiles{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:620px){.pricing-tiles{grid-template-columns:1fr}}
+.tile{border:1.5px solid var(--border);border-radius:14px;padding:28px 24px;background:var(--surface);display:flex;flex-direction:column}
+.tile.featured{border-color:var(--blue);background:var(--panel);box-shadow:0 4px 24px rgba(27,63,110,0.12);position:relative}
+.popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;padding:3px 16px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap}
+.tile-tier{font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
+.tile-price{font-family:Georgia,serif;font-size:36px;font-weight:700;color:var(--t1)}
+.tile-period{font-size:14px;color:var(--t3)}
+.tile-note{font-size:13px;color:var(--t3);margin-bottom:18px;min-height:20px}
+.feat-list{list-style:none;margin-bottom:24px;flex:1;display:flex;flex-direction:column;gap:9px}
+.feat-list li{display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--t2)}
+.feat-list .chk{color:var(--blue);font-weight:700;flex-shrink:0}
+.feat-name{font-weight:600;color:var(--t1)}
+.btn-tile{display:block;width:100%;padding:13px 20px;border-radius:8px;font-size:15px;font-weight:700;text-align:center;cursor:pointer;border:none;transition:filter 0.15s,transform 0.1s}
+.btn-tile.primary{background:var(--blue);color:#fff;box-shadow:0 3px 12px rgba(27,63,110,0.22)}
+.btn-tile.primary:hover{filter:brightness(1.10);transform:translateY(-1px)}
+.btn-tile.secondary{background:var(--panel);color:var(--t2);border:1.5px solid var(--border)}
+.btn-tile.secondary:hover{border-color:var(--acc-mid);color:var(--acc-mid)}
+.free-forever{font-size:12px;color:var(--t3);text-align:center;margin-top:10px}
+
+/* FOOTER */
+.site-footer{background:#0F1D2E;padding:28px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-brand{font-family:Georgia,serif;font-size:15px;font-weight:700;color:#fff}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:13px;color:rgba(255,255,255,0.5)}
+.footer-links a:hover{color:rgba(255,255,255,0.85)}
+.footer-copy{font-size:12px;color:rgba(255,255,255,0.35)}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">
+    <div class="logo-mark">C</div>
+    <div>
+      <div class="logo-text">CapPlan</div>
+      <div class="logo-sub">Business &middot; International Edition</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <!-- Shown only for active subscribers -->
+    <div class="hdr-member" id="hdr-member">
+      <span class="hdr-member-name" id="hdr-member-name"></span>
+      <button class="hdr-manage-btn" onclick="manageSubscription()">Manage subscription</button>
+      <button class="hdr-signout-btn" onclick="signOut()">Sign out</button>
+    </div>
+    <!-- Shown for non-members -->
+    <a href="../index.html" class="hdr-back" id="hdr-back">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8.5 2L4 7l4.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Change edition
+    </a>
+  </div>
+</header>
+
+<!-- MEMBER WELCOME BANNER (subscribers only) -->
+<div class="member-banner" id="member-banner">
+  <div class="member-inner">
+    <div class="member-greeting">
+      <h1>Welcome back</h1>
+      <p>Use the finder below to open any model in your Business International Suite.</p>
+    </div>
+    <div class="member-status">
+      <div class="member-status-dot"></div>
+      <span class="member-status-text">Business International Suite — Active</span>
+    </div>
+  </div>
+</div>
+
+<!-- EDITION BANNER (non-members) -->
+<div class="edition-banner" id="edition-banner">
+  <div class="edition-inner">
+    <h1>CapPlan Business &mdash; International Edition</h1>
+    <p class="desc">Capital investment models using classical depreciation methods, with support for 9 currencies. Built for businesses outside the US tax system.</p>
+    <div class="pills">
+      <span class="pill">Straight-Line (SL)</span>
+      <span class="pill">Double-Declining Balance (DDB)</span>
+      <span class="pill">Sum-of-Years-Digits (SYD)</span>
+      <span class="pill">9 Currency Options</span>
+    </div>
+    <p class="currency-note">Currencies: <span>USD &middot; CAD &middot; GBP &middot; EUR &middot; AUD &middot; NZD &middot; CHF &middot; JPY &middot; SGD</span></p>
+  </div>
+</div>
+
+<div class="finder-section">
+  <div class="finder-inner">
+    <div class="finder-headline" id="finder-headline">Find your CapPlan model</div>
+    <p class="finder-sub" id="finder-sub">Answer two questions to see exactly which model handles your decision &mdash; and what it does.</p>
+    <div id="bc" class="breadcrumb" style="display:none"></div>
+    <div id="finder" class="step-panel"></div>
+  </div>
+</div>
+
+<div class="divider" id="pricing-divider"></div>
+
+<div class="pricing-section" id="pricing-section">
+  <div class="pricing-inner">
+    <div class="pricing-headline">Simple, transparent pricing</div>
+    <p class="pricing-sub">Start free with the core model. Upgrade when you need the full suite.</p>
+
+    <div class="billing-toggle">
+      <span class="toggle-label active" id="lbl-mo">Monthly</span>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="billing-chk" onchange="onBillingToggle()">
+        <div class="toggle-track"></div>
+        <div class="toggle-knob"></div>
+      </label>
+      <span class="toggle-label" id="lbl-yr">Annual &nbsp;<span class="annual-badge">Save $84/year</span></span>
+    </div>
+
+    <div class="pricing-tiles">
+      <div class="tile">
+        <div class="tile-tier">Starter</div>
+        <div><span class="tile-price">$0</span><span class="tile-period"> / always free</span></div>
+        <p class="tile-note">Always free &mdash; no card required</p>
+        <ul class="feat-list">
+          <li><span class="chk">&#10003;</span><span><span class="feat-name">M1 &mdash; Asset Purchase Analysis</span><br><span style="font-size:12px;color:var(--t3)">Straight-Line (SL) &middot; Double-Declining Balance (DDB) &middot; Sum-of-Years-Digits (SYD)</span></span></li>
+        </ul>
+        <button class="btn-tile secondary" onclick="openFreeModel()">Open free model</button>
+        <p class="free-forever">Free forever &mdash; no trial, no expiry</p>
+      </div>
+
+      <div class="tile featured">
+        <span class="popular-badge">Most popular</span>
+        <div class="tile-tier">Full Suite</div>
+        <div><span class="tile-price" id="suite-price">$37</span><span class="tile-period" id="suite-period"> / month</span></div>
+        <p class="tile-note" id="suite-note">&nbsp;</p>
+        <ul class="feat-list">
+          <li><span class="chk">&#10003;</span><span><span class="feat-name">All 13 capital models</span></span></li>
+          <li><span class="chk">&#10003;</span><span>SL &middot; DDB &middot; SYD depreciation methods</span></li>
+          <li><span class="chk">&#10003;</span><span>9 currencies: USD, CAD, GBP, EUR, AUD, NZD, CHF, JPY, SGD</span></li>
+          <li><span class="chk">&#10003;</span><span>NPV, IRR, BCR, payback &amp; optimal replacement</span></li>
+          <li><span class="chk">&#10003;</span><span>Lease vs purchase, pricing &amp; valuation models</span></li>
+          <li><span class="chk">&#10003;</span><span>Save &amp; revisit analyses</span></li>
+        </ul>
+        <button class="btn-tile primary" onclick="checkoutFromPricing()">Get Full Suite</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-brand">CapPlan</div>
+  <div class="footer-links">
+    <a href="../../index.html">Home</a>
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Support</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 CapPlan. All rights reserved.</div>
+</footer>
+
+<script src="../../capplan-auth.js"></script>
+<script>
+var SUITE_ID = 'business_intl';
+var FREE_MODEL_FILE = '../../capplan_model1.html';
+var billing = 'monthly';
+var isMember = false; // set true after auth check confirms active subscription
+
+var MODELS = {
+  M1: {id:'M1', file:'../../capplan_model1.html',  title:'Asset Purchase Analysis',       tagline:'Does this capital investment meet our required return?',              desc:'Full investment appraisal using classical depreciation (SL, DDB, or SYD): NPV, benefit-cost ratio, IRR, and payback. Choose your depreciation method and currency.', free:true,  methods:['SL','DDB','SYD'], also:['M2','M12','M13']},
+  M2: {id:'M2', file:'../../capplan_model2.html',  title:'Which Option?',                 tagline:'Which asset option delivers the best return on investment?',          desc:'Compares multiple options on NPV. Choose SL, DDB, or SYD per run. Supports all 9 currencies.', free:false, methods:['SL','DDB','SYD'], also:['M1','M4']},
+  M3: {id:'M3', file:'../../capplan_model3.html',  title:'Replace This Asset?',           tagline:'Does replacing this asset now make financial sense?',                 desc:'Calculates the NPV of replacing an existing asset using classical depreciation. Supports all 9 currencies.', free:false, methods:['SL','DDB','SYD'], also:['M4','M5']},
+  M4: {id:'M4', file:'../../capplan_model4.html',  title:'Which Replacement?',            tagline:'Which replacement option gives us the best financial outcome?',       desc:'Compares multiple replacement options against your current asset on an NPV basis. SL, DDB, or SYD.', free:false, methods:['SL','DDB','SYD'], also:['M3','M5']},
+  M5: {id:'M5', file:'../../capplan_model5.html',  title:'Optimal Replacement Year',      tagline:'What is the optimal year to replace this asset?',                    desc:'Finds the year that minimises equivalent annual cost, balancing declining capital cost against rising operating cost.', free:false, methods:['SL','DDB','SYD'], also:['M3','M4']},
+  M6: {id:'M6', file:'../../capplan_model6.html',  title:'Minimum Lease Payment',         tagline:'What is the minimum lease payment that covers our costs?',           desc:"Calculates the minimum annual lease payment that recovers the lessor's cost including tax shields at a target return.", free:false, methods:['SL'], also:['M7','M8']},
+  M7: {id:'M7', file:'../../capplan_model7.html',  title:'Minimum Hourly Rate',           tagline:'What is the minimum rate we need to charge per hour?',               desc:'Calculates the minimum charge-out rate per hour to recover the cost of an asset at a target return, including operating costs.', free:false, methods:['SL','DDB','SYD'], also:['M6','M8']},
+  M8: {id:'M8', file:'../../capplan_model8.html',  title:'Minimum Tender Price',          tagline:'What is the minimum we should quote on this contract?',              desc:'Calculates the minimum contract price for work performed with an asset, ensuring full cost recovery at a target return.', free:false, methods:['SL','DDB','SYD'], also:['M6','M7']},
+  M9: {id:'M9', file:'../../capplan_model9.html',  title:'Lease vs Purchase',             tagline:'Should we lease or purchase this asset?',                            desc:'Compares the after-tax present value of leasing versus purchasing, and calculates the pre-tax implied lease rate.', free:false, methods:['SL','DDB','SYD'], also:['M10','M11']},
+  M10:{id:'M10',file:'../../capplan_model10.html', title:'Sale and Leaseback',            tagline:'Does selling and leasing back this asset make financial sense?',     desc:'Calculates whether a sale and leaseback creates value, weighing cash released against forfeited tax shields and lease obligations.', free:false, methods:['SL'], also:['M9','M11']},
+  M11:{id:'M11',file:'../../capplan_model11.html', title:'Implied Cost of Leasing',       tagline:'What is this lease actually costing us as a financing rate?',        desc:'Finds the pre-tax financing rate embedded in the lease by comparing lease cash flows to the purchase alternative.', free:false, methods:['SL','DDB','SYD'], also:['M9','M10']},
+  M12:{id:'M12',file:'../../capplan_model12.html', title:'Minimum Selling Price',         tagline:'What is the minimum we should accept if we sell this asset?',        desc:'Calculates the minimum acceptable sale price for an asset you own, accounting for tax shields already claimed and your target return.', free:false, methods:['SL','DDB','SYD'], also:['M13','M1']},
+  M13:{id:'M13',file:'../../capplan_model13.html', title:'Maximum Purchase Price',        tagline:'What is the maximum we should pay for this asset?',                  desc:'Calculates the maximum you should pay for an asset and earn your target return, using depreciation and salvage value analytically.', free:false, methods:['SL','DDB','SYD'], also:['M12','M1']},
+};
+
+var TREE = {
+  root:{q:'What kind of decision are you facing?',sub:'Tell us what you are trying to work out.',choices:[
+    {icon:'🛒',title:'Buying or acquiring an asset',desc:'Evaluating a purchase, comparing options, or working out the maximum you should pay',next:'buying'},
+    {icon:'🔄',title:'Replacing an asset we own',desc:'Deciding whether to replace, comparing replacements, or finding the optimal timing',next:'replacing'},
+    {icon:'📋',title:'Leasing — as lessee or lessor',desc:'Comparing lease vs buy, setting a lease rate, or finding out what a lease is costing us',next:'leasing'},
+    {icon:'💰',title:'Pricing our equipment or services',desc:'Setting a minimum hourly rate, tender price, or lease payment to recover our costs',next:'pricing'},
+    {icon:'🏷️',title:'Valuing an asset we own',desc:'Finding the minimum we should accept if selling, or the ceiling for what to pay',next:'valuing'},
+  ]},
+  buying:{q:'What best describes your situation?',choices:[
+    {icon:'✅',title:'Evaluating a single asset purchase',desc:'I want to know whether buying this specific asset makes financial sense',next:'M'},
+    {icon:'⚖️',title:'Comparing two or more options',desc:'I have several candidates and want to pick the one with the best financial return',next:'M_compare'},
+    {icon:'💲',title:'Working out the maximum I should pay',desc:'I know what the asset will return — I want to find my price ceiling',next:'M_maxprice'},
+  ]},
+  replacing:{q:'What best describes your situation?',choices:[
+    {icon:'🔁',title:'Should I replace now?',desc:'I want to know whether replacing my current asset is financially justified',next:'M_replace_now'},
+    {icon:'🏆',title:'Which replacement is best?',desc:'I have multiple replacement options and want to pick the highest NPV',next:'M_replace_which'},
+    {icon:'📅',title:'When is the right time to replace?',desc:'I want to find the year that minimises my total annual cost of ownership',next:'M_replace_when'},
+  ]},
+  leasing:{q:'What best describes your situation?',choices:[
+    {icon:'⚖️',title:'Lease vs buy — which is cheaper?',desc:'I am deciding whether to lease or purchase and want to compare total cost',next:'M_lease_vs_buy'},
+    {icon:'🏦',title:'Should I sell and lease back?',desc:'I am considering releasing capital by selling and leasing back an asset I own',next:'M_leaseback'},
+    {icon:'📊',title:'What is my lease costing me?',desc:'I want to find the effective financing rate embedded in my current lease',next:'M_lease_cost'},
+  ]},
+  pricing:{q:'What type of pricing are you setting?',choices:[
+    {icon:'📝',title:'Minimum lease payment',desc:'I own an asset and want to lease it out — what is the minimum I need to charge?',next:'M_pricing_lease'},
+    {icon:'🕐',title:'Minimum hourly rate',desc:'I rent out equipment by the hour — what is the minimum rate to recover costs?',next:'M_pricing_hourly'},
+    {icon:'📄',title:'Minimum tender price',desc:'I am quoting on a contract — what is my cost floor?',next:'M_pricing_tender'},
+  ]},
+  valuing:{q:'What do you need to know?',choices:[
+    {icon:'🔻',title:'Minimum selling price',desc:'I want to sell an asset I own — what is the lowest price I should accept?',next:'M_minprice'},
+    {icon:'🔺',title:'Maximum purchase price',desc:'I am buying — what is the highest price I should pay to earn my target return?',next:'M_maxprice'},
+  ]},
+};
+
+var RESULTS = {
+  'M':'M1','M_compare':'M2','M_maxprice':'M13',
+  'M_replace_now':'M3','M_replace_which':'M4','M_replace_when':'M5',
+  'M_lease_vs_buy':'M9','M_leaseback':'M10','M_lease_cost':'M11',
+  'M_pricing_lease':'M6','M_pricing_hourly':'M7','M_pricing_tender':'M8',
+  'M_minprice':'M12',
+};
+
+var path = [];
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+/* ── AUTH INIT ─────────────────────────────────────────────── */
+async function initPage() {
+  if (typeof CapPlanAuth === 'undefined') { renderFinder(); return; }
+
+  try {
+    var suites = await CapPlanAuth.getActiveSuites(); // returns array or null
+
+    if (suites && suites.includes('business_intl')) {
+      // ── MEMBER MODE ──
+      isMember = true;
+
+      // Header
+      document.getElementById('hdr-member').classList.add('visible');
+      document.getElementById('hdr-back').style.display = 'none';
+      var displayName = await CapPlanAuth.getDisplayName();
+      if (displayName) document.getElementById('hdr-member-name').textContent = displayName;
+
+      // Banners
+      document.getElementById('member-banner').classList.add('visible');
+      document.getElementById('edition-banner').style.display = 'none';
+
+      // Finder copy
+      document.getElementById('finder-headline').textContent = 'Open a model';
+      document.getElementById('finder-sub').textContent = 'Choose a decision type and open the model — your subscription covers all 13 models.';
+
+      // Hide pricing
+      document.getElementById('pricing-section').style.display = 'none';
+      document.getElementById('pricing-divider').style.display = 'none';
+    }
+    // else: not logged in or no business_intl subscription — keep default marketing view
+  } catch(e) {
+    console.warn('initPage error:', e);
+  }
+
+  renderFinder();
+}
+
+/* ── FINDER RENDER ─────────────────────────────────────────── */
+function renderFinder(){
+  var nodeKey = path.length ? path[path.length-1].next : 'root';
+  var bcEl = document.getElementById('bc');
+  var panelEl = document.getElementById('finder');
+
+  renderBreadcrumb(bcEl);
+
+  if(RESULTS[nodeKey]!==undefined){
+    renderResult(RESULTS[nodeKey], panelEl, false);
+    return;
+  }
+  var node = TREE[nodeKey];
+  if(!node) return;
+
+  var stepNum = path.length + 1;
+  var html = '<div class="step-header">';
+  html += '<div class="step-label">Step '+stepNum+' of 2</div>';
+  html += '<div class="step-q">'+esc(node.q)+'</div>';
+  if(node.sub) html += '<div class="step-sub">'+esc(node.sub)+'</div>';
+  html += '</div><div class="choices-list">';
+  node.choices.forEach(function(c,i){
+    html += '<button class="choice-btn" onclick="pick('+i+')">';
+    html += '<span class="choice-icon">'+c.icon+'</span>';
+    html += '<span><span class="choice-title">'+esc(c.title)+'</span>';
+    html += '<span class="choice-desc">'+esc(c.desc)+'</span></span>';
+    html += '</button>';
+  });
+  html += '</div>';
+  panelEl.innerHTML = html;
+}
+
+function pick(i){
+  var nodeKey = path.length ? path[path.length-1].next : 'root';
+  var c = TREE[nodeKey].choices[i];
+  path.push({title:c.title, next:c.next});
+  renderFinder();
+}
+
+function renderResult(mid, el, isAlso){
+  var m = MODELS[mid];
+
+  var methodsHtml = '';
+  if(m.methods && m.methods.length){
+    methodsHtml = '<div class="method-pills">';
+    m.methods.forEach(function(mth){
+      var labels = {SL:'Straight-Line', DDB:'Double-Declining Balance', SYD:'Sum-of-Years-Digits'};
+      methodsHtml += '<span class="method-pill">'+esc(mth)+' &mdash; '+esc(labels[mth]||mth)+'</span>';
+    });
+    methodsHtml += '</div>';
+  }
+
+  var alsoHtml = '';
+  if(m.also && m.also.length){
+    alsoHtml = '<div class="also-suite"><div class="also-label">Also in Full Suite</div><div class="also-chips">';
+    m.also.forEach(function(aid){
+      var am = MODELS[aid];
+      if(am) alsoHtml += '<button class="also-chip" onclick="showAlso(\''+aid+'\')"><span class="chip-id">'+esc(am.id)+'</span> '+esc(am.title)+'</button>';
+    });
+    alsoHtml += '</div></div>';
+  }
+
+  var backBtn = isAlso
+    ? '<button class="back-inline" onclick="renderFinder()">&#8592; Back to my result</button>'
+    : '<button class="back-inline" onclick="goBack()">&#8592; Different decision</button>';
+
+  var actionHtml;
+  if (m.free) {
+    // Free model — always just open it
+    actionHtml = '<button class="btn-primary" onclick="openFreeModel()">Open free model &rarr;</button>';
+  } else if (isMember) {
+    // Subscriber — open directly, no Stripe
+    actionHtml = '<button class="btn-primary" onclick="openModel(\''+esc(m.file)+'\')">Open '+esc(m.title)+' &rarr;</button>';
+  } else {
+    // Non-subscriber — show subscribe CTA
+    actionHtml =
+      '<div class="suite-badge">This model is included in Full Suite</div><br>'+
+      '<button class="btn-primary" onclick="startCheckout(\''+esc(m.file)+'\')">Subscribe and open '+esc(m.title)+' &rarr;</button>'+
+      '<p class="free-note">Not ready to subscribe? <a href="'+FREE_MODEL_FILE+'">M1 &mdash; Asset Purchase Analysis</a> is always free.</p>';
+  }
+
+  el.innerHTML =
+    '<div class="result-card">'+
+    '<div class="result-card-header">'+
+    '<span class="model-badge">'+esc(m.id)+'</span>'+
+    '<div><div class="model-name">'+esc(m.title)+'</div>'+
+    '<div class="model-tagline">'+esc(m.tagline)+'</div></div>'+
+    '</div>'+
+    '<div class="result-body">'+
+    '<p class="result-desc">'+esc(m.desc)+'</p>'+
+    methodsHtml+
+    actionHtml+
+    alsoHtml+
+    '<div>'+backBtn+'</div>'+
+    '</div></div>';
+}
+
+function showAlso(mid){
+  renderResult(mid, document.getElementById('finder'), true);
+  document.getElementById('bc').style.display = 'none';
+}
+
+function goBack(){
+  if(path.length) path.pop();
+  renderFinder();
+}
+
+function renderBreadcrumb(el){
+  if(!path.length){el.style.display='none';return;}
+  el.style.display='flex';
+  var html='<span class="bc-item" onclick="resetFinder()">Start</span>';
+  path.forEach(function(s,i){
+    html+='<span class="bc-sep">&#8250;</span>';
+    if(i<path.length-1) html+='<span class="bc-item" onclick="goToStep('+i+')">'+esc(s.title)+'</span>';
+    else html+='<span>'+esc(s.title)+'</span>';
+  });
+  el.innerHTML=html;
+}
+
+function goToStep(i){path=path.slice(0,i+1);renderFinder();}
+function resetFinder(){path=[];renderFinder();}
+
+/* ── ACTIONS ───────────────────────────────────────────────── */
+function openModel(modelFile) {
+  window.location.href = modelFile;
+}
+
+async function startCheckout(modelFile){
+  if(typeof CapPlanAuth!=='undefined'){
+    await CapPlanAuth.startCheckout(SUITE_ID,billing);
+    window.location.href=modelFile;
+  }
+}
+
+function openFreeModel(){window.location.href=FREE_MODEL_FILE;}
+function checkoutFromPricing(){startCheckout(FREE_MODEL_FILE);}
+
+async function manageSubscription(){
+  if(typeof CapPlanAuth!=='undefined'){
+    await CapPlanAuth.openPortal();
+  }
+}
+
+async function signOut(){
+  if(typeof CapPlanAuth!=='undefined'){
+    await CapPlanAuth.logout();
+  }
+}
+
+function onBillingToggle(){
+  var chk=document.getElementById('billing-chk').checked;
+  billing=chk?'annual':'monthly';
+  document.getElementById('lbl-mo').classList.toggle('active',!chk);
+  document.getElementById('lbl-yr').classList.toggle('active',chk);
+  document.getElementById('suite-price').textContent=chk?'$30':'$37';
+  document.getElementById('suite-period').textContent=' / month';
+  document.getElementById('suite-note').innerHTML=chk?'$360 / year, billed annually':'&nbsp;';
+}
+
+/* ── START ─────────────────────────────────────────────────── */
+initPage();
 </script>
 </body>
 </html>
