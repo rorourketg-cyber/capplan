@@ -1,170 +1,139 @@
 /**
- * capplan-auth.js  —  CapPlan auth + access-control library
+ * capplan-auth.js
+ * Shared auth + access-control library for all CapPlan pages.
  *
- * Usage on each model page:
- *   <script src="../capplan-auth.js"></script>  (or ../../capplan-auth.js)
- *   <script>
- *     CapPlanAuth.init('personal1');   // free model — renders immediately
- *     render();
- *   </script>
+ * Model pages:
+ *   CapPlanAuth.init('us_model2').then(ok => { if (ok) render(); });
+ *
+ * Index / hub pages (no overlay, just check status):
+ *   const suites = await CapPlanAuth.getActiveSuites();
+ *   const name   = await CapPlanAuth.getDisplayName();
  */
 
 const CapPlanAuth = (() => {
 
-  // ── Config ────────────────────────────────────────────────────────────────
   const AUTH0_DOMAIN    = 'dev-7g0nuvl1fuufbeyn.us.auth0.com';
   const AUTH0_CLIENT_ID = 'zNrADr5Yz57Tg9tVKH7lcN5YtPguyIuR';
-  const STRIPE_PUB_KEY  = 'pk_test_51UKfwkPnu63aqS4gaT5ynA4PKp4xWsZIPFS5adtJOfote9HxFarTdDT18TiE45oHI9Luyx3PbVdYiU3VofMUK4NV00l8zFGQn2';
   const CHECKOUT_WORKER = 'https://patient-base-51d4.rorourketg.workers.dev';
 
-  // Free model IDs — these pass through immediately without auth check
+  // Models that are always free — no auth check needed
   const FREE_MODELS = ['personal1', 'model1', 'us_model1', 'P1', 'UM1', 'M1'];
 
-  // Suite membership
-  const SUITE_MODELS = {
-    personal:     ['personal1','personal2','personal3','personal4','personal5',
-                   'personal9','personal11','personal12','personal13'],
-    business_us:  ['model1','model2','model3','model4','model5','model6','model7',
-                   'model8','model9','model10','model11','model12','model13'],
-    business_intl:['model1','model2','model3','model4','model5','model6','model7',
-                   'model8','model9','model10','model11','model12','model13'],
-  };
+  // Claim namespace used by Auth0 Action
+  const META_CLAIM = 'https://capplan.online/app_metadata';
 
-  // Display names for personal models
-  const PERSONAL_MODEL_NAMES = {
-    personal2:  'Which Option Should I Buy?',
-    personal3:  'Should I Replace What I Own?',
-    personal4:  'Which Replacement is Best?',
-    personal5:  'When Should I Replace It?',
-    personal9:  'Lease or Buy?',
-    personal11: 'What is This Lease Costing Me?',
-    personal12: 'What is the Least I Should Accept?',
-    personal13: 'What is the Most I Should Pay?',
-  };
+  let _clientPromise = null;
 
-  // Pricing labels for upgrade overlay
-  const SUITE_META = {
-    personal:      { name: 'Personal',                    price: '$12/month' },
-    business_us:   { name: 'Business — US Edition',       price: '$37/month' },
-    business_intl: { name: 'Business — International',    price: '$37/month' },
-  };
-
-  // ── Auth0 client (lazy) ───────────────────────────────────────────────────
-  let _client = null;
-
-  function loadAuth0SDK() {
-    return new Promise((resolve, reject) => {
-      if (window.auth0) return resolve();
-      const s = document.createElement('script');
-      s.src = 'https://unpkg.com/@auth0/auth0-spa-js@2.0.3/dist/auth0-spa-js.production.js';
-      s.onload = resolve;
-      s.onerror = reject;
-      document.head.appendChild(s);
-    });
+  // ── Auth0 client (singleton) ───────────────────────────────
+  function getClient() {
+    if (!_clientPromise) {
+      _clientPromise = window.auth0.createAuth0Client({
+        domain:   AUTH0_DOMAIN,
+        clientId: AUTH0_CLIENT_ID,
+        authorizationParams: {
+          redirect_uri: window.location.origin + window.location.pathname,
+        },
+        cacheLocation: 'localstorage',
+        useRefreshTokens: true,
+      });
+    }
+    return _clientPromise;
   }
 
-  async function getClient() {
-    if (_client) return _client;
-    await loadAuth0SDK();
-    _client = await window.auth0.createAuth0Client({
-      domain:   AUTH0_DOMAIN,
-      clientId: AUTH0_CLIENT_ID,
-      authorizationParams: {
-        redirect_uri: window.location.origin + window.location.pathname,
-      },
-      cacheLocation: 'localstorage',
-      useRefreshTokens: true,
-    });
-    return _client;
-  }
-
-  // ── Determine which suite a model belongs to ──────────────────────────────
+  // ── Determine which suite a model belongs to ───────────────
   function suiteForModel(modelId) {
-    // Personal models start with 'personal'
-    if (modelId.startsWith('personal') || modelId === 'P1') return 'personal';
-    // US models: we're in business/us/ so modelId is 'model1' etc.
-    // International: same filename pattern — we detect by page URL
-    if (window.location.pathname.includes('/us/')) return 'business_us';
-    if (window.location.pathname.includes('/international/')) return 'business_intl';
-    return 'business_us'; // fallback
+    const path = window.location.pathname;
+    if (path.includes('/us/'))            return 'business_us';
+    if (path.includes('/international/')) return 'business_intl';
+    if (modelId.startsWith('us_model'))   return 'business_us';
+    if (modelId.startsWith('model'))      return 'business_intl';
+    return 'personal';
   }
 
-  // ── Overlays ──────────────────────────────────────────────────────────────
+  // ── Overlays ───────────────────────────────────────────────
   function showLoginPrompt() {
     document.body.style.overflow = 'hidden';
-    const el = document.createElement('div');
-    el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:9999';
-    el.innerHTML = `
-      <div style="background:#fff;border-radius:12px;padding:40px 36px;max-width:400px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.2);text-align:center">
-        <div style="font-size:2rem;margin-bottom:12px">🔐</div>
-        <h2 style="margin:0 0 10px;font-size:1.25rem;color:#111">Sign in to CapPlan</h2>
-        <p style="margin:0 0 24px;color:#555;line-height:1.6">Create a free account or sign in to use this model.</p>
+    const overlay = document.createElement('div');
+    overlay.id = 'capplan-login-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:9999;';
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:12px;padding:40px 36px;max-width:400px;
+                  width:90%;box-shadow:0 8px 40px rgba(0,0,0,.18);text-align:center">
+        <h2 style="margin:0 0 12px;font-size:1.3rem;color:#111">Sign in to CapPlan</h2>
+        <p style="margin:0 0 24px;color:#555;line-height:1.6">
+          Create a free account to use this model and save your analyses.
+        </p>
         <button onclick="CapPlanAuth.login()"
-          style="background:#1B3F6E;color:#fff;border:none;border-radius:8px;padding:13px 32px;font-size:1rem;cursor:pointer;width:100%;margin-bottom:10px">
+          style="background:#1B3F6E;color:#fff;border:none;border-radius:8px;
+                 padding:14px 32px;font-size:1rem;cursor:pointer;width:100%;margin-bottom:12px">
           Sign in / Create account
         </button>
-        <a href="/" style="color:#888;font-size:.875rem;text-decoration:none">← Back to home</a>
+        <a href="/" style="color:#888;font-size:.9rem;text-decoration:none">Back to home</a>
       </div>`;
-    document.body.appendChild(el);
+    document.body.appendChild(overlay);
   }
 
   function showUpgradeOverlay(modelId) {
-    const suite = suiteForModel(modelId);
-    const meta  = SUITE_META[suite] || { name: 'Full Suite', price: '$37/month' };
-    const modelName = PERSONAL_MODEL_NAMES[modelId] || null;
+    const suite      = suiteForModel(modelId);
     const isPersonal = suite === 'personal';
-
-    // Build the description sentence
-    const modelNameHtml = modelName
-      ? `The model, <strong><em>${modelName}</em></strong>, is part of the Full Suite.`
-      : 'This model is part of the Full Suite.';
+    const isUS       = suite === 'business_us';
+    const price      = isPersonal ? '$12/month' : '$37/month';
+    const suiteName  = isPersonal ? 'Personal'
+                     : isUS       ? 'Business — US Edition'
+                     :              'Business — International Edition';
 
     document.body.style.overflow = 'hidden';
-    const el = document.createElement('div');
-    el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:9999';
-    el.innerHTML = `
-      <div style="background:#fff;border-radius:12px;padding:40px 36px;max-width:440px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.2);text-align:center">
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) mainContent.style.filter = 'blur(4px)';
+
+    const overlay = document.createElement('div');
+    overlay.id = 'capplan-upgrade-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999;';
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:12px;padding:40px 36px;max-width:440px;
+                  width:90%;box-shadow:0 8px 40px rgba(0,0,0,.18);text-align:center">
         <div style="font-size:2rem;margin-bottom:12px">🔒</div>
-        <h2 style="margin:0 0 10px;font-size:1.25rem;color:#111">CapPlan ${meta.name} — Full Suite</h2>
-        <p style="margin:0 0 8px;color:#555;line-height:1.6">${modelNameHtml} Start a free 30-day trial — no credit card required until it ends.</p>
-        <p style="font-weight:700;font-size:1.1rem;margin:0 0 24px;color:#111">${meta.price} &nbsp;·&nbsp; cancel anytime</p>
+        <h2 style="margin:0 0 12px;font-size:1.3rem;color:#111">
+          CapPlan ${suiteName} — Full Suite
+        </h2>
+        <p style="margin:0 0 24px;color:#555;line-height:1.6">
+          This model is included in the Full Suite. Subscribe to access all models
+          in this suite.
+        </p>
+        <p style="font-weight:700;font-size:1.1rem;margin:0 0 24px;color:#111">
+          ${price} &nbsp;·&nbsp; cancel anytime
+        </p>
         <button onclick="CapPlanAuth.startCheckout('${suite}','monthly')"
-          style="background:#2E7D52;color:#fff;border:none;border-radius:8px;padding:13px 32px;font-size:1rem;cursor:pointer;width:100%;margin-bottom:16px;line-height:1.4">
-          Start free trial${modelName ? `<br><span style="font-size:.8rem;opacity:.85">(${modelName})</span>` : ''}
+          style="background:#1B3F6E;color:#fff;border:none;border-radius:8px;
+                 padding:14px 32px;font-size:1rem;cursor:pointer;width:100%;margin-bottom:12px">
+          Subscribe — ${price}
         </button>
-        <button onclick="CapPlanAuth.startCheckout('${suite}','annual')"
-          style="background:#1B3F6E;color:#fff;border:none;border-radius:8px;padding:10px 32px;font-size:.9rem;cursor:pointer;width:100%;margin-bottom:16px;line-height:1.4">
-          Annual plan (save 20%)${isPersonal ? `<br><span style="font-size:.8rem;opacity:.85">(All nine programs)</span>` : ''}
+        <button onclick="history.back()"
+          style="background:none;border:none;color:#888;cursor:pointer;font-size:.9rem">
+          Go back
         </button>
-        <a href="/" style="color:#888;font-size:.875rem;text-decoration:none">← Back to home</a>
       </div>`;
-    document.body.appendChild(el);
+    document.body.appendChild(overlay);
   }
 
-  // ── Public API ────────────────────────────────────────────────────────────
+  // ── Public API ─────────────────────────────────────────────
   return {
 
     /**
-     * Call on model page load.
-     * Free models: pass-through immediately (no auth check).
-     * Paid models: check Auth0 session + app_metadata.active_suites.
-     * Returns true (access granted) or false (showing overlay / redirecting).
+     * Called on model pages. Returns true if user has access,
+     * false if an overlay was shown (login prompt or upgrade prompt).
      */
     async init(modelId) {
-      // Free models always pass through
       if (FREE_MODELS.includes(modelId)) return true;
-
       try {
         const client = await getClient();
-
-        // Handle Auth0 redirect callback
         const params = new URLSearchParams(window.location.search);
+
         if (params.has('code') && params.has('state')) {
           await client.handleRedirectCallback();
           window.history.replaceState({}, document.title, window.location.pathname);
         }
 
-        // After Stripe checkout, force a fresh login to get updated token
         if (params.has('subscribed')) {
           window.history.replaceState({}, document.title, window.location.pathname);
           await client.loginWithRedirect({
@@ -176,9 +145,8 @@ const CapPlanAuth = (() => {
         const isAuth = await client.isAuthenticated();
         if (!isAuth) { showLoginPrompt(); return false; }
 
-        // Check active_suites in app_metadata (set by Auth0 Action on Stripe webhook)
         const user = await client.getUser();
-        const activeSuites = user?.['https://capplan.online/app_metadata']?.active_suites || [];
+        const activeSuites = user?.[META_CLAIM]?.active_suites || [];
         const suite = suiteForModel(modelId);
 
         if (!activeSuites.includes(suite)) {
@@ -187,58 +155,121 @@ const CapPlanAuth = (() => {
         }
 
         return true;
-
       } catch (e) {
         console.warn('CapPlanAuth.init error:', e);
-        // Fail open — don't block the model on auth errors
-        return true;
+        return true; // fail open
       }
     },
 
-    /** Redirect to Auth0 Universal Login */
-    async login() {
-      const client = await getClient();
-      await client.loginWithRedirect();
+    /**
+     * Returns the array of active suites for the current user,
+     * or null if not authenticated. Does NOT show any overlay.
+     * Used by index/hub pages to adapt their UI.
+     * e.g. ['personal'], ['business_us', 'business_intl']
+     */
+    async getActiveSuites() {
+      try {
+        const client = await getClient();
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('code') && params.has('state')) {
+          await client.handleRedirectCallback();
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        const isAuth = await client.isAuthenticated();
+        if (!isAuth) return null;
+        const user = await client.getUser();
+        return user?.[META_CLAIM]?.active_suites || [];
+      } catch (e) {
+        console.warn('CapPlanAuth.getActiveSuites error:', e);
+        return null;
+      }
     },
 
-    /** Sign out */
-    async signOut() {
+    /**
+     * Returns a display name for the logged-in user (first name,
+     * nickname, or email prefix), or null if not authenticated.
+     */
+    async getDisplayName() {
+      try {
+        const client = await getClient();
+        const isAuth = await client.isAuthenticated();
+        if (!isAuth) return null;
+        const user = await client.getUser();
+        if (!user) return null;
+        return user.given_name || user.nickname || (user.email ? user.email.split('@')[0] : null);
+      } catch (e) {
+        return null;
+      }
+    },
+
+    /** Redirect to Auth0 login */
+    async login() {
+      const client = await getClient();
+      await client.loginWithRedirect({
+        authorizationParams: { redirect_uri: window.location.origin + window.location.pathname },
+      });
+    },
+
+    /** Redirect to Auth0 logout, return to home */
+    async logout() {
       const client = await getClient();
       await client.logout({ logoutParams: { returnTo: window.location.origin } });
     },
 
-    /** Get current user (calls callback with user object or null) */
-    async getUser(callback) {
+    /**
+     * Launch Stripe Checkout via Cloudflare Worker.
+     * suite: 'personal' | 'business_us' | 'business_intl'
+     * billing: 'monthly' | 'annual'
+     * successUrl: optional — defaults to current page with ?subscribed=1
+     */
+    async startCheckout(suite, billing = 'monthly', successUrl) {
       try {
         const client = await getClient();
         const isAuth = await client.isAuthenticated();
-        if (!isAuth) { callback(null); return; }
+        if (!isAuth) {
+          await client.loginWithRedirect({
+            authorizationParams: { redirect_uri: window.location.href },
+          });
+          return;
+        }
         const user = await client.getUser();
-        callback(user || null);
-      } catch { callback(null); }
-    },
+        const email = user?.email || '';
+        const redirectTo = successUrl || (window.location.origin + window.location.pathname + '?subscribed=1');
 
-    /** Start Stripe Checkout — calls the Cloudflare Worker */
-    async startCheckout(suiteId, billing) {
-      try {
-        const userEmail = await new Promise(res => this.getUser(u => res(u?.email || null)));
         const res = await fetch(CHECKOUT_WORKER, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            suiteId,
-            billing: billing || 'monthly',
-            userEmail,
-            successUrl: window.location.origin + window.location.pathname + '?subscribed=1',
-            cancelUrl:  window.location.href,
-          }),
+          body: JSON.stringify({ suite, billing, email, successUrl: redirectTo }),
         });
         const data = await res.json();
         if (data.url) window.location.href = data.url;
-        else alert('Could not start checkout. Please try again.');
+        else throw new Error('No URL returned from checkout worker');
       } catch (e) {
-        console.error('CapPlanAuth.startCheckout:', e);
+        console.error('CapPlanAuth.startCheckout error:', e);
         alert('Could not start checkout. Please try again.');
+      }
+    },
+
+    /**
+     * Open Stripe Customer Portal via Cloudflare Worker.
+     * Requires the worker to support a /portal endpoint.
+     */
+    async openPortal() {
+      try {
+        const client = await getClient();
+        const user = await client.getUser();
+        const email = user?.email || '';
+        const res = await fetch(CHECKOUT_WORKER + '/portal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, returnUrl: window.location.href }),
+        });
+        const data = await res.json();
+        if (data.url) window.location.href = data.url;
+        else throw new Error('No portal URL returned');
+      } catch (e) {
+        console.error('CapPlanAuth.openPortal error:', e);
+        alert('Could not open billing portal. Please try again.');
       }
     },
   };
