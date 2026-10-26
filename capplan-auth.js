@@ -27,11 +27,17 @@ const CapPlanAuth = (() => {
   // ── Auth0 client (singleton) ───────────────────────────────
   function getClient() {
     if (!_clientPromise) {
+      const path = window.location.pathname;
+      const redirectUri = path.includes('/us/') || path.includes('capplan_us_model')
+        ? window.location.origin + '/business/us/'
+        : path.includes('/international/') || path.includes('capplan_model')
+        ? window.location.origin + '/business/international/'
+        : window.location.origin + '/personal/';
       _clientPromise = window.auth0.createAuth0Client({
         domain:   AUTH0_DOMAIN,
         clientId: AUTH0_CLIENT_ID,
         authorizationParams: {
-          redirect_uri: window.location.origin + window.location.pathname,
+          redirect_uri: redirectUri,
         },
         cacheLocation: 'localstorage',
         useRefreshTokens: true,
