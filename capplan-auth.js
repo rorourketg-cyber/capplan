@@ -3,7 +3,7 @@
  * Shared auth + access-control library for all CapPlan pages.
  *
  * Model pages:
- *   CapPlanAuth.init('us_model2').then(ok => { if (ok) render(); });
+ *   CapPlanAuth.init('personal1').then(ok => { if (ok) render(); });
  *
  * Index / hub pages (no overlay, just check status):
  *   const suites = await CapPlanAuth.getActiveSuites();
@@ -12,8 +12,8 @@
 
 const CapPlanAuth = (() => {
 
-  const AUTH0_DOMAIN    = 'dev-74uhps8oq6hjgk8o.us.auth0.com';
-  const AUTH0_CLIENT_ID = '1oCZLeLb8rcdIPvQKHOplADLcdFX87T0';
+  const AUTH0_DOMAIN    = 'dev-7g0nuvl1fuufbeyn.us.auth0.com';
+  const AUTH0_CLIENT_ID = 'zNrADr5Yz57Tg9tVKH7lcN5YtPguyIuR';
   const CHECKOUT_WORKER = 'https://patient-base-51d4.rorourketg.workers.dev';
 
   // Models that are always free — no auth check needed
@@ -48,6 +48,13 @@ const CapPlanAuth = (() => {
     if (modelId.startsWith('us_model'))   return 'business_us';
     if (modelId.startsWith('model'))      return 'business_intl';
     return 'personal';
+  }
+
+  // ── Inject suite nav bar (if capplan-nav.js is loaded) ────
+  function injectNav(activeSuites) {
+    if (window.CapPlanNav && typeof window.CapPlanNav.inject === 'function') {
+      window.CapPlanNav.inject(activeSuites || []);
+    }
   }
 
   // ── Overlays ───────────────────────────────────────────────
@@ -122,15 +129,36 @@ const CapPlanAuth = (() => {
     /**
      * Called on model pages. Returns true if user has access,
      * false if an overlay was shown (login prompt or upgrade prompt).
+     * Also injects the suite nav bar for authenticated members.
      */
     async init(modelId) {
-      if (FREE_MODELS.includes(modelId)) return true;
+      // Free models: always accessible, but still show nav if user is logged in
+      if (FREE_MODELS.includes(modelId)) {
+        // Best-effort: show nav for logged-in members without blocking render
+        getClient().then(async client => {
+          try {
+            const isAuth = await client.isAuthenticated();
+            if (isAuth) {
+              const user = await client.getUser();
+              const activeSuites = user?.[META_CLAIM]?.active_suites || [];
+              injectNav(activeSuites);
+            }
+          } catch (e) { /* silent — nav is enhancement only */ }
+        });
+        return true;
+      }
+
       try {
         const client = await getClient();
         const params = new URLSearchParams(window.location.search);
 
         if (params.has('code') && params.has('state')) {
-          await client.handleRedirectCallback();
+          try {
+            await client.handleRedirectCallback();
+          } catch (e) {
+            // Invalid state (e.g. back-button after redirect) — ignore and continue
+            if (!e.message || !e.message.includes('Invalid state')) throw e;
+          }
           window.history.replaceState({}, document.title, window.location.pathname);
         }
 
@@ -154,6 +182,9 @@ const CapPlanAuth = (() => {
           return false;
         }
 
+        // ── User has access: inject suite nav bar ──────────────
+        injectNav(activeSuites);
+
         return true;
       } catch (e) {
         console.warn('CapPlanAuth.init error:', e);
@@ -172,7 +203,11 @@ const CapPlanAuth = (() => {
         const client = await getClient();
         const params = new URLSearchParams(window.location.search);
         if (params.has('code') && params.has('state')) {
-          await client.handleRedirectCallback();
+          try {
+            await client.handleRedirectCallback();
+          } catch (e) {
+            if (!e.message || !e.message.includes('Invalid state')) throw e;
+          }
           window.history.replaceState({}, document.title, window.location.pathname);
         }
         const isAuth = await client.isAuthenticated();
