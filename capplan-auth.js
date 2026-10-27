@@ -27,17 +27,11 @@ const CapPlanAuth = (() => {
   // ── Auth0 client (singleton) ───────────────────────────────
   function getClient() {
     if (!_clientPromise) {
-      const path = window.location.pathname;
-      const redirectUri = path.includes('/us/') || path.includes('capplan_us_model')
-        ? window.location.origin + '/business/us/'
-        : path.includes('/international/') || path.includes('capplan_model')
-        ? window.location.origin + '/business/international/'
-        : window.location.origin + '/personal/';
       _clientPromise = window.auth0.createAuth0Client({
         domain:   AUTH0_DOMAIN,
         clientId: AUTH0_CLIENT_ID,
         authorizationParams: {
-          redirect_uri: redirectUri,
+          redirect_uri: window.location.origin + window.location.pathname,
         },
         cacheLocation: 'localstorage',
         useRefreshTokens: true,
@@ -138,18 +132,21 @@ const CapPlanAuth = (() => {
      * Also injects the suite nav bar for authenticated members.
      */
     async init(modelId) {
-      // Free models: always accessible, but still show nav if user is logged in
+      // Free models: always accessible. Always show nav — logged-out visitors
+      // see locked pills (marketing); logged-in subscribers see their full suite.
       if (FREE_MODELS.includes(modelId)) {
-        // Best-effort: show nav for logged-in members without blocking render
+        // Show nav immediately with empty suites (all locked) for visitors
+        injectNav([]);
+        // Then upgrade silently if the user is authenticated
         getClient().then(async client => {
           try {
             const isAuth = await client.isAuthenticated();
             if (isAuth) {
               const user = await client.getUser();
               const activeSuites = user?.[META_CLAIM]?.active_suites || [];
-              injectNav(activeSuites);
+              injectNav(activeSuites); // re-inject with real access level
             }
-          } catch (e) { /* silent — nav is enhancement only */ }
+          } catch (e) { /* silent */ }
         });
         return true;
       }
