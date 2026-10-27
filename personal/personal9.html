@@ -125,6 +125,7 @@ body.printing>*:not(#main-content){display:none!important}
 <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 <script src="/capplan-nav.js"></script>
 <script src="/capplan-auth.js"></script>
+<script>
 var CURRENCIES=[{code:"USD",symbol:"$",label:"US Dollar"},{code:"EUR",symbol:"€",label:"Euro"},{code:"GBP",symbol:"£",label:"British Pound"},{code:"CAD",symbol:"CA$",label:"Canadian Dollar"},{code:"AUD",symbol:"AU$",label:"Australian Dollar"},{code:"NZD",symbol:"NZ$",label:"New Zealand Dollar"},{code:"JPY",symbol:"¥",label:"Japanese Yen"},{code:"JPY",symbol:"¥",label:"Japanese Yen"},{code:"CHF",symbol:"CHF",label:"Swiss Franc"}];
 function getSym(){var c=CURRENCIES.find(function(c){return c.code===S.currency});return c?c.symbol:"$"}
 function toggleCur(){S.cur_open=!S.cur_open;var dd=document.getElementById("cur-dropdown");dd.style.display=S.cur_open?"block":"none";if(S.cur_open){dd.innerHTML="";CURRENCIES.forEach(function(c){var b=document.createElement("button");b.style.cssText="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:"+(c.code===S.currency?"var(--green-soft)":"transparent")+";border:none;border-bottom:1px solid var(--border);cursor:pointer";b.innerHTML='<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--green);width:36px">'+c.symbol+'</span><span>'+c.label+'</span>';b.onclick=function(){S.currency=c.code;S.cur_open=false;render()};dd.appendChild(b);});}}
