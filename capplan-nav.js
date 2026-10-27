@@ -108,7 +108,9 @@
 
     var currentModel = null;
     for (var i = 0; i < suite.models.length; i++) {
-      if (path.indexOf(suite.models[i].file) !== -1) {
+      // Match with or without .html extension (Cloudflare Pages strips .html)
+      var fileBase = suite.models[i].file.replace(/\.html$/, '');
+      if (path.indexOf(fileBase) !== -1) {
         currentModel = suite.models[i];
         break;
       }
@@ -416,8 +418,9 @@
 
     // Scroll current pill into view
     if (currentModel) {
+      var currentFileBase = currentModel.file.replace(/\.html$/, '');
       for (var j = 0; j < strip.children.length; j++) {
-        if (strip.children[j].href && strip.children[j].href.indexOf(currentModel.file) !== -1) {
+        if (strip.children[j].href && strip.children[j].href.indexOf(currentFileBase) !== -1) {
           setTimeout((function (el) {
             return function () { el.scrollIntoView({ inline: 'center', block: 'nearest' }); };
           }(strip.children[j])), 50);
