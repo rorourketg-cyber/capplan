@@ -62,7 +62,7 @@ const CapPlanAuth = (() => {
     document.body.style.overflow = 'hidden';
     const overlay = document.createElement('div');
     overlay.id = 'capplan-login-overlay';
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:9999;';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;z-index:9999;';
     overlay.innerHTML = `
       <div style="background:#fff;border-radius:12px;padding:40px 36px;max-width:400px;
                   width:90%;box-shadow:0 8px 40px rgba(0,0,0,.18);text-align:center">
@@ -95,7 +95,7 @@ const CapPlanAuth = (() => {
 
     const overlay = document.createElement('div');
     overlay.id = 'capplan-upgrade-overlay';
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999;';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.20);display:flex;align-items:center;justify-content:center;z-index:9999;';
     overlay.innerHTML = `
       <div style="background:#fff;border-radius:12px;padding:40px 36px;max-width:440px;
                   width:90%;box-shadow:0 8px 40px rgba(0,0,0,.18);text-align:center">
