@@ -109,10 +109,15 @@
     var currentModel = null;
     for (var i = 0; i < suite.models.length; i++) {
       // Match with or without .html extension (Cloudflare Pages strips .html)
+      // Use word-boundary check so 'personal1' doesn't match 'personal13'
       var fileBase = suite.models[i].file.replace(/\.html$/, '');
-      if (path.indexOf(fileBase) !== -1) {
-        currentModel = suite.models[i];
-        break;
+      var idx = path.indexOf(fileBase);
+      if (idx !== -1) {
+        var after = path[idx + fileBase.length];
+        if (after === undefined || after === '/' || after === '.' || after === '?') {
+          currentModel = suite.models[i];
+          break;
+        }
       }
     }
     return { suite: suite, currentModel: currentModel };
@@ -169,7 +174,7 @@
     // Backdrop
     var backdrop = document.createElement('div');
     backdrop.id = 'cpn-upgrade-backdrop';
-    backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(15,29,46,.4);z-index:9999;transition:opacity .25s';
+    backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(15,29,46,.18);z-index:9999;transition:opacity .25s';
     backdrop.style.opacity = '0';
     backdrop.addEventListener('click', closeUpgradePanel);
     document.body.appendChild(backdrop);
@@ -420,7 +425,10 @@
     if (currentModel) {
       var currentFileBase = currentModel.file.replace(/\.html$/, '');
       for (var j = 0; j < strip.children.length; j++) {
-        if (strip.children[j].href && strip.children[j].href.indexOf(currentFileBase) !== -1) {
+        var pillHref = strip.children[j].href || '';
+        var pidx = pillHref.indexOf(currentFileBase);
+        var pafter = pidx !== -1 ? pillHref[pidx + currentFileBase.length] : '';
+        if (pidx !== -1 && (pafter === undefined || pafter === '' || pafter === '/' || pafter === '.' || pafter === '?')) {
           setTimeout((function (el) {
             return function () { el.scrollIntoView({ inline: 'center', block: 'nearest' }); };
           }(strip.children[j])), 50);
