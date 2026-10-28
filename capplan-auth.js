@@ -175,7 +175,7 @@ const CapPlanAuth = (() => {
 
         const isAuth = await client.isAuthenticated();
 
-        // Always inject nav first — visitors see locked marketing pills,
+        // Always  inject nav first — visitors see locked marketing pills,
         // subscribers see their full suite after auth check below.
         injectNav([]);
 
