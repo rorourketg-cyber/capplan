@@ -54,19 +54,19 @@
       color:   '#1B3F6E',
       homeUrl: '/business/us/',
       models: [
-        { file: 'capplan_us_model1.html',  url: '/capplan_us_model1.html',  benefit: 'Does this capital investment meet our required return?' },
-        { file: 'capplan_us_model2.html',  url: '/capplan_us_model2.html',  benefit: 'Which asset gives the best return on investment?' },
-        { file: 'capplan_us_model3.html',  url: '/capplan_us_model3.html',  benefit: 'Does replacing this asset now make financial sense?' },
-        { file: 'capplan_us_model4.html',  url: '/capplan_us_model4.html',  benefit: 'Which replacement option gives us the best financial outcome?' },
-        { file: 'capplan_us_model5.html',  url: '/capplan_us_model5.html',  benefit: 'What is the optimal period to replace this asset?' },
-        { file: 'capplan_us_model6.html',  url: '/capplan_us_model6.html',  benefit: 'What is the minimum lease payment to charge that will recover our costs?' },
-        { file: 'capplan_us_model7.html',  url: '/capplan_us_model7.html',  benefit: 'What is the minimum hourly rate we need to charge for equipment rental?' },
-        { file: 'capplan_us_model8.html',  url: '/capplan_us_model8.html',  benefit: 'What is the minimum hourly rate we need to charge for equipment rental with operator?' },
-        { file: 'capplan_us_model9.html',  url: '/capplan_us_model9.html',  benefit: 'Should we lease or purchase this asset?' },
-        { file: 'capplan_us_model10.html', url: '/capplan_us_model10.html', benefit: 'Does a sale and leaseback on this asset make financial sense?' },
-        { file: 'capplan_us_model11.html', url: '/capplan_us_model11.html', benefit: 'What is this lease costing us as a financing rate?' },
-        { file: 'capplan_us_model12.html', url: '/capplan_us_model12.html', benefit: 'What is the minimum price we should accept to sell this asset?' },
-        { file: 'capplan_us_model13.html', url: '/capplan_us_model13.html', benefit: 'What is the maximum we should pay to buy this asset?' }
+        { file: 'model1.html',  url: '/business/us/model1.html',  benefit: 'Does this capital investment meet our required return?' },
+        { file: 'model2.html',  url: '/business/us/model2.html',  benefit: 'Which asset gives the best return on investment?' },
+        { file: 'model3.html',  url: '/business/us/model3.html',  benefit: 'Does replacing this asset now make financial sense?' },
+        { file: 'model4.html',  url: '/business/us/model4.html',  benefit: 'Which replacement option gives us the best financial outcome?' },
+        { file: 'model5.html',  url: '/business/us/model5.html',  benefit: 'What is the optimal period to replace this asset?' },
+        { file: 'model6.html',  url: '/business/us/model6.html',  benefit: 'What is the minimum lease payment to charge that will recover our costs?' },
+        { file: 'model7.html',  url: '/business/us/model7.html',  benefit: 'What is the minimum hourly rate we need to charge for equipment rental?' },
+        { file: 'model8.html',  url: '/business/us/model8.html',  benefit: 'What is the minimum hourly rate we need to charge for equipment rental with operator?' },
+        { file: 'model9.html',  url: '/business/us/model9.html',  benefit: 'Should we lease or purchase this asset?' },
+        { file: 'model10.html', url: '/business/us/model10.html', benefit: 'Does a sale and leaseback on this asset make financial sense?' },
+        { file: 'model11.html', url: '/business/us/model11.html', benefit: 'What is this lease costing us as a financing rate?' },
+        { file: 'model12.html', url: '/business/us/model12.html', benefit: 'What is the minimum price we should accept to sell this asset?' },
+        { file: 'model13.html', url: '/business/us/model13.html', benefit: 'What is the maximum we should pay to buy this asset?' }
       ]
     },
     business_intl: {
@@ -75,19 +75,19 @@
       color:   '#1B3F6E',
       homeUrl: '/business/international/',
       models: [
-        { file: 'capplan_model1.html',  url: '/capplan_model1.html',  benefit: 'Does this capital investment meet our required return?' },
-        { file: 'capplan_model2.html',  url: '/capplan_model2.html',  benefit: 'Which asset gives the best return on investment?' },
-        { file: 'capplan_model3.html',  url: '/capplan_model3.html',  benefit: 'Does replacing this asset now make financial sense?' },
-        { file: 'capplan_model4.html',  url: '/capplan_model4.html',  benefit: 'Which replacement option gives us the best financial outcome?' },
-        { file: 'capplan_model5.html',  url: '/capplan_model5.html',  benefit: 'What is the optimal period to replace this asset?' },
-        { file: 'capplan_model6.html',  url: '/capplan_model6.html',  benefit: 'What is the minimum lease payment to charge that will recover our costs?' },
-        { file: 'capplan_model7.html',  url: '/capplan_model7.html',  benefit: 'What is the minimum hourly rate we need to charge for equipment rental?' },
-        { file: 'capplan_model8.html',  url: '/capplan_model8.html',  benefit: 'What is the minimum hourly rate we need to charge for equipment rental with operator?' },
-        { file: 'capplan_model9.html',  url: '/capplan_model9.html',  benefit: 'Should we lease or purchase this asset?' },
-        { file: 'capplan_model10.html', url: '/capplan_model10.html', benefit: 'Does a sale and leaseback on this asset make financial sense?' },
-        { file: 'capplan_model11.html', url: '/capplan_model11.html', benefit: 'What is this lease costing us as a financing rate?' },
-        { file: 'capplan_model12.html', url: '/capplan_model12.html', benefit: 'What is the minimum price we should accept to sell this asset?' },
-        { file: 'capplan_model13.html', url: '/capplan_model13.html', benefit: 'What is the maximum we should pay to buy this asset?' }
+        { file: 'model1.html',  url: '/business/international/model1.html',  benefit: 'Does this capital investment meet our required return?' },
+        { file: 'model2.html',  url: '/business/international/model2.html',  benefit: 'Which asset gives the best return on investment?' },
+        { file: 'model3.html',  url: '/business/international/model3.html',  benefit: 'Does replacing this asset now make financial sense?' },
+        { file: 'model4.html',  url: '/business/international/model4.html',  benefit: 'Which replacement option gives us the best financial outcome?' },
+        { file: 'model5.html',  url: '/business/international/model5.html',  benefit: 'What is the optimal period to replace this asset?' },
+        { file: 'model6.html',  url: '/business/international/model6.html',  benefit: 'What is the minimum lease payment to charge that will recover our costs?' },
+        { file: 'model7.html',  url: '/business/international/model7.html',  benefit: 'What is the minimum hourly rate we need to charge for equipment rental?' },
+        { file: 'model8.html',  url: '/business/international/model8.html',  benefit: 'What is the minimum hourly rate we need to charge for equipment rental with operator?' },
+        { file: 'model9.html',  url: '/business/international/model9.html',  benefit: 'Should we lease or purchase this asset?' },
+        { file: 'model10.html', url: '/business/international/model10.html', benefit: 'Does a sale and leaseback on this asset make financial sense?' },
+        { file: 'model11.html', url: '/business/international/model11.html', benefit: 'What is this lease costing us as a financing rate?' },
+        { file: 'model12.html', url: '/business/international/model12.html', benefit: 'What is the minimum price we should accept to sell this asset?' },
+        { file: 'model13.html', url: '/business/international/model13.html', benefit: 'What is the maximum we should pay to buy this asset?' }
       ]
     }
   };
@@ -98,10 +98,9 @@
     var suite;
     if (path.indexOf('/personal/') !== -1) {
       suite = SUITES.personal;
-    } else if (path.indexOf('/us/') !== -1 || path.indexOf('capplan_us_model') !== -1) {
+    } else if (path.indexOf('/us/') !== -1) {
       suite = SUITES.business_us;
-    } else if (path.indexOf('/international/') !== -1 ||
-               (path.indexOf('capplan_model') !== -1 && path.indexOf('capplan_us_model') === -1)) {
+    } else if (path.indexOf('/international/') !== -1) {
       suite = SUITES.business_intl;
     }
     if (!suite) return null;
