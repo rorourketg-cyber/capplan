@@ -49,7 +49,7 @@ Creator: Bob (contact via reply-to on emails; email address is private — never
 | Personal | $12/month | $10/month | $120/year |
 
 **Trial incentive prices — email delivery only, never on public pages:**
-- Business: $97/year first year, renews at $360/year
+- Business: $179/year first year, renews at $360/year
 - Personal: $52/year first year, renews at $120/year
 
 **Bundle (Business subscribers only):** Add Personal for $97/year
