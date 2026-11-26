@@ -4,1015 +4,672 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CapPlan · Personal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap">
 <style>
 :root {
-  --green:#2E7D52; --green-mid:#2A6B47; --green-warm:#3D8B5A; --green-soft:rgba(46,125,82,0.09);
-  --blue:#1B3F6E; --blue-soft:rgba(27,63,110,0.09);
-  --gold:#C9A84C;
-  --surface:#F7F8FA; --panel:#ffffff; --border:#E2E6EC;
+  --teal:#2E7D52; --teal-mid:#3D8B5A; --teal-deep:#1A5234; --teal-soft:rgba(46,125,82,0.08);
+  --gold:#C9A84C; --gold-soft:rgba(201,168,76,0.12);
+  --surface:#F4F8F5; --panel:#ffffff; --border:#D8E8DC; --border-strong:#B4CFC0;
   --t1:#0F1D2E; --t2:#4A5568; --t3:#8A96A6;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--surface);color:var(--t1);line-height:1.5}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--surface);color:var(--t1);line-height:1.5;font-size:15px}
 a{color:inherit;text-decoration:none}
+img{max-width:100%}
 
-/* HEADER */
-.site-header{position:sticky;top:0;z-index:100;background:var(--green);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;box-shadow:0 2px 8px rgba(0,0,0,0.18)}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-mark{width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:16px;font-weight:700;color:#fff}
-.logo-text{font-family:Georgia,serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.2px}
-.logo-sub{font-size:11px;color:rgba(255,255,255,0.65);font-weight:400;letter-spacing:0.5px;margin-top:1px}
-.hdr-right{display:flex;align-items:center;gap:16px}
-.hdr-back{font-size:13px;color:rgba(255,255,255,0.75);display:flex;align-items:center;gap:5px;transition:color 0.15s}
+/* ── HEADER ─────────────────────────────────────────────────────── */
+.hdr{position:sticky;top:0;z-index:100;background:var(--teal);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:58px;box-shadow:0 2px 10px rgba(0,0,0,0.18)}
+.hdr-logo{display:flex;align-items:center;gap:10px}
+.hdr-mark{width:34px;height:34px;background:rgba(255,255,255,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#fff}
+.hdr-name{font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.2px}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,0.55);font-weight:500;letter-spacing:0.4px;margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:14px}
+.hdr-back{font-size:13px;color:rgba(255,255,255,0.70);display:flex;align-items:center;gap:5px;transition:color .15s;cursor:pointer}
 .hdr-back:hover{color:#fff}
-/* Member header actions — hidden until auth check completes */
+.hdr-signin{font-size:13px;font-weight:600;color:rgba(255,255,255,0.80);background:none;border:1.5px solid rgba(255,255,255,0.28);border-radius:6px;padding:6px 14px;cursor:pointer;transition:all .15s}
+.hdr-signin:hover{color:#fff;border-color:rgba(255,255,255,0.65);background:rgba(255,255,255,0.09)}
+.hdr-trial{font-size:13px;font-weight:700;color:var(--teal);background:#fff;border:none;border-radius:6px;padding:6px 14px;cursor:pointer;transition:filter .15s}
+.hdr-trial:hover{filter:brightness(0.93)}
 .hdr-member{display:none;align-items:center;gap:12px}
-.hdr-member.visible{display:flex}
-.hdr-member-name{font-size:13px;color:rgba(255,255,255,0.85)}
-.hdr-manage-btn{font-size:13px;color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:5px 12px;transition:all 0.15s;background:none;cursor:pointer}
-.hdr-manage-btn:hover{color:#fff;border-color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.1)}
-.hdr-signout-btn{font-size:13px;color:rgba(255,255,255,0.55);background:none;border:none;cursor:pointer;padding:0;transition:color 0.15s}
-.hdr-signout-btn:hover{color:rgba(255,255,255,0.85)}
+.hdr-member.vis{display:flex}
+.hdr-mname{font-size:13px;color:rgba(255,255,255,0.80);font-weight:500}
+.hdr-manage{font-size:13px;color:rgba(255,255,255,0.70);border:1.5px solid rgba(255,255,255,0.28);border-radius:6px;padding:6px 14px;cursor:pointer;background:none;transition:all .15s}
+.hdr-manage:hover{color:#fff;border-color:rgba(255,255,255,0.65);background:rgba(255,255,255,0.09)}
+.hdr-signout{font-size:13px;color:rgba(255,255,255,0.45);background:none;border:none;cursor:pointer;padding:0;transition:color .15s}
+.hdr-signout:hover{color:rgba(255,255,255,0.80)}
 
-/* MEMBER WELCOME BANNER — shown instead of edition banner for subscribers */
-.member-banner{display:none;background:var(--panel);border-bottom:2px solid var(--green);padding:24px 24px 20px}
-.member-banner.visible{display:block}
-.member-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.member-greeting h1{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--t1);margin-bottom:4px}
-.member-greeting p{font-size:14px;color:var(--t2)}
-.member-status{display:flex;align-items:center;gap:8px;background:rgba(46,125,82,0.07);border:1px solid rgba(46,125,82,0.18);border-radius:8px;padding:10px 16px}
-.member-status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
-.member-status-text{font-size:13px;color:var(--green-warm);font-weight:600}
+/* ── MEMBER BANNER ───────────────────────────────────────────────── */
+.mbr-banner{display:none;background:var(--panel);border-bottom:2px solid var(--teal);padding:22px 24px}
+.mbr-banner.vis{display:block}
+.mbr-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.mbr-greeting h2{font-family:'Playfair Display',Georgia,serif;font-size:21px;color:var(--t1);margin-bottom:3px}
+.mbr-greeting p{font-size:14px;color:var(--t2)}
+.mbr-badge{display:flex;align-items:center;gap:8px;background:var(--teal-soft);border:1px solid rgba(46,125,82,0.18);border-radius:8px;padding:10px 16px}
+.mbr-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.mbr-status{font-size:13px;color:var(--teal-mid);font-weight:600}
 
-/* EDITION BANNER — shown for non-members */
-.edition-banner{background:var(--panel);border-bottom:1px solid var(--border);padding:28px 24px 24px}
-.edition-inner{max-width:900px;margin:0 auto}
-.edition-banner h1{font-family:Georgia,serif;font-size:26px;font-weight:700;color:var(--t1);margin-bottom:6px}
-.edition-banner .desc{font-size:15px;color:var(--t2);margin-bottom:14px}
-.pills{display:flex;flex-wrap:wrap;gap:8px}
-.pill{display:inline-block;padding:4px 12px;background:var(--green-soft);color:var(--green-warm);border:1px solid rgba(46,125,82,0.18);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:0.2px}
+/* ── HERO ──────────────────────────────────────────────────────── */
+.hero{background:var(--panel);border-bottom:1px solid var(--border);padding:32px 24px 28px}
+.hero-inner{max-width:900px;margin:0 auto}
+.hero h1{font-family:'Playfair Display',Georgia,serif;font-size:28px;color:var(--t1);margin-bottom:7px}
+.hero p{font-size:15px;color:var(--t2);margin-bottom:16px;max-width:620px}
+.pills{display:flex;flex-wrap:wrap;gap:7px}
+.pill{padding:4px 12px;background:var(--teal-soft);color:var(--teal-mid);border:1px solid rgba(46,125,82,0.15);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:0.2px}
 
-/* FINDER */
-.finder-section{background:rgba(46,125,82,0.05);border-bottom:1px solid rgba(46,125,82,0.10);padding:40px 24px}
-.finder-inner{max-width:780px;margin:0 auto}
-.finder-headline{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--t1);margin-bottom:6px}
-.finder-sub{font-size:15px;color:var(--t2);margin-bottom:28px}
-.breadcrumb{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:var(--t3);flex-wrap:wrap}
-.bc-item{color:var(--green-warm);cursor:pointer}
+/* ── VIDEO SLOT ──────────────────────────────────────────────────── */
+.video-wrap{background:var(--panel);border-bottom:1px solid var(--border);padding:30px 24px}
+.video-inner{max-width:780px;margin:0 auto}
+.video-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+.video-box{position:relative;width:100%;aspect-ratio:16/9;background:var(--teal-deep);border-radius:10px;overflow:hidden}
+.video-box iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+.video-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:rgba(255,255,255,0.5);font-size:13px}
+
+/* ── MAIN LAYOUT ─────────────────────────────────────────────────── */
+.main-wrap{max-width:1060px;margin:0 auto;padding:36px 24px 48px;display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start}
+@media(max-width:820px){.main-wrap{grid-template-columns:1fr}}
+
+/* ── FINDER ──────────────────────────────────────────────────────── */
+.finder-wrap{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 2px 14px rgba(46,125,82,0.07)}
+.finder-head{background:linear-gradient(135deg,var(--teal-deep) 0%,var(--teal) 100%);padding:22px 26px}
+.finder-head h2{font-family:'Playfair Display',Georgia,serif;font-size:20px;color:#fff;margin-bottom:4px}
+.finder-head p{font-size:13px;color:rgba(255,255,255,0.72)}
+.finder-body{padding:20px}
+
+/* Step indicator */
+.step-track{display:flex;align-items:center;justify-content:flex-start;gap:0;margin-bottom:18px;flex-wrap:wrap}
+.st{display:flex;align-items:center;gap:7px;padding:5px 12px;border-radius:16px;font-size:12px;font-weight:600;color:var(--t3);transition:all .2s}
+.st.done{color:var(--teal)}
+.st.active{background:var(--teal);color:#fff}
+.st-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;background:rgba(0,0,0,0.07);flex-shrink:0}
+.st.active .st-num{background:rgba(255,255,255,0.22)}
+.st.done .st-num{background:var(--teal-soft);color:var(--teal)}
+.st-sep{width:24px;height:1px;background:var(--border)}
+
+/* Breadcrumb */
+.bc{display:flex;align-items:center;gap:7px;margin-bottom:14px;font-size:13px;color:var(--t3);flex-wrap:wrap;min-height:22px}
+.bc-item{color:var(--teal-mid);cursor:pointer;font-weight:500}
 .bc-item:hover{text-decoration:underline}
-.bc-sep{color:var(--border)}
+.bc-sep{color:var(--border-strong)}
 
-/* STEP PANEL */
-.step-panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(46,125,82,0.07)}
-.step-header{background:var(--green);color:#fff;padding:18px 24px}
-.step-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:4px}
-.step-q{font-family:Georgia,serif;font-size:18px;font-weight:700}
-.step-sub{font-size:13px;color:rgba(255,255,255,0.75);margin-top:4px}
-.choices-list{padding:12px;display:flex;flex-direction:column;gap:8px}
-.choice-btn{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border:1.5px solid var(--border);border-radius:9px;background:var(--surface);cursor:pointer;text-align:left;transition:border-color 0.15s,background 0.15s,box-shadow 0.15s;width:100%}
-.choice-btn:hover{border-color:var(--green-warm);background:var(--green-soft);box-shadow:0 2px 8px rgba(46,125,82,0.09)}
-.choice-icon{font-size:22px;flex-shrink:0;margin-top:1px}
-.choice-title{font-size:15px;font-weight:600;color:var(--t1);display:block}
-.choice-desc{font-size:13px;color:var(--t2);margin-top:2px;display:block}
+/* Question card */
+.q-card{border:1.5px solid var(--border);border-radius:10px;overflow:hidden;animation:fadeUp .22s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.q-hdr{background:var(--teal-soft);border-bottom:1px solid var(--border);padding:14px 18px}
+.q-label{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--teal-mid);margin-bottom:3px}
+.q-text{font-family:'Playfair Display',Georgia,serif;font-size:16px;color:var(--t1)}
+.q-choices{padding:10px;display:flex;flex-direction:column;gap:7px}
+.choice-btn{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;text-align:left;transition:border-color .14s,background .14s,box-shadow .14s;width:100%}
+.choice-btn:hover{border-color:var(--teal-mid);background:var(--teal-soft);box-shadow:0 2px 8px rgba(46,125,82,0.09)}
+.ch-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.ch-title{font-size:14px;font-weight:600;color:var(--t1);display:block;margin-bottom:2px}
+.ch-desc{font-size:12px;color:var(--t2)}
 
-/* RESULT CARD */
-.result-card{border-radius:12px;overflow:hidden;border:1.5px solid var(--border);box-shadow:0 4px 20px rgba(46,125,82,0.10);background:var(--panel)}
-.result-card-header{background:var(--green);color:#fff;padding:20px 24px;display:flex;align-items:flex-start;gap:14px}
-.model-badge{background:rgba(255,255,255,0.18);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;letter-spacing:0.5px;flex-shrink:0;margin-top:3px;font-family:system-ui,sans-serif}
-.model-name{font-family:Georgia,serif;font-size:20px;font-weight:700}
-.model-tagline{font-size:13px;color:rgba(255,255,255,0.80);margin-top:4px}
-.result-body{padding:22px 24px}
-.result-desc{font-size:15px;color:var(--t2);margin-bottom:20px;line-height:1.6}
-.suite-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(46,125,82,0.07);color:var(--green-warm);border:1px solid rgba(46,125,82,0.15);border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600;margin-bottom:16px}
-.suite-badge::before{content:'✓';font-weight:700}
-.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;border:none;width:100%;background:var(--green);color:#fff;box-shadow:0 4px 16px rgba(46,125,82,0.25);transition:filter 0.15s,transform 0.1s}
-.btn-primary:hover{filter:brightness(1.10);transform:translateY(-1px)}
-.free-note{text-align:center;font-size:13px;color:var(--t3);margin-top:12px}
-.free-note a{color:var(--green-warm);font-weight:600}
-.free-note a:hover{text-decoration:underline}
-.also-suite{margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
-.also-label{font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px}
-.also-chips{display:flex;flex-wrap:wrap;gap:8px}
-.also-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:13px;font-weight:500;background:var(--green-soft);color:var(--green-warm);border:1px solid rgba(46,125,82,0.18);cursor:pointer;transition:background 0.15s}
+/* Result card */
+.result-card{border:1.5px solid var(--border);border-radius:10px;overflow:hidden;animation:fadeUp .25s ease}
+.result-head{background:var(--teal);padding:18px 20px}
+.result-title{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#fff;margin-bottom:3px}
+.result-tagline{font-size:12px;color:rgba(255,255,255,0.72)}
+.result-body{padding:18px 20px}
+.result-desc{font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:14px}
+.result-feat-label{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:9px}
+.result-feats{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.result-feat{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--t2)}
+.feat-chk{width:17px;height:17px;border-radius:50%;background:var(--teal-soft);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;margin-top:1px}
+.btn-open{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:12px 20px;background:var(--teal);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 3px 14px rgba(46,125,82,0.22);transition:filter .15s,transform .1s}
+.btn-open:hover{filter:brightness(1.10);transform:translateY(-1px)}
+.btn-subscribe{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:12px 20px;background:var(--gold);color:#1A3020;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 3px 14px rgba(201,168,76,0.28);transition:filter .15s,transform .1s}
+.btn-subscribe:hover{filter:brightness(1.07);transform:translateY(-1px)}
+.suite-incl{display:flex;align-items:center;gap:6px;background:var(--teal-soft);color:var(--teal-mid);border:1px solid rgba(46,125,82,0.15);border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600;margin-bottom:12px}
+.suite-incl::before{content:'✓';font-weight:800}
+.free-badge{display:inline-flex;align-items:center;gap:5px;background:#FFFBEB;border:1px solid #F59E0B;border-radius:5px;padding:2px 9px;font-size:11px;font-weight:700;color:#92400E;margin-left:8px;vertical-align:middle}
+.result-free-note{font-size:12px;color:var(--t3);margin-top:10px;text-align:center}
+.result-free-note a{color:var(--teal-mid);font-weight:600}
+.also-wrap{margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+.also-label{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:9px}
+.also-chips{display:flex;flex-wrap:wrap;gap:6px}
+.also-chip{display:inline-flex;align-items:center;padding:5px 11px;border-radius:16px;font-size:12px;font-weight:500;background:var(--teal-soft);color:var(--teal-mid);border:1px solid rgba(46,125,82,0.16);cursor:pointer;transition:background .14s}
 .also-chip:hover{background:rgba(46,125,82,0.15)}
-.back-inline{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--t3);cursor:pointer;background:none;border:none;padding:0;margin-top:14px}
-.back-inline:hover{color:var(--green-warm)}
+.back-link{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--t3);cursor:pointer;background:none;border:none;padding:0;margin-top:12px;transition:color .14s}
+.back-link:hover{color:var(--teal-mid)}
+.start-over{text-align:center;margin-top:12px}
+.start-over button{background:none;border:none;font-size:12px;color:var(--t3);cursor:pointer;padding:6px 12px;border-radius:5px;transition:color .14s}
+.start-over button:hover{color:var(--teal);background:var(--teal-soft)}
 
-/* DIVIDER */
-.divider{height:1px;background:var(--border)}
+/* ── RIGHT COLUMN ─────────────────────────────────────────────────── */
+.right-col{display:flex;flex-direction:column;gap:20px}
 
-/* PRICING */
-.pricing-section{background:var(--panel);padding:44px 24px}
-.pricing-inner{max-width:820px;margin:0 auto}
-.pricing-headline{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--t1);text-align:center;margin-bottom:6px}
-.pricing-sub{font-size:15px;color:var(--t2);text-align:center;margin-bottom:24px}
-.billing-toggle{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px}
-.toggle-label{font-size:14px;color:var(--t2);font-weight:500}
-.toggle-label.active{color:var(--t1);font-weight:700}
-.toggle-wrap{position:relative;width:48px;height:26px;cursor:pointer}
-.toggle-wrap input{opacity:0;width:0;height:0;position:absolute}
-.toggle-track{position:absolute;inset:0;border-radius:13px;background:#CBD5E0;transition:background 0.2s}
-.toggle-wrap input:checked + .toggle-track{background:var(--green)}
-.toggle-knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:transform 0.2s;pointer-events:none}
-.toggle-wrap input:checked ~ .toggle-knob{transform:translateX(22px)}
-.annual-badge{background:#ECFDF5;color:#166534;border:1px solid #BBF7D0;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700}
-.pricing-tiles{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-@media(max-width:620px){.pricing-tiles{grid-template-columns:1fr}}
-.tile{border:1.5px solid var(--border);border-radius:14px;padding:28px 24px;background:var(--surface);display:flex;flex-direction:column}
-.tile.featured{border-color:var(--green);background:var(--panel);box-shadow:0 4px 24px rgba(46,125,82,0.12);position:relative}
-.popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:3px 16px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap}
-.tile-tier{font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
-.tile-price{font-family:Georgia,serif;font-size:36px;font-weight:700;color:var(--t1)}
-.tile-period{font-size:14px;color:var(--t3)}
-.tile-note{font-size:13px;color:var(--t3);margin-bottom:18px;min-height:20px}
-.feat-list{list-style:none;margin-bottom:24px;flex:1;display:flex;flex-direction:column;gap:9px}
-.feat-list li{display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--t2)}
-.feat-list .chk{color:var(--green);font-weight:700;flex-shrink:0}
-.feat-name{font-weight:600;color:var(--t1)}
-.btn-tile{display:block;width:100%;padding:13px 20px;border-radius:8px;font-size:15px;font-weight:700;text-align:center;cursor:pointer;border:none;transition:filter 0.15s,transform 0.1s}
-.btn-tile.primary{background:var(--green);color:#fff;box-shadow:0 3px 12px rgba(46,125,82,0.22)}
-.btn-tile.primary:hover{filter:brightness(1.10);transform:translateY(-1px)}
-.btn-tile.secondary{background:var(--panel);color:var(--t2);border:1.5px solid var(--border)}
-.btn-tile.secondary:hover{border-color:var(--green-warm);color:var(--green-warm)}
-.free-forever{font-size:12px;color:var(--t3);text-align:center;margin-top:10px}
+/* Model browser */
+.model-browser{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 2px 14px rgba(46,125,82,0.06)}
+.mb-head{background:linear-gradient(135deg,var(--teal-deep) 0%,var(--teal) 100%);padding:18px 20px}
+.mb-head h3{font-family:'Playfair Display',Georgia,serif;font-size:17px;color:#fff;margin-bottom:3px}
+.mb-head p{font-size:12px;color:rgba(255,255,255,0.65)}
+.mb-body{padding:16px}
+.mb-select-wrap{position:relative;margin-bottom:14px}
+.mb-select{width:100%;padding:11px 36px 11px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--t1);appearance:none;cursor:pointer;transition:border-color .14s}
+.mb-select:focus{outline:none;border-color:var(--teal-mid)}
+.mb-caret{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--t3)}
+.mb-preview{display:none;border:1.5px solid var(--border);border-radius:9px;overflow:hidden}
+.mb-preview.show{display:block}
+.mbp-head{background:var(--teal-soft);border-bottom:1px solid var(--border);padding:12px 16px}
+.mbp-title{font-weight:700;color:var(--t1);font-size:14px;margin-bottom:2px}
+.mbp-tagline{font-size:12px;color:var(--t2)}
+.mbp-body{padding:12px 16px}
+.mbp-desc{font-size:13px;color:var(--t2);line-height:1.55;margin-bottom:12px}
+.mbp-btn{display:block;width:100%;padding:10px 16px;background:var(--teal);color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:filter .15s}
+.mbp-btn:hover{filter:brightness(1.10)}
+.mbp-btn.sub{background:var(--gold);color:#1A3020}
+.mbp-free{font-size:11px;color:var(--t3);text-align:center;margin-top:7px}
 
-/* FOOTER */
-.site-footer{background:#0F1D2E;padding:28px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.footer-brand{font-family:Georgia,serif;font-size:15px;font-weight:700;color:#fff}
-.footer-links{display:flex;gap:20px}
-.footer-links a{font-size:13px;color:rgba(255,255,255,0.5)}
-.footer-links a:hover{color:rgba(255,255,255,0.85)}
-.footer-copy{font-size:12px;color:rgba(255,255,255,0.35)}
+/* Trial card */
+.trial-card{background:linear-gradient(135deg,var(--teal-deep) 0%,var(--teal) 100%);border-radius:14px;padding:22px 20px;color:#fff}
+.trial-label{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:10px}
+.trial-card h3{font-family:'Playfair Display',Georgia,serif;font-size:19px;margin-bottom:8px}
+.trial-card p{font-size:13px;color:rgba(255,255,255,0.72);margin-bottom:16px;line-height:1.5}
+.btn-trial{display:block;width:100%;padding:12px;background:#fff;color:var(--teal);border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:filter .15s}
+.btn-trial:hover{filter:brightness(0.94)}
+.trial-note{font-size:11px;color:rgba(255,255,255,0.45);text-align:center;margin-top:9px}
+
+/* Pricing card */
+.pricing-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 2px 14px rgba(46,125,82,0.06)}
+.pc-head{padding:16px 20px;border-bottom:1px solid var(--border)}
+.pc-head h3{font-family:'Playfair Display',Georgia,serif;font-size:16px;color:var(--t1);margin-bottom:3px}
+.pc-head p{font-size:12px;color:var(--t2)}
+.billing-toggle{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface)}
+.tog-label{font-size:13px;color:var(--t2);font-weight:500}
+.tog-label.active{color:var(--t1);font-weight:700}
+.tog{position:relative;width:44px;height:24px;cursor:pointer}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-track{position:absolute;inset:0;border-radius:12px;background:#CBD5E0;transition:background .2s}
+.tog input:checked + .tog-track{background:var(--teal)}
+.tog-knob{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:transform .2s;pointer-events:none}
+.tog input:checked ~ .tog-knob{transform:translateX(20px)}
+.save-badge{background:#ECFDF5;color:#166534;border:1px solid #A7F3D0;border-radius:16px;padding:2px 9px;font-size:11px;font-weight:700}
+.pc-prices{padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+.price-row{display:flex;align-items:baseline;justify-content:space-between;padding:10px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface)}
+.price-row.featured{border-color:var(--teal);background:var(--teal-soft)}
+.pr-label{font-size:13px;font-weight:600;color:var(--t2)}
+.pr-label.featured{color:var(--teal-mid)}
+.pr-price{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:var(--t1)}
+.pr-period{font-size:12px;color:var(--t3);margin-left:3px}
+.pr-note{font-size:11px;color:var(--t3);text-align:center;margin-top:2px}
+.pc-cta{padding:0 20px 16px}
+.btn-pc-sub{display:block;width:100%;padding:12px;background:var(--teal);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:filter .15s,transform .1s}
+.btn-pc-sub:hover{filter:brightness(1.10);transform:translateY(-1px)}
+.pc-free{font-size:12px;color:var(--t3);text-align:center;margin-top:9px}
+.pc-free a{color:var(--teal-mid);font-weight:600}
+
+/* ── FOOTER ──────────────────────────────────────────────────────── */
+.site-footer{background:var(--teal-deep);padding:26px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.ft-brand{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#fff}
+.ft-links{display:flex;gap:18px}
+.ft-links a{font-size:13px;color:rgba(255,255,255,0.45);transition:color .14s}
+.ft-links a:hover{color:rgba(255,255,255,0.80)}
+.ft-copy{font-size:12px;color:rgba(255,255,255,0.28)}
+
+@media(max-width:600px){
+  .hero h1{font-size:22px}
+  .hdr-trial{display:none}
+  .main-wrap{padding:20px 16px 36px;gap:20px}
+  .step-track{gap:4px}
+}
 </style>
 </head>
 <body>
 
-<header class="site-header">
-  <div class="logo">
-    <div class="logo-mark">C</div>
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-logo">
+    <div class="hdr-mark">C</div>
     <div>
-      <div class="logo-text">CapPlan</div>
-      <div class="logo-sub">Personal</div>
+      <div class="hdr-name">CapPlan</div>
+      <div class="hdr-sub">Personal</div>
     </div>
   </div>
   <div class="hdr-right">
-    <!-- Shown only for active subscribers -->
-    <div class="hdr-member" id="hdr-member">
-      <span class="hdr-member-name" id="hdr-member-name"></span>
-      <button class="hdr-manage-btn" onclick="manageSubscription()">Manage subscription</button>
-      <button class="hdr-signout-btn" onclick="signOut()">Sign out</button>
-    </div>
-    <!-- Shown for non-members -->
     <a href="../index.html" class="hdr-back" id="hdr-back">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8.5 2L4 7l4.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Back to home
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M7.5 2L3 6.5l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Home
     </a>
+    <button class="hdr-signin" id="hdr-signin" onclick="signIn()">Sign in</button>
+    <button class="hdr-trial" id="hdr-trial" onclick="startTrial()">Start free trial</button>
+    <div class="hdr-member" id="hdr-member">
+      <span class="hdr-mname" id="hdr-mname"></span>
+      <button class="hdr-manage" onclick="manageSubscription()">Manage subscription</button>
+      <button class="hdr-signout" onclick="signOut()">Sign out</button>
+    </div>
   </div>
 </header>
 
-<!-- MEMBER WELCOME BANNER (subscribers only) -->
-<div class="member-banner" id="member-banner">
-  <div class="member-inner">
-    <div class="member-greeting">
-      <h1>Welcome back</h1>
-      <p>Use the finder below to open any model in your Personal Suite.</p>
+<!-- MEMBER BANNER -->
+<div class="mbr-banner" id="mbr-banner">
+  <div class="mbr-inner">
+    <div class="mbr-greeting">
+      <h2>Welcome back</h2>
+      <p>Use the finder or browse the full model list — your subscription covers all 9 models.</p>
     </div>
-    <div class="member-status">
-      <div class="member-status-dot"></div>
-      <span class="member-status-text">Personal Suite — Active</span>
+    <div class="mbr-badge">
+      <div class="mbr-dot"></div>
+      <span class="mbr-status">Personal Suite &mdash; Active</span>
     </div>
   </div>
 </div>
 
-<!-- EDITION BANNER (non-members) -->
-<div class="edition-banner" id="edition-banner">
-  <div class="edition-inner">
+<!-- HERO -->
+<div class="hero" id="hero-section">
+  <div class="hero-inner">
     <h1>CapPlan Personal</h1>
-    <p class="desc">Practical financial models for personal asset decisions — buying, replacing, leasing, selling, and negotiating. No financial background needed.</p>
+    <p>Financial decision models for major personal purchases — cars, appliances, equipment, solar. No financial background required.</p>
     <div class="pills">
-      <span class="pill">Buy vs. lease</span>
-      <span class="pill">Replacement timing</span>
-      <span class="pill">Negotiation tools</span>
-      <span class="pill">Works for any durable asset</span>
+      <span class="pill">Buy or lease</span>
+      <span class="pill">Replace or keep</span>
+      <span class="pill">Set a price floor or ceiling</span>
+      <span class="pill">No jargon</span>
     </div>
   </div>
 </div>
 
-<div class="finder-section">
-  <div class="finder-inner">
-    <div class="finder-headline" id="finder-headline">Find your CapPlan model</div>
-    <p class="finder-sub" id="finder-sub">Answer a couple of questions to see exactly which model handles your decision — and what it does.</p>
-    <div id="bc" class="breadcrumb" style="display:none"></div>
-    <div id="finder" class="step-panel"></div>
+<!-- VIDEO SLOT -->
+<div class="video-wrap">
+  <div class="video-inner">
+    <div class="video-label">See it in action</div>
+    <div class="video-box">
+      <!-- <iframe src="PLACEHOLDER_PERSONAL_VIDEO" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
+      <div class="video-ph">
+        <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="21" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><polygon points="18,14 34,22 18,30" fill="rgba(255,255,255,0.6)"/></svg>
+        <span>Video coming soon</span>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="divider" id="pricing-divider"></div>
+<!-- MAIN -->
+<div class="main-wrap">
 
-<div class="pricing-section" id="pricing-section">
-  <div class="pricing-inner">
-    <div class="pricing-headline">Simple, transparent pricing</div>
-    <p class="pricing-sub">Start free with the core model. Upgrade when you need the full suite.</p>
-
-    <div class="billing-toggle">
-      <span class="toggle-label active" id="lbl-mo">Monthly</span>
-      <label class="toggle-wrap">
-        <input type="checkbox" id="billing-chk" onchange="onBillingToggle()">
-        <div class="toggle-track"></div>
-        <div class="toggle-knob"></div>
-      </label>
-      <span class="toggle-label" id="lbl-yr">Annual &nbsp;<span class="annual-badge">Save $29/year</span></span>
+  <!-- LEFT: FINDER -->
+  <div class="finder-wrap">
+    <div class="finder-head">
+      <h2 id="finder-title">Find your model</h2>
+      <p id="finder-sub">Answer a few questions to see exactly which model handles your decision.</p>
     </div>
-
-    <div class="pricing-tiles">
-      <div class="tile">
-        <div class="tile-tier">Starter</div>
-        <div><span class="tile-price">$0</span><span class="tile-period"> / always free</span></div>
-        <p class="tile-note">Always free &mdash; no card required</p>
-        <ul class="feat-list">
-          <li><span class="chk">&#10003;</span><span><span class="feat-name">Should I Buy This?</span><br><span style="font-size:12px;color:var(--t3)">Full NPV analysis for any personal asset purchase</span></span></li>
-        </ul>
-        <button class="btn-tile secondary" onclick="openFreeModel()">Open free model</button>
-        <p class="free-forever">Free forever &mdash; no trial, no expiry</p>
-      </div>
-
-      <div class="tile featured">
-        <span class="popular-badge">Most popular</span>
-        <div class="tile-tier">Full Suite</div>
-        <div><span class="tile-price" id="suite-price">$12</span><span class="tile-period" id="suite-period"> / month</span></div>
-        <p class="tile-note" id="suite-note">&nbsp;</p>
-        <ul class="feat-list">
-          <li><span class="chk">&#10003;</span><span><span class="feat-name">All 9 personal models</span></span></li>
-          <li><span class="chk">&#10003;</span><span>Buy, compare, replace, lease, sell &amp; negotiate</span></li>
-          <li><span class="chk">&#10003;</span><span>Works for cars, appliances, boats, equipment &amp; more</span></li>
-          <li><span class="chk">&#10003;</span><span>Built-in benefit &amp; value estimation wizards</span></li>
-          <li><span class="chk">&#10003;</span><span>Save &amp; revisit analyses</span></li>
-        </ul>
-        <button class="btn-tile primary" onclick="checkoutFromPricing()">Get Full Suite</button>
+    <div class="finder-body">
+      <div class="step-track" id="step-track"></div>
+      <div id="bc" class="bc"></div>
+      <div id="finder-panel"></div>
+      <div class="start-over" id="start-over" style="display:none">
+        <button onclick="restart()">↩ Start over</button>
       </div>
     </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-col">
+
+    <!-- MODEL BROWSER -->
+    <div class="model-browser">
+      <div class="mb-head">
+        <h3>Browse all models</h3>
+        <p>Know what you need? Go straight there.</p>
+      </div>
+      <div class="mb-body">
+        <div class="mb-select-wrap">
+          <select class="mb-select" id="mb-select" onchange="onModelSelect(this.value)">
+            <option value="">Select a model&hellip;</option>
+            <option value="P1">Should I Buy This? &mdash; free</option>
+            <option value="P2">Which Option Should I Buy?</option>
+            <option value="P3">Should I Replace What I Own?</option>
+            <option value="P4">Which Replacement Is Best?</option>
+            <option value="P5">When Should I Replace It?</option>
+            <option value="P9">Should I Lease or Buy?</option>
+            <option value="P11">What Is This Lease Really Costing Me?</option>
+            <option value="P12">What's the Least I Should Accept?</option>
+            <option value="P13">What's the Most I Should Pay?</option>
+          </select>
+          <svg class="mb-caret" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="mb-preview" id="mb-preview">
+          <div id="mb-detail" style="display:none">
+            <div class="mbp-head">
+              <div class="mbp-title" id="mbp-title"></div>
+              <div class="mbp-tagline" id="mbp-tagline"></div>
+            </div>
+            <div class="mbp-body">
+              <div class="mbp-desc" id="mbp-desc"></div>
+              <button class="mbp-btn" id="mbp-btn" onclick="openFromBrowser()"></button>
+              <div class="mbp-free" id="mbp-free"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FREE TRIAL CARD -->
+    <div class="trial-card" id="trial-card">
+      <div class="trial-label">Free trial</div>
+      <h3>Try all 9 models free for 2 weeks</h3>
+      <p>No credit card required. All models open from day one. Cancel at any time.</p>
+      <button class="btn-trial" onclick="startTrial()">Start free trial &rarr;</button>
+      <div class="trial-note">2-week trial &middot; No card required</div>
+    </div>
+
+    <!-- PRICING CARD -->
+    <div class="pricing-card" id="pricing-card">
+      <div class="pc-head">
+        <h3>Simple pricing</h3>
+        <p>One plan. All 9 models. Cancel any time.</p>
+      </div>
+      <div class="billing-toggle">
+        <span class="tog-label active" id="tog-mo">Monthly</span>
+        <label class="tog">
+          <input type="checkbox" id="billing-tog" onchange="onBillingToggle()">
+          <div class="tog-track"></div>
+          <div class="tog-knob"></div>
+        </label>
+        <span class="tog-label" id="tog-yr">Annual&nbsp;<span class="save-badge" id="save-badge">Save $24</span></span>
+      </div>
+      <div class="pc-prices">
+        <div class="price-row">
+          <span class="pr-label">Starter &mdash; free forever</span>
+          <div><span class="pr-price">$0</span></div>
+        </div>
+        <div class="price-row featured">
+          <span class="pr-label featured">Full Suite</span>
+          <div><span class="pr-price" id="pc-price">$12</span><span class="pr-period" id="pc-period">/month</span></div>
+        </div>
+        <div class="pr-note" id="pc-note">&nbsp;</div>
+      </div>
+      <div class="pc-cta">
+        <button class="btn-pc-sub" onclick="checkoutFromPricing()">Get Full Suite &rarr;</button>
+        <div class="pc-free">Model 1 is <a href="#" onclick="openFreeModel();return false">always free</a> &mdash; no sign-up needed</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <footer class="site-footer">
-  <div class="footer-brand">CapPlan</div>
-  <div class="footer-links">
+  <div class="ft-brand">CapPlan</div>
+  <div class="ft-links">
     <a href="../index.html">Home</a>
     <a href="#">Privacy</a>
     <a href="#">Terms</a>
     <a href="#">Support</a>
   </div>
-  <div class="footer-copy">&copy; 2026 CapPlan. All rights reserved.</div>
-</footer>
-
-<script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
-<script src="../capplan-auth.js"></script>
-<script>
-var SUITE_ID = 'personal';
-var FREE_MODEL_FILE = 'personal1.html';
-var billing = 'monthly';
-var isMember = false; // set true after auth check confirms active subscription
-
-var MODELS = {
-  P1:  {id:'P1',  file:'personal1.html',  title:'Should I Buy This?',             tagline:'Is buying this asset worth the money?',                                    desc:'You\'re thinking about buying something — a car, appliance, boat, solar panels, or other durable asset. This model works out whether the purchase makes financial sense given what you\'ll get from it and what it will be worth when you\'re done.', free:true,  also:['P2','P9','P13']},
-  P2:  {id:'P2',  file:'personal2.html',  title:'Which Option Should I Buy?',     tagline:'I\'m choosing between options — which is the better financial choice?',      desc:'You\'ve narrowed it down to two or more candidates and want to compare them financially. Which car gives you more value for money? Does the premium model pay for itself over the base model?', free:false, also:['P1','P3','P13']},
-  P3:  {id:'P3',  file:'personal3.html',  title:'Should I Replace What I Own?',   tagline:'My current asset is ageing — is it time to replace it?',                   desc:'You own something and it\'s getting old, expensive to run, or simply behind the times. This model compares the cost of keeping what you have against the financial case for replacing it.', free:false, also:['P4','P5','P1']},
-  P4:  {id:'P4',  file:'personal4.html',  title:'Which Replacement Is Best?',     tagline:'I\'m replacing something — which option makes the most sense?',            desc:'You\'ve decided to replace your current asset and want to compare the alternatives. Which new model is the better financial choice, accounting for what you\'ll get for your old one?', free:false, also:['P3','P5','P2']},
-  P5:  {id:'P5',  file:'personal5.html',  title:'When Should I Replace It?',      tagline:'My asset is still working — but when is the right time to replace it?',    desc:'You\'re not sure whether to replace now, next year, or in five years. This model finds the financially optimal replacement interval — the age at which the cost of keeping the asset per year is minimised.', free:false, also:['P3','P4','P1']},
-  P9:  {id:'P9',  file:'personal9.html',  title:'Should I Lease or Buy?',         tagline:'I can lease or buy — which costs less?',                                   desc:'Leasing and buying both get you the use of the asset, but the costs work very differently. This model works out which option is cheaper in present value terms, and — if leasing costs more but you need to lease anyway — exactly how much extra you\'re paying.', free:false, also:['P11','P1','P13']},
-  P11: {id:'P11', file:'personal11.html', title:'What Is This Lease Really Costing Me?', tagline:'What interest rate is the lessor really charging?',              desc:'Lease payments can look attractive without revealing the financing cost embedded in them. This model works out the effective interest rate in any lease offer, so you can compare it to what you\'d pay if you borrowed to buy instead.', free:false, also:['P9','P1','P13']},
-  P12: {id:'P12', file:'personal12.html', title:'What\'s the Least I Should Accept?', tagline:'I\'m selling something — what\'s the minimum price I should accept?', desc:'When selling an asset you\'ve owned and used, the minimum acceptable price depends on what you originally paid, how much use you\'ve had from it, and your target return. This model calculates that floor price.', free:false, also:['P13','P3','P1']},
-  P13: {id:'P13', file:'personal13.html', title:'What\'s the Most I Should Pay?', tagline:'I\'m buying something — what\'s the maximum I should pay?',               desc:'Rather than evaluating a given price, this model works backwards from your required return to calculate the highest price that still makes the purchase worthwhile. That number is your private walk-away point in any negotiation.', free:false, also:['P12','P1','P9']},
-};
-
-var TREE = {
-  root: {q:'What kind of decision are you facing?', sub:'Tell us what\'s on your mind and we\'ll point you to the right model.', choices:[
-    {icon:'🛒', title:'Buying or acquiring something',      desc:'A car, appliance, boat, equipment, or other asset you\'re considering purchasing', next:'buying'},
-    {icon:'🔧', title:'Something I already own',            desc:'An asset I have now — deciding whether to replace it, or figuring out when to',    next:'owning'},
-    {icon:'📋', title:'I am considering a lease',           desc:'Comparing lease vs buying, or understanding what a lease offer is really costing', next:'leasing'},
-    {icon:'💰', title:'Negotiating a price',                desc:'Working out what to accept when selling, or the maximum I should pay when buying', next:'negotiating'},
-  ]},
-  buying: {q:'Are you comparing options, or evaluating one specific thing?', choices:[
-    {icon:'🎯', title:'Evaluating one specific asset',      desc:'I have one thing in mind and want to know if buying it makes financial sense',    next:'P1'},
-    {icon:'⚖️', title:'Comparing two or more options',     desc:'I\'m deciding between alternatives — which one is the better financial choice?',   next:'P2'},
-    {icon:'🤝', title:'Negotiating the purchase price',    desc:'I want to know the maximum I should pay before entering negotiations',             next:'P13'},
-  ]},
-  owning: {q:'What are you trying to decide about the asset you own?', choices:[
-    {icon:'🔄', title:'Whether to replace it now',         desc:'It\'s getting old or costly — should I replace it, or keep it going?',            next:'replacing'},
-    {icon:'📅', title:'When to replace it',                desc:'I know I\'ll replace it eventually — what\'s the financially optimal time?',       next:'P5'},
-    {icon:'💵', title:'What to sell it for',               desc:'I\'m planning to sell and want to know the minimum price I should accept',         next:'P12'},
-  ]},
-  replacing: {q:'Do you have a specific replacement in mind, or are you comparing options?', choices:[
-    {icon:'🔁', title:'One specific replacement',          desc:'I know what I\'d replace it with — I just need to know if the switch makes sense', next:'P3'},
-    {icon:'📊', title:'Comparing replacement options',     desc:'I have several candidates for the replacement and want to pick the best one',      next:'P4'},
-  ]},
-  leasing: {q:'What do you want to know about the lease?', choices:[
-    {icon:'⚖️', title:'Lease vs buying — which costs less?',      desc:'I can do either — I want to know which option is cheaper overall',              next:'P9'},
-    {icon:'🔍', title:'What this lease is really costing me',     desc:'I have a lease offer and want to know the effective interest rate embedded in it', next:'P11'},
-  ]},
-  negotiating: {q:'Are you on the buying side or the selling side?', choices:[
-    {icon:'💵', title:'I\'m selling — what\'s my minimum?',  desc:'What\'s the floor price I should accept to earn a fair return on my investment?', next:'P12'},
-    {icon:'🏷️', title:'I\'m buying — what\'s my maximum?', desc:'What\'s the highest price I should pay before walking away?',                      next:'P13'},
-  ]},
-};
-
-var path = [];
-
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-
-/* ── AUTH INIT ─────────────────────────────────────────────── */
-async function initPage() {
-  if (typeof CapPlanAuth === 'undefined') { renderFinder(); return; }
-
-  try {
-    var suites = await CapPlanAuth.getActiveSuites(); // returns array or null
-
-    if (suites && suites.includes('personal')) {
-      // ── MEMBER MODE ──
-      isMember = true;
-
-      // Header
-      document.getElementById('hdr-member').classList.add('visible');
-      document.getElementById('hdr-back').style.display = 'none';
-      var displayName = await CapPlanAuth.getDisplayName();
-      if (displayName) document.getElementById('hdr-member-name').textContent = displayName;
-
-      // Banners
-      document.getElementById('member-banner').classList.add('visible');
-      document.getElementById('edition-banner').style.display = 'none';
-
-      // Finder copy
-      document.getElementById('finder-headline').textContent = 'Open a model';
-      document.getElementById('finder-sub').textContent = 'Choose a decision type and open the model — your subscription covers all nine.';
-
-      // Hide pricing
-      document.getElementById('pricing-section').style.display = 'none';
-      document.getElementById('pricing-divider').style.display = 'none';
-    }
-    // else: not logged in or no personal subscription — keep default marketing view
-  } catch(e) {
-    console.warn('initPage error:', e);
-  }
-
-  renderFinder();
-}
-
-/* ── FINDER RENDER ─────────────────────────────────────────── */
-function renderFinder(){
-  var nodeKey = path.length ? path[path.length-1].next : 'root';
-  var bcEl = document.getElementById('bc');
-  var panelEl = document.getElementById('finder');
-
-  renderBreadcrumb(bcEl);
-
-  if(MODELS[nodeKey]){
-    renderResult(nodeKey, panelEl, false);
-    return;
-  }
-  var node = TREE[nodeKey];
-  if(!node) return;
-
-  var stepNum = path.length + 1;
-  var html = '<div class="step-header">';
-  html += '<div class="step-label">Step '+stepNum+'</div>';
-  html += '<div class="step-q">'+esc(node.q)+'</div>';
-  if(node.sub) html += '<div class="step-sub">'+esc(node.sub)+'</div>';
-  html += '</div><div class="choices-list">';
-  node.choices.forEach(function(c,i){
-    html += '<button class="choice-btn" onclick="pick('+i+')">';
-    html += '<span class="choice-icon">'+c.icon+'</span>';
-    html += '<span><span class="choice-title">'+esc(c.title)+'</span>';
-    html += '<span class="choice-desc">'+esc(c.desc)+'</span></span>';
-    html += '</button>';
-  });
-  html += '</div>';
-  panelEl.innerHTML = html;
-}
-
-function pick(i){
-  var nodeKey = path.length ? path[path.length-1].next : 'root';
-  var c = TREE[nodeKey].choices[i];
-  path.push({title:c.title, next:c.next});
-  renderFinder();
-}
-
-function renderResult(mid, el, isAlso){
-  var m = MODELS[mid];
-  var alsoHtml = '';
-  if(m.also && m.also.length){
-    alsoHtml = '<div class="also-suite"><div class="also-label">Also in Full Suite</div><div class="also-chips">';
-    m.also.forEach(function(aid){
-      var am = MODELS[aid];
-      if(am) alsoHtml += '<button class="also-chip" onclick="showAlso(\''+aid+'\')">'+esc(am.title)+'</button>';
-    });
-    alsoHtml += '</div></div>';
-  }
-  var backBtn = isAlso
-    ? '<button class="back-inline" onclick="renderFinder()">&#8592; Back to my result</button>'
-    : '<button class="back-inline" onclick="goBack()">&#8592; Different decision</button>';
-
-  var actionHtml;
-  if (m.free) {
-    // Free model — always just open it
-    actionHtml = '<button class="btn-primary" onclick="openFreeModel()">Open free model &rarr;</button>';
-  } else if (isMember) {
-    // Subscriber — open directly, no Stripe
-    actionHtml = '<button class="btn-primary" onclick="openModel(\''+esc(m.file)+'\')">Open '+esc(m.title)+' &rarr;</button>';
-  } else {
-    // Non-subscriber — show subscribe CTA
-    actionHtml =
-      '<div class="suite-badge">This model is included in Full Suite</div><br>'+
-      '<button class="btn-primary" onclick="startCheckout(\''+esc(m.file)+'\')">Subscribe and open '+esc(m.title)+' &rarr;</button>'+
-      '<p class="free-note">Not ready to subscribe? <a href="'+FREE_MODEL_FILE+'">Should I Buy This?</a> is always free.</p>';
-  }
-
-  el.innerHTML =
-    '<div class="result-card">'+
-    '<div class="result-card-header">'+
-    '<span class="model-badge">'+esc(m.id)+'</span>'+
-    '<div><div class="model-name">'+esc(m.title)+'</div>'+
-    '<div class="model-tagline">'+esc(m.tagline)+'</div></div>'+
-    '</div>'+
-    '<div class="result-body">'+
-    '<p class="result-desc">'+esc(m.desc)+'</p>'+
-    actionHtml+
-    alsoHtml+
-    '<div>'+backBtn+'</div>'+
-    '</div></div>';
-}
-
-function showAlso(mid){
-  renderResult(mid, document.getElementById('finder'), true);
-  document.getElementById('bc').style.display = 'none';
-}
-
-function goBack(){
-  if(path.length) path.pop();
-  renderFinder();
-}
-
-function renderBreadcrumb(el){
-  if(!path.length){el.style.display='none';return;}
-  el.style.display='flex';
-  var html='<span class="bc-item" onclick="resetFinder()">Start</span>';
-  path.forEach(function(s,i){
-    html+='<span class="bc-sep">&#8250;</span>';
-    if(i<path.length-1) html+='<span class="bc-item" onclick="goToStep('+i+')">'+esc(s.title)+'</span>';
-    else html+='<span>'+esc(s.title)+'</span>';
-  });
-  el.innerHTML=html;
-}
-
-function goToStep(i){path=path.slice(0,i+1);renderFinder();}
-function resetFinder(){path=[];renderFinder();}
-
-/* ── ACTIONS ───────────────────────────────────────────────── */
-function openModel(modelFile) {
-  window.location.href = modelFile;
-}
-
-async function startCheckout(modelFile){
-  if(typeof CapPlanAuth!=='undefined'){
-    await CapPlanAuth.startCheckout(SUITE_ID, billing);
-    // After Stripe, success URL returns to model page directly (set in checkout worker)
-  }
-}
-
-function openFreeModel(){ window.location.href = FREE_MODEL_FILE; }
-function checkoutFromPricing(){ startCheckout(FREE_MODEL_FILE); }
-
-async function manageSubscription(){
-  if(typeof CapPlanAuth!=='undefined'){
-    await CapPlanAuth.openPortal();
-  }
-}
-
-async function signOut(){
-  if(typeof CapPlanAuth!=='undefined'){
-    await CapPlanAuth.logout();
-  }
-}
-
-function onBillingToggle(){
-  var chk = document.getElementById('billing-chk').checked;
-  billing = chk ? 'annual' : 'monthly';
-  document.getElementById('lbl-mo').classList.toggle('active', !chk);
-  document.getElementById('lbl-yr').classList.toggle('active', chk);
-  document.getElementById('suite-price').textContent = chk ? '$10' : '$12';
-  document.getElementById('suite-period').textContent = ' / month';
-  document.getElementById('suite-note').innerHTML = chk ? '$115 / year, billed annually' : '&nbsp;';
-}
-
-/* ── START ─────────────────────────────────────────────────── */
-initPage();
-</script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CapPlan · Personal</title>
-<style>
-:root {
-  --green:#2E7D52; --green-mid:#2A6B47; --green-warm:#3D8B5A; --green-soft:rgba(46,125,82,0.09);
-  --blue:#1B3F6E; --blue-soft:rgba(27,63,110,0.09);
-  --gold:#C9A84C;
-  --surface:#F7F8FA; --panel:#ffffff; --border:#E2E6EC;
-  --t1:#0F1D2E; --t2:#4A5568; --t3:#8A96A6;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--surface);color:var(--t1);line-height:1.5}
-a{color:inherit;text-decoration:none}
-
-/* HEADER */
-.site-header{position:sticky;top:0;z-index:100;background:var(--green);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;box-shadow:0 2px 8px rgba(0,0,0,0.18)}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-mark{width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:16px;font-weight:700;color:#fff}
-.logo-text{font-family:Georgia,serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.2px}
-.logo-sub{font-size:11px;color:rgba(255,255,255,0.65);font-weight:400;letter-spacing:0.5px;margin-top:1px}
-.hdr-right{display:flex;align-items:center;gap:16px}
-.hdr-back{font-size:13px;color:rgba(255,255,255,0.75);display:flex;align-items:center;gap:5px;transition:color 0.15s}
-.hdr-back:hover{color:#fff}
-/* Member header actions — hidden until auth check completes */
-.hdr-member{display:none;align-items:center;gap:12px}
-.hdr-member.visible{display:flex}
-.hdr-member-name{font-size:13px;color:rgba(255,255,255,0.85)}
-.hdr-manage-btn{font-size:13px;color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:5px 12px;transition:all 0.15s;background:none;cursor:pointer}
-.hdr-manage-btn:hover{color:#fff;border-color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.1)}
-.hdr-signout-btn{font-size:13px;color:rgba(255,255,255,0.55);background:none;border:none;cursor:pointer;padding:0;transition:color 0.15s}
-.hdr-signout-btn:hover{color:rgba(255,255,255,0.85)}
-
-/* MEMBER WELCOME BANNER — shown instead of edition banner for subscribers */
-.member-banner{display:none;background:var(--panel);border-bottom:2px solid var(--green);padding:24px 24px 20px}
-.member-banner.visible{display:block}
-.member-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.member-greeting h1{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--t1);margin-bottom:4px}
-.member-greeting p{font-size:14px;color:var(--t2)}
-.member-status{display:flex;align-items:center;gap:8px;background:rgba(46,125,82,0.07);border:1px solid rgba(46,125,82,0.18);border-radius:8px;padding:10px 16px}
-.member-status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
-.member-status-text{font-size:13px;color:var(--green-warm);font-weight:600}
-
-/* EDITION BANNER — shown for non-members */
-.edition-banner{background:var(--panel);border-bottom:1px solid var(--border);padding:28px 24px 24px}
-.edition-inner{max-width:900px;margin:0 auto}
-.edition-banner h1{font-family:Georgia,serif;font-size:26px;font-weight:700;color:var(--t1);margin-bottom:6px}
-.edition-banner .desc{font-size:15px;color:var(--t2);margin-bottom:14px}
-.pills{display:flex;flex-wrap:wrap;gap:8px}
-.pill{display:inline-block;padding:4px 12px;background:var(--green-soft);color:var(--green-warm);border:1px solid rgba(46,125,82,0.18);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:0.2px}
-
-/* FINDER */
-.finder-section{background:rgba(46,125,82,0.05);border-bottom:1px solid rgba(46,125,82,0.10);padding:40px 24px}
-.finder-inner{max-width:780px;margin:0 auto}
-.finder-headline{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--t1);margin-bottom:6px}
-.finder-sub{font-size:15px;color:var(--t2);margin-bottom:28px}
-.breadcrumb{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:var(--t3);flex-wrap:wrap}
-.bc-item{color:var(--green-warm);cursor:pointer}
-.bc-item:hover{text-decoration:underline}
-.bc-sep{color:var(--border)}
-
-/* STEP PANEL */
-.step-panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(46,125,82,0.07)}
-.step-header{background:var(--green);color:#fff;padding:18px 24px}
-.step-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:4px}
-.step-q{font-family:Georgia,serif;font-size:18px;font-weight:700}
-.step-sub{font-size:13px;color:rgba(255,255,255,0.75);margin-top:4px}
-.choices-list{padding:12px;display:flex;flex-direction:column;gap:8px}
-.choice-btn{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border:1.5px solid var(--border);border-radius:9px;background:var(--surface);cursor:pointer;text-align:left;transition:border-color 0.15s,background 0.15s,box-shadow 0.15s;width:100%}
-.choice-btn:hover{border-color:var(--green-warm);background:var(--green-soft);box-shadow:0 2px 8px rgba(46,125,82,0.09)}
-.choice-icon{font-size:22px;flex-shrink:0;margin-top:1px}
-.choice-title{font-size:15px;font-weight:600;color:var(--t1);display:block}
-.choice-desc{font-size:13px;color:var(--t2);margin-top:2px;display:block}
-
-/* RESULT CARD */
-.result-card{border-radius:12px;overflow:hidden;border:1.5px solid var(--border);box-shadow:0 4px 20px rgba(46,125,82,0.10);background:var(--panel)}
-.result-card-header{background:var(--green);color:#fff;padding:20px 24px;display:flex;align-items:flex-start;gap:14px}
-.model-badge{background:rgba(255,255,255,0.18);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;letter-spacing:0.5px;flex-shrink:0;margin-top:3px;font-family:system-ui,sans-serif}
-.model-name{font-family:Georgia,serif;font-size:20px;font-weight:700}
-.model-tagline{font-size:13px;color:rgba(255,255,255,0.80);margin-top:4px}
-.result-body{padding:22px 24px}
-.result-desc{font-size:15px;color:var(--t2);margin-bottom:20px;line-height:1.6}
-.suite-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(46,125,82,0.07);color:var(--green-warm);border:1px solid rgba(46,125,82,0.15);border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600;margin-bottom:16px}
-.suite-badge::before{content:'✓';font-weight:700}
-.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;border:none;width:100%;background:var(--green);color:#fff;box-shadow:0 4px 16px rgba(46,125,82,0.25);transition:filter 0.15s,transform 0.1s}
-.btn-primary:hover{filter:brightness(1.10);transform:translateY(-1px)}
-.free-note{text-align:center;font-size:13px;color:var(--t3);margin-top:12px}
-.free-note a{color:var(--green-warm);font-weight:600}
-.free-note a:hover{text-decoration:underline}
-.also-suite{margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
-.also-label{font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px}
-.also-chips{display:flex;flex-wrap:wrap;gap:8px}
-.also-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:13px;font-weight:500;background:var(--green-soft);color:var(--green-warm);border:1px solid rgba(46,125,82,0.18);cursor:pointer;transition:background 0.15s}
-.also-chip:hover{background:rgba(46,125,82,0.15)}
-.back-inline{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--t3);cursor:pointer;background:none;border:none;padding:0;margin-top:14px}
-.back-inline:hover{color:var(--green-warm)}
-
-/* DIVIDER */
-.divider{height:1px;background:var(--border)}
-
-/* PRICING */
-.pricing-section{background:var(--panel);padding:44px 24px}
-.pricing-inner{max-width:820px;margin:0 auto}
-.pricing-headline{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--t1);text-align:center;margin-bottom:6px}
-.pricing-sub{font-size:15px;color:var(--t2);text-align:center;margin-bottom:24px}
-.billing-toggle{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px}
-.toggle-label{font-size:14px;color:var(--t2);font-weight:500}
-.toggle-label.active{color:var(--t1);font-weight:700}
-.toggle-wrap{position:relative;width:48px;height:26px;cursor:pointer}
-.toggle-wrap input{opacity:0;width:0;height:0;position:absolute}
-.toggle-track{position:absolute;inset:0;border-radius:13px;background:#CBD5E0;transition:background 0.2s}
-.toggle-wrap input:checked + .toggle-track{background:var(--green)}
-.toggle-knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:transform 0.2s;pointer-events:none}
-.toggle-wrap input:checked ~ .toggle-knob{transform:translateX(22px)}
-.annual-badge{background:#ECFDF5;color:#166534;border:1px solid #BBF7D0;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700}
-.pricing-tiles{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-@media(max-width:620px){.pricing-tiles{grid-template-columns:1fr}}
-.tile{border:1.5px solid var(--border);border-radius:14px;padding:28px 24px;background:var(--surface);display:flex;flex-direction:column}
-.tile.featured{border-color:var(--green);background:var(--panel);box-shadow:0 4px 24px rgba(46,125,82,0.12);position:relative}
-.popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:3px 16px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap}
-.tile-tier{font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
-.tile-price{font-family:Georgia,serif;font-size:36px;font-weight:700;color:var(--t1)}
-.tile-period{font-size:14px;color:var(--t3)}
-.tile-note{font-size:13px;color:var(--t3);margin-bottom:18px;min-height:20px}
-.feat-list{list-style:none;margin-bottom:24px;flex:1;display:flex;flex-direction:column;gap:9px}
-.feat-list li{display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--t2)}
-.feat-list .chk{color:var(--green);font-weight:700;flex-shrink:0}
-.feat-name{font-weight:600;color:var(--t1)}
-.btn-tile{display:block;width:100%;padding:13px 20px;border-radius:8px;font-size:15px;font-weight:700;text-align:center;cursor:pointer;border:none;transition:filter 0.15s,transform 0.1s}
-.btn-tile.primary{background:var(--green);color:#fff;box-shadow:0 3px 12px rgba(46,125,82,0.22)}
-.btn-tile.primary:hover{filter:brightness(1.10);transform:translateY(-1px)}
-.btn-tile.secondary{background:var(--panel);color:var(--t2);border:1.5px solid var(--border)}
-.btn-tile.secondary:hover{border-color:var(--green-warm);color:var(--green-warm)}
-.free-forever{font-size:12px;color:var(--t3);text-align:center;margin-top:10px}
-
-/* FOOTER */
-.site-footer{background:#0F1D2E;padding:28px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.footer-brand{font-family:Georgia,serif;font-size:15px;font-weight:700;color:#fff}
-.footer-links{display:flex;gap:20px}
-.footer-links a{font-size:13px;color:rgba(255,255,255,0.5)}
-.footer-links a:hover{color:rgba(255,255,255,0.85)}
-.footer-copy{font-size:12px;color:rgba(255,255,255,0.35)}
-</style>
-</head>
-<body>
-
-<header class="site-header">
-  <div class="logo">
-    <div class="logo-mark">C</div>
-    <div>
-      <div class="logo-text">CapPlan</div>
-      <div class="logo-sub">Personal</div>
-    </div>
-  </div>
-  <div class="hdr-right">
-    <!-- Shown only for active subscribers -->
-    <div class="hdr-member" id="hdr-member">
-      <span class="hdr-member-name" id="hdr-member-name"></span>
-      <button class="hdr-manage-btn" onclick="manageSubscription()">Manage subscription</button>
-      <button class="hdr-signout-btn" onclick="signOut()">Sign out</button>
-    </div>
-    <!-- Shown for non-members -->
-    <a href="../index.html" class="hdr-back" id="hdr-back">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8.5 2L4 7l4.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Back to home
-    </a>
-  </div>
-</header>
-
-<!-- MEMBER WELCOME BANNER (subscribers only) -->
-<div class="member-banner" id="member-banner">
-  <div class="member-inner">
-    <div class="member-greeting">
-      <h1>Welcome back</h1>
-      <p>Use the finder below to open any model in your Personal Suite.</p>
-    </div>
-    <div class="member-status">
-      <div class="member-status-dot"></div>
-      <span class="member-status-text">Personal Suite — Active</span>
-    </div>
-  </div>
-</div>
-
-<!-- EDITION BANNER (non-members) -->
-<div class="edition-banner" id="edition-banner">
-  <div class="edition-inner">
-    <h1>CapPlan Personal</h1>
-    <p class="desc">Practical financial models for personal asset decisions — buying, replacing, leasing, selling, and negotiating. No financial background needed.</p>
-    <div class="pills">
-      <span class="pill">Buy vs. lease</span>
-      <span class="pill">Replacement timing</span>
-      <span class="pill">Negotiation tools</span>
-      <span class="pill">Works for any durable asset</span>
-    </div>
-  </div>
-</div>
-
-<div class="finder-section">
-  <div class="finder-inner">
-    <div class="finder-headline" id="finder-headline">Find your CapPlan model</div>
-    <p class="finder-sub" id="finder-sub">Answer a couple of questions to see exactly which model handles your decision — and what it does.</p>
-    <div id="bc" class="breadcrumb" style="display:none"></div>
-    <div id="finder" class="step-panel"></div>
-  </div>
-</div>
-
-<div class="divider" id="pricing-divider"></div>
-
-<div class="pricing-section" id="pricing-section">
-  <div class="pricing-inner">
-    <div class="pricing-headline">Simple, transparent pricing</div>
-    <p class="pricing-sub">Start free with the core model. Upgrade when you need the full suite.</p>
-
-    <div class="billing-toggle">
-      <span class="toggle-label active" id="lbl-mo">Monthly</span>
-      <label class="toggle-wrap">
-        <input type="checkbox" id="billing-chk" onchange="onBillingToggle()">
-        <div class="toggle-track"></div>
-        <div class="toggle-knob"></div>
-      </label>
-      <span class="toggle-label" id="lbl-yr">Annual &nbsp;<span class="annual-badge">Save $29/year</span></span>
-    </div>
-
-    <div class="pricing-tiles">
-      <div class="tile">
-        <div class="tile-tier">Starter</div>
-        <div><span class="tile-price">$0</span><span class="tile-period"> / always free</span></div>
-        <p class="tile-note">Always free &mdash; no card required</p>
-        <ul class="feat-list">
-          <li><span class="chk">&#10003;</span><span><span class="feat-name">Should I Buy This?</span><br><span style="font-size:12px;color:var(--t3)">Full NPV analysis for any personal asset purchase</span></span></li>
-        </ul>
-        <button class="btn-tile secondary" onclick="openFreeModel()">Open free model</button>
-        <p class="free-forever">Free forever &mdash; no trial, no expiry</p>
-      </div>
-
-      <div class="tile featured">
-        <span class="popular-badge">Most popular</span>
-        <div class="tile-tier">Full Suite</div>
-        <div><span class="tile-price" id="suite-price">$12</span><span class="tile-period" id="suite-period"> / month</span></div>
-        <p class="tile-note" id="suite-note">&nbsp;</p>
-        <ul class="feat-list">
-          <li><span class="chk">&#10003;</span><span><span class="feat-name">All 9 personal models</span></span></li>
-          <li><span class="chk">&#10003;</span><span>Buy, compare, replace, lease, sell &amp; negotiate</span></li>
-          <li><span class="chk">&#10003;</span><span>Works for cars, appliances, boats, equipment &amp; more</span></li>
-          <li><span class="chk">&#10003;</span><span>Built-in benefit &amp; value estimation wizards</span></li>
-          <li><span class="chk">&#10003;</span><span>Save &amp; revisit analyses</span></li>
-        </ul>
-        <button class="btn-tile primary" onclick="checkoutFromPricing()">Get Full Suite</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<footer class="site-footer">
-  <div class="footer-brand">CapPlan</div>
-  <div class="footer-links">
-    <a href="../index.html">Home</a>
-    <a href="#">Privacy</a>
-    <a href="#">Terms</a>
-    <a href="#">Support</a>
-  </div>
-  <div class="footer-copy">&copy; 2026 CapPlan. All rights reserved.</div>
+  <div class="ft-copy">&copy; 2026 CapPlan. All rights reserved.</div>
 </footer>
 
 <script src="../capplan-auth.js"></script>
 <script>
 var SUITE_ID = 'personal';
-var FREE_MODEL_FILE = 'personal1.html';
+var FREE_MODEL = 'personal1.html';
 var billing = 'monthly';
-var isMember = false; // set true after auth check confirms active subscription
+var isMember = false;
+var currentBrowserModel = null;
 
 var MODELS = {
-  P1:  {id:'P1',  file:'personal1.html',  title:'Should I Buy This?',             tagline:'Is buying this asset worth the money?',                                    desc:'You\'re thinking about buying something — a car, appliance, boat, solar panels, or other durable asset. This model works out whether the purchase makes financial sense given what you\'ll get from it and what it will be worth when you\'re done.', free:true,  also:['P2','P9','P13']},
-  P2:  {id:'P2',  file:'personal2.html',  title:'Which Option Should I Buy?',     tagline:'I\'m choosing between options — which is the better financial choice?',      desc:'You\'ve narrowed it down to two or more candidates and want to compare them financially. Which car gives you more value for money? Does the premium model pay for itself over the base model?', free:false, also:['P1','P3','P13']},
-  P3:  {id:'P3',  file:'personal3.html',  title:'Should I Replace What I Own?',   tagline:'My current asset is ageing — is it time to replace it?',                   desc:'You own something and it\'s getting old, expensive to run, or simply behind the times. This model compares the cost of keeping what you have against the financial case for replacing it.', free:false, also:['P4','P5','P1']},
-  P4:  {id:'P4',  file:'personal4.html',  title:'Which Replacement Is Best?',     tagline:'I\'m replacing something — which option makes the most sense?',            desc:'You\'ve decided to replace your current asset and want to compare the alternatives. Which new model is the better financial choice, accounting for what you\'ll get for your old one?', free:false, also:['P3','P5','P2']},
-  P5:  {id:'P5',  file:'personal5.html',  title:'When Should I Replace It?',      tagline:'My asset is still working — but when is the right time to replace it?',    desc:'You\'re not sure whether to replace now, next year, or in five years. This model finds the financially optimal replacement interval — the age at which the cost of keeping the asset per year is minimised.', free:false, also:['P3','P4','P1']},
-  P9:  {id:'P9',  file:'personal9.html',  title:'Should I Lease or Buy?',         tagline:'I can lease or buy — which costs less?',                                   desc:'Leasing and buying both get you the use of the asset, but the costs work very differently. This model works out which option is cheaper in present value terms, and — if leasing costs more but you need to lease anyway — exactly how much extra you\'re paying.', free:false, also:['P11','P1','P13']},
-  P11: {id:'P11', file:'personal11.html', title:'What Is This Lease Really Costing Me?', tagline:'What interest rate is the lessor really charging?',              desc:'Lease payments can look attractive without revealing the financing cost embedded in them. This model works out the effective interest rate in any lease offer, so you can compare it to what you\'d pay if you borrowed to buy instead.', free:false, also:['P9','P1','P13']},
-  P12: {id:'P12', file:'personal12.html', title:'What\'s the Least I Should Accept?', tagline:'I\'m selling something — what\'s the minimum price I should accept?', desc:'When selling an asset you\'ve owned and used, the minimum acceptable price depends on what you originally paid, how much use you\'ve had from it, and your target return. This model calculates that floor price.', free:false, also:['P13','P3','P1']},
-  P13: {id:'P13', file:'personal13.html', title:'What\'s the Most I Should Pay?', tagline:'I\'m buying something — what\'s the maximum I should pay?',               desc:'Rather than evaluating a given price, this model works backwards from your required return to calculate the highest price that still makes the purchase worthwhile. That number is your private walk-away point in any negotiation.', free:false, also:['P12','P1','P9']},
+  P1:{file:'personal1.html',title:'Should I Buy This?',tagline:'Is buying this asset worth the money?',desc:'Works out whether a personal purchase makes financial sense — car, appliance, solar, boat, or any durable asset. Includes a benefit estimation wizard and sensitivity analysis.',free:true,also:['P2','P9','P13'],features:['NPV calculation with benefit wizard','Sensitivity: how the answer changes with higher or lower benefits','"What would it take?" — minimum benefit to justify the purchase','Decision robustness indicator']},
+  P2:{file:'personal2.html',title:'Which Option Should I Buy?',tagline:'Which is the better financial choice?',desc:'Compares two or more options side by side. Which car gives more value for money? Does the premium model pay for itself over the base?',free:false,also:['P1','P3','P13'],features:['Side-by-side comparison of up to five alternatives','Identifies the highest net present value option','Benefit wizard for each alternative','Total cost of ownership alongside NPV']},
+  P3:{file:'personal3.html',title:'Should I Replace What I Own?',tagline:'Is it time to replace my current asset?',desc:'Compares the cost of keeping your ageing asset against the financial case for replacing it, accounting for current resale value.',free:false,also:['P4','P5','P1'],features:['Keep vs replace on a present value basis','Accounts for current resale value of what you own','O&M cost escalation — maintenance rises with age','Breakeven: how much replacement needs to save']},
+  P4:{file:'personal4.html',title:'Which Replacement Is Best?',tagline:'Which replacement option makes most sense?',desc:'Compares replacement alternatives side by side, accounting for the trade-in value of what you currently own.',free:false,also:['P3','P5','P2'],features:['Replacement analysis with multi-option comparison','Accounts for trade-in or resale value','Up to five replacement options compared','Sensitivity across all alternatives']},
+  P5:{file:'personal5.html',title:'When Should I Replace It?',tagline:'What is the financially optimal replacement year?',desc:"Finds the year that minimises your equivalent annual cost — the age at which the asset's total annual cost is lowest.",free:false,also:['P3','P4','P1'],features:['Year-by-year equivalent annual cost for every holding period','Identifies the financially optimal replacement age','Pre-loaded O&M defaults for vehicles, appliances, HVAC and more','Shows where you are on the cost curve']},
+  P9:{file:'personal9.html',title:'Should I Lease or Buy?',tagline:'Which costs less in present value terms?',desc:'Compares total cost of leasing versus buying in today\'s dollars. Calculates the implied interest rate in the lease and your break-even payment.',free:false,also:['P11','P1','P13'],features:['Total cost of leasing vs buying in present value','Works for any asset: car, equipment, appliance','Break-even lease payment where leasing becomes cheaper','Monthly equivalent of the leasing premium']},
+  P11:{file:'personal11.html',title:'What Is This Lease Really Costing Me?',tagline:'What interest rate is embedded in my lease?',desc:'Calculates the effective financing rate hidden in a lease offer, so you can compare it to what you\'d pay borrowing to buy.',free:false,also:['P9','P1','P13'],features:['Implied interest rate in any lease structure','Compares to your available borrowing rate','Clear decision: borrow and buy, or accept the lease','Sensitivity: how the rate changes at different payments']},
+  P12:{file:'personal12.html',title:"What's the Least I Should Accept?",tagline:'What is the minimum selling price I should accept?',desc:"When selling an asset you've owned and used, your price floor depends on what you paid, the value you've had from it, and your required return.",free:false,also:['P13','P3','P1'],features:['Minimum selling price to earn your target return','Accounts for the value already received','Price floor vs age: how minimum changes over time','Sensitivity to required return assumption']},
+  P13:{file:'personal13.html',title:"What's the Most I Should Pay?",tagline:'What is the maximum price worth paying?',desc:'Works backwards from your required return to calculate the highest price that still makes the purchase worthwhile — your walk-away point in any negotiation.',free:false,also:['P12','P1','P9'],features:['Maximum price that earns your target return','Benefit wizard to build realistic estimates','Negotiation range: maximum at target vs ceiling at 0%','Sensitivity to benefit levels and required return']},
 };
 
 var TREE = {
-  root: {q:'What kind of decision are you facing?', sub:'Tell us what\'s on your mind and we\'ll point you to the right model.', choices:[
-    {icon:'🛒', title:'Buying or acquiring something',      desc:'A car, appliance, boat, equipment, or other asset you\'re considering purchasing', next:'buying'},
-    {icon:'🔧', title:'Something I already own',            desc:'An asset I have now — deciding whether to replace it, or figuring out when to',    next:'owning'},
-    {icon:'📋', title:'I am considering a lease',           desc:'Comparing lease vs buying, or understanding what a lease offer is really costing', next:'leasing'},
-    {icon:'💰', title:'Negotiating a price',                desc:'Working out what to accept when selling, or the maximum I should pay when buying', next:'negotiating'},
+  root:{step:1,label:"What's on your mind?",q:'What kind of decision are you facing?',choices:[
+    {icon:'🛒',title:'Buying or acquiring something',desc:"A car, appliance, boat, equipment, or other asset I'm considering purchasing",next:'buying'},
+    {icon:'🔧',title:'Something I already own',desc:'An asset I have now — deciding whether to replace it, or figuring out when to',next:'owning'},
+    {icon:'📋',title:'I am considering a lease',desc:'Comparing lease vs buying, or understanding what a lease offer is really costing',next:'leasing'},
+    {icon:'💰',title:'Negotiating a price',desc:'Working out what to accept when selling, or the maximum I should pay when buying',next:'negotiating'},
   ]},
-  buying: {q:'Are you comparing options, or evaluating one specific thing?', choices:[
-    {icon:'🎯', title:'Evaluating one specific asset',      desc:'I have one thing in mind and want to know if buying it makes financial sense',    next:'P1'},
-    {icon:'⚖️', title:'Comparing two or more options',     desc:'I\'m deciding between alternatives — which one is the better financial choice?',   next:'P2'},
-    {icon:'🤝', title:'Negotiating the purchase price',    desc:'I want to know the maximum I should pay before entering negotiations',             next:'P13'},
+  buying:{step:2,label:'Buying something',q:'Are you comparing options, or evaluating one specific thing?',choices:[
+    {icon:'🎯',title:'Evaluating one specific asset',desc:"I have one thing in mind and want to know if buying it makes financial sense",next:'P1'},
+    {icon:'⚖️',title:'Comparing two or more options',desc:"I'm deciding between alternatives — which one is the better financial choice?",next:'P2'},
+    {icon:'🤝',title:'Negotiating the purchase price',desc:'I want to know the maximum I should pay before entering negotiations',next:'P13'},
   ]},
-  owning: {q:'What are you trying to decide about the asset you own?', choices:[
-    {icon:'🔄', title:'Whether to replace it now',         desc:'It\'s getting old or costly — should I replace it, or keep it going?',            next:'replacing'},
-    {icon:'📅', title:'When to replace it',                desc:'I know I\'ll replace it eventually — what\'s the financially optimal time?',       next:'P5'},
-    {icon:'💵', title:'What to sell it for',               desc:'I\'m planning to sell and want to know the minimum price I should accept',         next:'P12'},
+  owning:{step:2,label:'Something I already own',q:'What are you trying to decide about the asset you own?',choices:[
+    {icon:'🔄',title:'Whether to replace it now',desc:"It's getting old or costly — should I replace it, or keep it going?",next:'replacing'},
+    {icon:'📅',title:'When to replace it',desc:"I know I'll replace it eventually — but what's the financially optimal time?",next:'P5'},
+    {icon:'💵',title:'What to sell it for',desc:"I'm planning to sell and want to know the minimum price I should accept",next:'P12'},
   ]},
-  replacing: {q:'Do you have a specific replacement in mind, or are you comparing options?', choices:[
-    {icon:'🔁', title:'One specific replacement',          desc:'I know what I\'d replace it with — I just need to know if the switch makes sense', next:'P3'},
-    {icon:'📊', title:'Comparing replacement options',     desc:'I have several candidates for the replacement and want to pick the best one',      next:'P4'},
+  replacing:{step:3,label:'Replacing what I own',q:'Do you have a specific replacement in mind, or comparing options?',choices:[
+    {icon:'🔁',title:'One specific replacement',desc:"I know what I'd replace it with — I just need to know if the switch makes sense",next:'P3'},
+    {icon:'📊',title:'Comparing replacement options',desc:'I have several candidates for the replacement and want to pick the best one',next:'P4'},
   ]},
-  leasing: {q:'What do you want to know about the lease?', choices:[
-    {icon:'⚖️', title:'Lease vs buying — which costs less?',      desc:'I can do either — I want to know which option is cheaper overall',              next:'P9'},
-    {icon:'🔍', title:'What this lease is really costing me',     desc:'I have a lease offer and want to know the effective interest rate embedded in it', next:'P11'},
+  leasing:{step:2,label:'A lease',q:'What do you want to know about the lease?',choices:[
+    {icon:'⚖️',title:'Lease vs buying — which costs less?',desc:'I can do either — I want to know which option is cheaper overall',next:'P9'},
+    {icon:'🔍',title:'What this lease is really costing me',desc:'I have a lease offer and want to know the effective interest rate embedded in it',next:'P11'},
   ]},
-  negotiating: {q:'Are you on the buying side or the selling side?', choices:[
-    {icon:'💵', title:'I\'m selling — what\'s my minimum?',  desc:'What\'s the floor price I should accept to earn a fair return on my investment?', next:'P12'},
-    {icon:'🏷️', title:'I\'m buying — what\'s my maximum?', desc:'What\'s the highest price I should pay before walking away?',                      next:'P13'},
+  negotiating:{step:2,label:'Negotiating a price',q:'Are you on the buying side or the selling side?',choices:[
+    {icon:'💵',title:"I'm selling — what's my minimum?",desc:"What's the floor price I should accept to earn a fair return on my investment?",next:'P12'},
+    {icon:'🏷️',title:"I'm buying — what's my maximum?",desc:"What's the highest price I should pay before walking away?",next:'P13'},
   ]},
 };
 
-var path = [];
+var PATH = [];
+var CURRENT = 'root';
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-/* ── AUTH INIT ─────────────────────────────────────────────── */
-async function initPage() {
-  if (typeof CapPlanAuth === 'undefined') { renderFinder(); return; }
-
-  try {
-    var suites = await CapPlanAuth.getActiveSuites(); // returns array or null
-
-    if (suites && suites.includes('personal')) {
-      // ── MEMBER MODE ──
-      isMember = true;
-
-      // Header
-      document.getElementById('hdr-member').classList.add('visible');
-      document.getElementById('hdr-back').style.display = 'none';
-      var displayName = await CapPlanAuth.getDisplayName();
-      if (displayName) document.getElementById('hdr-member-name').textContent = displayName;
-
-      // Banners
-      document.getElementById('member-banner').classList.add('visible');
-      document.getElementById('edition-banner').style.display = 'none';
-
-      // Finder copy
-      document.getElementById('finder-headline').textContent = 'Open a model';
-      document.getElementById('finder-sub').textContent = 'Choose a decision type and open the model — your subscription covers all nine.';
-
-      // Hide pricing
-      document.getElementById('pricing-section').style.display = 'none';
-      document.getElementById('pricing-divider').style.display = 'none';
+/* ── AUTH ─────────────────────────────────────── */
+async function initPage(){
+  if(typeof CapPlanAuth==='undefined'){render();return;}
+  try{
+    var suites=await CapPlanAuth.getActiveSuites();
+    if(suites && suites.includes('personal')){
+      isMember=true;
+      document.getElementById('hdr-member').classList.add('vis');
+      document.getElementById('hdr-signin').style.display='none';
+      document.getElementById('hdr-trial').style.display='none';
+      document.getElementById('hdr-back').style.display='none';
+      var name=await CapPlanAuth.getDisplayName();
+      if(name) document.getElementById('hdr-mname').textContent=name;
+      document.getElementById('mbr-banner').classList.add('vis');
+      document.getElementById('hero-section').style.display='none';
+      document.getElementById('finder-title').textContent='Open a model';
+      document.getElementById('finder-sub').textContent='Choose a decision type to open the right model — your subscription covers all 9.';
+      document.getElementById('trial-card').style.display='none';
+      document.getElementById('pricing-card').style.display='none';
     }
-    // else: not logged in or no personal subscription — keep default marketing view
-  } catch(e) {
-    console.warn('initPage error:', e);
-  }
-
-  renderFinder();
+  }catch(e){console.warn('initPage:',e);}
+  render();
 }
 
-/* ── FINDER RENDER ─────────────────────────────────────────── */
-function renderFinder(){
-  var nodeKey = path.length ? path[path.length-1].next : 'root';
-  var bcEl = document.getElementById('bc');
-  var panelEl = document.getElementById('finder');
+/* ── FINDER RENDER ────────────────────────────── */
+function render(){
+  renderSteps();
+  renderBC();
+  var isResult = typeof CURRENT==='string' && MODELS[CURRENT];
+  document.getElementById('start-over').style.display = PATH.length>0?'block':'none';
+  if(isResult) renderResult(MODELS[CURRENT]);
+  else renderQuestion(TREE[CURRENT]);
+}
 
-  renderBreadcrumb(bcEl);
+function renderSteps(){
+  var steps=[{label:"What's on your mind?"},{label:'Narrow it down'},{label:'Your model'}];
+  var currentStep = PATH.length===0 ? 1 : MODELS[CURRENT] ? 3 : (TREE[CURRENT]&&TREE[CURRENT].step>=3?3:2);
+  if(CURRENT==='replacing') currentStep=3;
+  document.getElementById('step-track').innerHTML=steps.map(function(s,i){
+    var n=i+1;
+    var cls=n<currentStep?'done':n===currentStep?'active':'';
+    var icon=n<currentStep?'✓':String(n);
+    return (i>0?'<div class="st-sep"></div>':'')
+      +'<div class="st '+cls+'"><div class="st-num">'+icon+'</div>'+s.label+'</div>';
+  }).join('');
+}
 
-  if(MODELS[nodeKey]){
-    renderResult(nodeKey, panelEl, false);
-    return;
-  }
-  var node = TREE[nodeKey];
-  if(!node) return;
+function renderBC(){
+  var bc=document.getElementById('bc');
+  if(PATH.length===0){bc.innerHTML='';return;}
+  var parts=['<span class="bc-item" onclick="restart()">Home</span>'];
+  PATH.forEach(function(step,i){
+    var node=TREE[step.nodeId];
+    var choice=node.choices[step.choiceIdx];
+    parts.push('<span class="bc-sep">&rsaquo;</span>');
+    if(i<PATH.length-1) parts.push('<span class="bc-item" onclick="goBack('+i+')">'+esc(choice.title)+'</span>');
+    else parts.push('<span>'+esc(choice.title)+'</span>');
+  });
+  bc.innerHTML=parts.join('');
+}
 
-  var stepNum = path.length + 1;
-  var html = '<div class="step-header">';
-  html += '<div class="step-label">Step '+stepNum+'</div>';
-  html += '<div class="step-q">'+esc(node.q)+'</div>';
-  if(node.sub) html += '<div class="step-sub">'+esc(node.sub)+'</div>';
-  html += '</div><div class="choices-list">';
+function renderQuestion(node){
+  if(!node)return;
+  var html='<div class="q-card"><div class="q-hdr">'
+    +'<div class="q-label">'+esc(node.label)+'</div>'
+    +'<div class="q-text">'+esc(node.q)+'</div>'
+    +'</div><div class="q-choices">';
   node.choices.forEach(function(c,i){
-    html += '<button class="choice-btn" onclick="pick('+i+')">';
-    html += '<span class="choice-icon">'+c.icon+'</span>';
-    html += '<span><span class="choice-title">'+esc(c.title)+'</span>';
-    html += '<span class="choice-desc">'+esc(c.desc)+'</span></span>';
-    html += '</button>';
+    html+='<button class="choice-btn" onclick="choose(\''+node.id||CURRENT+'\','+i+',\''+c.next+'\')">'
+      +'<span class="ch-icon">'+c.icon+'</span>'
+      +'<span><span class="ch-title">'+esc(c.title)+'</span><span class="ch-desc">'+esc(c.desc)+'</span></span>'
+      +'</button>';
   });
-  html += '</div>';
-  panelEl.innerHTML = html;
+  html+='</div></div>';
+  document.getElementById('finder-panel').innerHTML=html;
 }
 
-function pick(i){
-  var nodeKey = path.length ? path[path.length-1].next : 'root';
-  var c = TREE[nodeKey].choices[i];
-  path.push({title:c.title, next:c.next});
-  renderFinder();
-}
-
-function renderResult(mid, el, isAlso){
-  var m = MODELS[mid];
-  var alsoHtml = '';
-  if(m.also && m.also.length){
-    alsoHtml = '<div class="also-suite"><div class="also-label">Also in Full Suite</div><div class="also-chips">';
-    m.also.forEach(function(aid){
-      var am = MODELS[aid];
-      if(am) alsoHtml += '<button class="also-chip" onclick="showAlso(\''+aid+'\')">'+esc(am.title)+'</button>';
+function renderResult(model){
+  var html='<div class="result-card"><div class="result-head">'
+    +'<div class="result-title">'+esc(model.title);
+  if(model.free) html+='<span class="free-badge">&#10022; Free</span>';
+  html+='</div><div class="result-tagline">'+esc(model.tagline)+'</div></div>';
+  html+='<div class="result-body"><p class="result-desc">'+esc(model.desc)+'</p>';
+  if(model.features&&model.features.length){
+    html+='<div class="result-feat-label">What this model does</div><div class="result-feats">';
+    model.features.forEach(function(f){
+      html+='<div class="result-feat"><div class="feat-chk">&#10003;</div><span>'+esc(f)+'</span></div>';
     });
-    alsoHtml += '</div></div>';
+    html+='</div>';
   }
-  var backBtn = isAlso
-    ? '<button class="back-inline" onclick="renderFinder()">&#8592; Back to my result</button>'
-    : '<button class="back-inline" onclick="goBack()">&#8592; Different decision</button>';
-
   var actionHtml;
-  if (m.free) {
-    // Free model — always just open it
-    actionHtml = '<button class="btn-primary" onclick="openFreeModel()">Open free model &rarr;</button>';
-  } else if (isMember) {
-    // Subscriber — open directly, no Stripe
-    actionHtml = '<button class="btn-primary" onclick="openModel(\''+esc(m.file)+'\')">Open '+esc(m.title)+' &rarr;</button>';
-  } else {
-    // Non-subscriber — show subscribe CTA
-    actionHtml =
-      '<div class="suite-badge">This model is included in Full Suite</div><br>'+
-      '<button class="btn-primary" onclick="startCheckout(\''+esc(m.file)+'\')">Subscribe and open '+esc(m.title)+' &rarr;</button>'+
-      '<p class="free-note">Not ready to subscribe? <a href="'+FREE_MODEL_FILE+'">Should I Buy This?</a> is always free.</p>';
+  if(model.free){
+    actionHtml='<button class="btn-open" onclick="openModel(\''+esc(model.file)+'\')">Open free model &rarr;</button>';
+  }else if(isMember){
+    actionHtml='<button class="btn-open" onclick="openModel(\''+esc(model.file)+'\')">Open '+esc(model.title)+' &rarr;</button>';
+  }else{
+    actionHtml='<div class="suite-incl">Included in Full Suite</div>'
+      +'<button class="btn-subscribe" onclick="startCheckout(\''+esc(model.file)+'\')">Subscribe and open &rarr;</button>'
+      +'<p class="result-free-note">Or try <a href="'+FREE_MODEL+'">"Should I Buy This?"</a> free — no sign-up needed.</p>';
   }
-
-  el.innerHTML =
-    '<div class="result-card">'+
-    '<div class="result-card-header">'+
-    '<span class="model-badge">'+esc(m.id)+'</span>'+
-    '<div><div class="model-name">'+esc(m.title)+'</div>'+
-    '<div class="model-tagline">'+esc(m.tagline)+'</div></div>'+
-    '</div>'+
-    '<div class="result-body">'+
-    '<p class="result-desc">'+esc(m.desc)+'</p>'+
-    actionHtml+
-    alsoHtml+
-    '<div>'+backBtn+'</div>'+
-    '</div></div>';
+  html+=actionHtml;
+  if(model.also&&model.also.length){
+    html+='<div class="also-wrap"><div class="also-label">Also worth considering</div><div class="also-chips">';
+    model.also.forEach(function(mid){
+      var am=MODELS[mid];
+      if(am) html+='<button class="also-chip" onclick="showModel(\''+mid+'\')">'+esc(am.title)+'</button>';
+    });
+    html+='</div></div>';
+  }
+  html+='<button class="back-link" onclick="restart()">&#8592; Start over</button>';
+  html+='</div></div>';
+  document.getElementById('finder-panel').innerHTML=html;
 }
 
-function showAlso(mid){
-  renderResult(mid, document.getElementById('finder'), true);
-  document.getElementById('bc').style.display = 'none';
+/* ── NAVIGATION ───────────────────────────────── */
+function choose(nodeId,choiceIdx,next){
+  PATH.push({nodeId:CURRENT,choiceIdx:choiceIdx});
+  CURRENT=next;
+  render();
+  document.getElementById('finder-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-function goBack(){
-  if(path.length) path.pop();
-  renderFinder();
+function goBack(pathIdx){
+  if(pathIdx===undefined){if(PATH.length)PATH.pop();}
+  else{PATH=PATH.slice(0,pathIdx);}
+  CURRENT=PATH.length===0?'root':(function(){
+    var prev=PATH[PATH.length-1];
+    return TREE[prev.nodeId].choices[prev.choiceIdx].next;
+  })();
+  render();
 }
 
-function renderBreadcrumb(el){
-  if(!path.length){el.style.display='none';return;}
-  el.style.display='flex';
-  var html='<span class="bc-item" onclick="resetFinder()">Start</span>';
-  path.forEach(function(s,i){
-    html+='<span class="bc-sep">&#8250;</span>';
-    if(i<path.length-1) html+='<span class="bc-item" onclick="goToStep('+i+')">'+esc(s.title)+'</span>';
-    else html+='<span>'+esc(s.title)+'</span>';
-  });
-  el.innerHTML=html;
+function restart(){PATH=[];CURRENT='root';render();}
+
+function showModel(modelId){
+  CURRENT=modelId;
+  renderResult(MODELS[modelId]);
 }
 
-function goToStep(i){path=path.slice(0,i+1);renderFinder();}
-function resetFinder(){path=[];renderFinder();}
-
-/* ── ACTIONS ───────────────────────────────────────────────── */
-function openModel(modelFile) {
-  window.location.href = modelFile;
+/* ── MODEL BROWSER ────────────────────────────── */
+function onModelSelect(mid){
+  currentBrowserModel=mid;
+  var preview=document.getElementById('mb-preview');
+  var detail=document.getElementById('mb-detail');
+  if(!mid){preview.classList.remove('show');detail.style.display='none';return;}
+  var m=MODELS[mid];
+  if(!m)return;
+  preview.classList.add('show');
+  detail.style.display='block';
+  document.getElementById('mbp-title').textContent=m.title;
+  document.getElementById('mbp-tagline').textContent=m.tagline;
+  document.getElementById('mbp-desc').textContent=m.desc;
+  var btn=document.getElementById('mbp-btn');
+  var freeNote=document.getElementById('mbp-free');
+  if(m.free){
+    btn.textContent='Open free model →';
+    btn.className='mbp-btn';
+    freeNote.textContent='Free forever — no sign-up needed';
+  }else if(isMember){
+    btn.textContent='Open '+m.title+' →';
+    btn.className='mbp-btn';
+    freeNote.textContent='';
+  }else{
+    btn.textContent='Subscribe and open →';
+    btn.className='mbp-btn sub';
+    freeNote.textContent='Included in Full Suite — 2-week free trial available';
+  }
 }
+
+function openFromBrowser(){
+  if(!currentBrowserModel)return;
+  var m=MODELS[currentBrowserModel];
+  if(!m)return;
+  if(m.free||isMember) openModel(m.file);
+  else startCheckout(m.file);
+}
+
+/* ── ACTIONS ──────────────────────────────────── */
+function openModel(f){window.location.href=f;}
+function openFreeModel(){openModel(FREE_MODEL);}
 
 async function startCheckout(modelFile){
   if(typeof CapPlanAuth!=='undefined'){
-    await CapPlanAuth.startCheckout(SUITE_ID, billing);
-    // After Stripe, success URL returns to model page directly (set in checkout worker)
+    await CapPlanAuth.startCheckout(SUITE_ID,billing);
+    if(modelFile) window.location.href=modelFile;
   }
 }
+function checkoutFromPricing(){startCheckout(null);}
 
-function openFreeModel(){ window.location.href = FREE_MODEL_FILE; }
-function checkoutFromPricing(){ startCheckout(FREE_MODEL_FILE); }
+async function startTrial(){
+  if(typeof CapPlanAuth!=='undefined') await CapPlanAuth.startTrial(SUITE_ID);
+  else alert('Trial sign-up — Auth0 would open here.');
+}
+
+async function signIn(){
+  if(typeof CapPlanAuth!=='undefined') await CapPlanAuth.login();
+  else alert('Sign-in — Auth0 would open here.');
+}
 
 async function manageSubscription(){
-  if(typeof CapPlanAuth!=='undefined'){
-    await CapPlanAuth.openPortal();
-  }
+  if(typeof CapPlanAuth!=='undefined') await CapPlanAuth.openPortal();
 }
 
 async function signOut(){
-  if(typeof CapPlanAuth!=='undefined'){
-    await CapPlanAuth.logout();
-  }
+  if(typeof CapPlanAuth!=='undefined') await CapPlanAuth.logout();
 }
 
 function onBillingToggle(){
-  var chk = document.getElementById('billing-chk').checked;
-  billing = chk ? 'annual' : 'monthly';
-  document.getElementById('lbl-mo').classList.toggle('active', !chk);
-  document.getElementById('lbl-yr').classList.toggle('active', chk);
-  document.getElementById('suite-price').textContent = chk ? '$10' : '$12';
-  document.getElementById('suite-period').textContent = ' / month';
-  document.getElementById('suite-note').innerHTML = chk ? '$115 / year, billed annually' : '&nbsp;';
+  var chk=document.getElementById('billing-tog').checked;
+  billing=chk?'annual':'monthly';
+  document.getElementById('tog-mo').classList.toggle('active',!chk);
+  document.getElementById('tog-yr').classList.toggle('active',chk);
+  document.getElementById('pc-price').textContent=chk?'$10':'$12';
+  document.getElementById('pc-period').textContent='/month';
+  document.getElementById('pc-note').innerHTML=chk?'$120 billed annually':'&nbsp;';
 }
 
-/* ── START ─────────────────────────────────────────────────── */
 initPage();
 </script>
 </body>
