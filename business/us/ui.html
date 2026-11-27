@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapPlan — Business Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --navy:#1B3F6E;--navy-mid:#2A5298;--navy-deep:#0F2545;--navy-soft:rgba(27,63,110,0.08);
+  --surface:#F5F7FA;--panel:#ffffff;--border:#E2E6EC;
+  --t1:#0F1D2E;--t2:#4A5568;--t3:#8A96A6;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--surface);color:var(--t1);font-size:15px;line-height:1.5}
+
+/* ── HEADER ── */
+.hdr{background:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:58px;box-shadow:0 2px 10px rgba(0,0,0,0.20);position:sticky;top:0;z-index:100}
+.hdr-left{display:flex;align-items:center;gap:14px}
+.hdr-mark{width:34px;height:34px;background:rgba(255,255,255,0.13);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:17px;color:#fff;font-weight:700}
+.hdr-brand{font-family:'Playfair Display',serif;font-size:17px;color:#fff}
+.hdr-pill{font-size:11px;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.75);border-radius:4px;padding:2px 8px;font-weight:600;letter-spacing:0.3px}
+.hdr-right{display:flex;align-items:center;gap:14px}
+.hdr-user{font-size:13px;color:rgba(255,255,255,0.75)}
+.hdr-manage{font-size:13px;color:rgba(255,255,255,0.70);border:1.5px solid rgba(255,255,255,0.28);border-radius:6px;padding:5px 13px;cursor:pointer;background:none}
+.hdr-manage:hover{background:rgba(255,255,255,0.08)}
+.hdr-signout{font-size:13px;color:rgba(255,255,255,0.40);background:none;border:none;cursor:pointer}
+.hdr-signout:hover{color:rgba(255,255,255,0.65)}
+/* unauthenticated state */
+.hdr-signin{font-size:13px;font-weight:600;color:#fff;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:6px;padding:5px 14px;cursor:pointer}
+.hdr-signin:hover{background:rgba(255,255,255,0.22)}
+#hdr-auth{display:none}
+
+/* ── WELCOME BAR ── */
+.welcome{background:var(--panel);border-bottom:2px solid var(--navy);padding:16px 28px}
+.welcome-inner{max-width:1120px;margin:0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.welcome-text h2{font-family:'Playfair Display',serif;font-size:19px;color:var(--t1);margin-bottom:3px}
+.welcome-text p{font-size:13px;color:var(--t2);max-width:520px;line-height:1.5}
+.welcome-badge{flex-shrink:0;display:flex;align-items:center;gap:7px;background:var(--navy-soft);border:1px solid rgba(27,63,110,0.18);border-radius:7px;padding:9px 14px;font-size:13px;color:var(--navy-mid);font-weight:600;white-space:nowrap}
+.badge-dot{width:7px;height:7px;border-radius:50%;background:var(--navy)}
+
+/* unauthenticated welcome */
+.welcome-unauth{display:none}
+.welcome-unauth h2{font-family:'Playfair Display',serif;font-size:19px;color:var(--t1);margin-bottom:3px}
+.welcome-unauth p{font-size:13px;color:var(--t2)}
+
+/* ── MAIN GRID ── */
+.wrap{max-width:1120px;margin:0 auto;padding:28px 24px 56px;display:grid;grid-template-columns:1fr 420px;gap:22px;align-items:start}
+
+/* ── CARDS ── */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(27,63,110,0.07)}
+
+/* ── TABS ── */
+.tab-bar{display:flex;border-bottom:1px solid var(--border)}
+.tab{flex:1;padding:13px 16px;font-size:13px;font-weight:600;color:var(--t3);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .12s,border-color .12s}
+.tab.active{color:var(--navy);border-bottom-color:var(--navy)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ── PANEL HEADERS ── */
+.pane-hd{background:linear-gradient(135deg,var(--navy-deep),var(--navy));padding:18px 24px}
+.pane-hd h2{font-family:'Playfair Display',serif;font-size:18px;color:#fff;margin-bottom:3px}
+.pane-hd p{font-size:12px;color:rgba(255,255,255,0.65)}
+
+/* ── FINDER ── */
+.finder-body{padding:20px 24px}
+.steps{display:flex;align-items:center;margin-bottom:16px}
+.stp{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:14px;font-size:11px;font-weight:600;color:var(--t3);white-space:nowrap}
+.stp.active{background:var(--navy);color:#fff}
+.stp.done{color:var(--navy-mid)}
+.stp-n{width:17px;height:17px;border-radius:50%;background:rgba(0,0,0,0.07);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0}
+.stp.active .stp-n{background:rgba(255,255,255,0.2)}
+.stp.done .stp-n{background:var(--navy-soft);color:var(--navy-mid)}
+.stp-sep{flex:1;height:1px;background:var(--border);max-width:28px;margin:0 2px}
+
+.q-wrap{border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
+.q-top{background:var(--navy-soft);border-bottom:1px solid var(--border);padding:12px 15px}
+.q-step-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--navy-mid);margin-bottom:3px}
+.q-text{font-family:'Playfair Display',serif;font-size:15px;color:var(--t1)}
+.q-choices{padding:8px;display:flex;flex-direction:column;gap:5px}
+.choice{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;text-align:left;width:100%;transition:border-color .13s,background .13s;font-family:inherit}
+.choice:hover{border-color:var(--navy-mid);background:var(--navy-soft)}
+.ch-ico{font-size:18px;flex-shrink:0;margin-top:1px}
+.ch-ttl{font-size:13px;font-weight:600;color:var(--t1);display:block;margin-bottom:1px}
+.ch-dsc{font-size:11px;color:var(--t2);display:block}
+
+/* back link */
+.q-back{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t3);cursor:pointer;background:none;border:none;padding:0 0 10px 0;font-family:inherit}
+.q-back:hover{color:var(--navy-mid)}
+
+/* result card */
+.result-card{border:1.5px solid var(--navy);border-radius:10px;overflow:hidden}
+.result-hd{background:var(--navy);padding:14px 16px}
+.result-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:rgba(255,255,255,0.6);margin-bottom:3px}
+.result-title{font-family:'Playfair Display',serif;font-size:17px;color:#fff}
+.result-body{padding:14px 16px}
+.result-tag{font-size:12px;font-style:italic;color:var(--t2);margin-bottom:8px}
+.result-desc{font-size:13px;color:var(--t2);line-height:1.55;margin-bottom:14px}
+.result-btn{display:block;width:100%;padding:11px;background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none}
+.result-btn:hover{background:var(--navy-mid)}
+.result-also{margin-top:12px}
+.result-also-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:7px}
+.also-items{display:flex;flex-direction:column;gap:5px}
+.also-item{display:flex;align-items:center;justify-content:space-between;padding:7px 11px;border:1px solid var(--border);border-radius:7px;background:var(--surface);cursor:pointer;font-family:inherit}
+.also-item:hover{border-color:var(--navy-mid);background:var(--navy-soft)}
+.also-name{font-size:12px;font-weight:600;color:var(--t1)}
+.also-arr{font-size:12px;color:var(--t3)}
+
+/* ── BROWSER ── */
+.browser-body{padding:18px 20px}
+.sel-wrap{position:relative;margin-bottom:14px}
+.sel{width:100%;padding:11px 34px 11px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--t1);appearance:none;cursor:pointer}
+.sel:focus{outline:none;border-color:var(--navy-mid)}
+.sel-caret{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--t3)}
+.preview{border:1.5px solid var(--border);border-radius:9px;overflow:hidden}
+.prev-hd{background:var(--navy-soft);border-bottom:1px solid var(--border);padding:12px 15px}
+.prev-title{font-weight:700;font-size:14px;color:var(--t1);margin-bottom:3px}
+.prev-tag{font-size:12px;color:var(--t2);font-style:italic}
+.prev-body{padding:14px 15px}
+.prev-desc{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:14px}
+.prev-open{display:block;width:100%;padding:11px;background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none}
+.prev-open:hover{background:var(--navy-mid)}
+.prev-placeholder{padding:28px 15px;text-align:center;color:var(--t3);font-size:13px}
+.free-tag{font-size:10px;font-weight:700;background:#FFFBEB;color:#92400E;border:1px solid #F59E0B;border-radius:4px;padding:1px 6px;margin-left:7px;vertical-align:middle}
+
+/* ── ABOUT ── */
+.about-body{padding:18px 20px;font-size:13px;color:var(--t2);line-height:1.65}
+.about-body p{margin-bottom:12px}
+.about-body p:last-child{margin-bottom:0}
+.about-body strong{color:var(--t1)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-mark">C</div>
+    <div class="hdr-brand">CapPlan</div>
+    <span class="hdr-pill">Business · US Edition</span>
+  </div>
+  <div class="hdr-right" id="hdr-auth">
+    <span class="hdr-user" id="hdr-name"></span>
+    <button class="hdr-manage" onclick="manageSubscription()">Manage subscription</button>
+    <button class="hdr-signout" onclick="signOut()">Sign out</button>
+  </div>
+  <div class="hdr-right" id="hdr-guest">
+    <button class="hdr-signin" onclick="signIn()">Sign in</button>
+  </div>
+</header>
+
+<!-- WELCOME BAR -->
+<div class="welcome">
+  <div class="welcome-inner" id="welcome-auth" style="display:none">
+    <div class="welcome-text">
+      <h2>Your models are ready</h2>
+      <p>Use the finder to match a model to your decision, or browse the full list and open one directly.</p>
+    </div>
+    <div class="welcome-badge">
+      <div class="badge-dot"></div>
+      <span id="badge-label">Business Suite · US Edition — Active</span>
+    </div>
+  </div>
+  <div class="welcome-inner" id="welcome-guest">
+    <div class="welcome-unauth" style="display:block">
+      <h2>CapPlan Business — US Edition</h2>
+      <p>Sign in to access your models, or <a href="../../index.html" style="color:var(--navy);font-weight:600">start a free trial</a> to get started.</p>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="wrap">
+
+  <!-- LEFT: FINDER -->
+  <div class="card">
+    <div class="pane-hd">
+      <h2>Find your model</h2>
+      <p>Answer two questions to get to the right model for your decision.</p>
+    </div>
+    <div class="finder-body">
+      <div class="steps" id="steps">
+        <div class="stp active" id="stp1"><div class="stp-n">1</div> Decision type</div>
+        <div class="stp-sep"></div>
+        <div class="stp" id="stp2"><div class="stp-n">2</div> Narrow down</div>
+        <div class="stp-sep"></div>
+        <div class="stp" id="stp3"><div class="stp-n">3</div> Your model</div>
+      </div>
+      <div id="finder-content"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: TABBED PANEL -->
+  <div class="card">
+    <div class="tab-bar">
+      <button class="tab active" id="tab-btn-browser" onclick="switchTab(this,'browser')">Browse all models</button>
+      <button class="tab" id="tab-btn-about" onclick="switchTab(this,'about')">About this suite</button>
+    </div>
+
+    <!-- BROWSE TAB -->
+    <div id="tab-browser" class="tab-panel active">
+      <div class="pane-hd">
+        <h2>Browse all models</h2>
+        <p>Know what you need? Select a model to see what it does, then open it.</p>
+      </div>
+      <div class="browser-body">
+        <div class="sel-wrap">
+          <select class="sel" id="modelSel" onchange="updatePreview()">
+            <option value="">Select a model…</option>
+            <option value="UM1">Asset Purchase Analysis</option>
+            <option value="UM2">Which Option?</option>
+            <option value="UM3">Replace This Asset?</option>
+            <option value="UM4">Which Replacement?</option>
+            <option value="UM5">Optimal Replacement Year</option>
+            <option value="UM6">Minimum Lease Payment</option>
+            <option value="UM7">Minimum Hourly Rate</option>
+            <option value="UM8">Minimum Tender Price</option>
+            <option value="UM9">Lease vs Purchase</option>
+            <option value="UM10">Sale and Leaseback</option>
+            <option value="UM11">Implied Cost of Leasing</option>
+            <option value="UM12">Minimum Selling Price</option>
+            <option value="UM13">Maximum Purchase Price</option>
+          </select>
+          <svg class="sel-caret" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M3 5l3.5 3.5L10 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div id="preview-area">
+          <div class="prev-placeholder">Select a model above to see details.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT TAB -->
+    <div id="tab-about" class="tab-panel">
+      <div class="pane-hd">
+        <h2>About this suite</h2>
+        <p>What's included and how it works.</p>
+      </div>
+      <div class="about-body">
+        <p><strong>13 models covering every major capital decision.</strong> Each model is built for one specific decision type — no guesswork, no general-purpose spreadsheet.</p>
+        <p><strong>US tax-aware throughout.</strong> Every model that involves depreciation uses MACRS (Modified Accelerated Cost Recovery System), with full support for bonus depreciation and Section 179 expensing.</p>
+        <p><strong>Asset Purchase Analysis is free permanently.</strong> It is always available, with or without a subscription.</p>
+        <p><strong>Your data stays with you.</strong> All calculations run in your browser. Nothing is sent to our servers.</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script src="../../capplan-auth.js"></script>
+<script>
+// ── MODEL DATA ──────────────────────────────────────────────────────────────
+var MODELS = {
+  UM1:{file:'us_model1.html',title:'Asset Purchase Analysis',free:true,
+    tagline:'Does this capital investment meet our required return?',
+    desc:'Full investment appraisal using MACRS depreciation: NPV, benefit-cost ratio, IRR, and payback. Bonus depreciation and Section 179 fully supported.',
+    also:['UM2','UM12','UM13']},
+  UM2:{file:'us_model2.html',title:'Which Option?',free:false,
+    tagline:'Which asset option delivers the best return on investment?',
+    desc:'Compares multiple options on NPV using MACRS depreciation. Bonus depreciation and Section 179 can be applied per option.',
+    also:['UM1','UM4']},
+  UM3:{file:'us_model3.html',title:'Replace This Asset?',free:false,
+    tagline:'Does replacing this asset now make financial sense?',
+    desc:'Calculates the NPV of replacing an existing asset, accounting for MACRS shields on the new asset and recapture tax on the old one.',
+    also:['UM4','UM5']},
+  UM4:{file:'us_model4.html',title:'Which Replacement?',free:false,
+    tagline:'Which replacement option gives us the best financial outcome?',
+    desc:'Compares multiple MACRS-depreciated replacement options against your current asset on an NPV basis.',
+    also:['UM3','UM5']},
+  UM5:{file:'us_model5.html',title:'Optimal Replacement Year',free:false,
+    tagline:'What is the optimal year to replace this asset?',
+    desc:'Finds the year that minimises equivalent annual cost for a MACRS-depreciated asset, balancing declining capital cost against rising operating cost.',
+    also:['UM3','UM4']},
+  UM6:{file:'us_model6.html',title:'Minimum Lease Payment',free:false,
+    tagline:'What is the minimum lease payment that covers our costs?',
+    desc:"Calculates the minimum annual lease payment that recovers the lessor's cost including MACRS tax shields at a target return.",
+    also:['UM7','UM8']},
+  UM7:{file:'us_model7.html',title:'Minimum Hourly Rate',free:false,
+    tagline:'What is the minimum rate we need to charge per hour?',
+    desc:'Calculates the minimum charge-out rate per hour to recover the cost of a MACRS asset at a target return, including operating costs.',
+    also:['UM6','UM8']},
+  UM8:{file:'us_model8.html',title:'Minimum Tender Price',free:false,
+    tagline:'What is the minimum we should quote on this contract?',
+    desc:'Calculates the minimum contract price for work performed with a MACRS asset, ensuring full cost recovery at a target return.',
+    also:['UM6','UM7']},
+  UM9:{file:'us_model9.html',title:'Lease vs Purchase',free:false,
+    tagline:'Should we lease or purchase this asset?',
+    desc:'Compares the after-tax present value of leasing versus purchasing using MACRS depreciation, and calculates the pre-tax implied lease rate.',
+    also:['UM10','UM11']},
+  UM10:{file:'us_model10.html',title:'Sale and Leaseback',free:false,
+    tagline:'Does selling and leasing back this asset make financial sense?',
+    desc:'Calculates whether a sale and leaseback creates value, accounting for forfeited MACRS shields and leaseback obligations.',
+    also:['UM9','UM11']},
+  UM11:{file:'us_model11.html',title:'Implied Cost of Leasing',free:false,
+    tagline:'What is this lease actually costing us as a financing rate?',
+    desc:'Finds the pre-tax financing rate embedded in the lease by comparing lease cash flows to the MACRS purchase alternative.',
+    also:['UM9','UM10']},
+  UM12:{file:'us_model12.html',title:'Minimum Selling Price',free:false,
+    tagline:'What is the minimum we should accept if we sell this asset?',
+    desc:"Calculates the minimum acceptable sale price for a MACRS asset you own, accounting for shields already claimed and your target return.",
+    also:['UM13','UM1']},
+  UM13:{file:'us_model13.html',title:'Maximum Purchase Price',free:false,
+    tagline:'What is the maximum we should pay for this asset?',
+    desc:'Calculates the maximum you should pay for a MACRS asset and earn your target return, using depreciation and salvage value analytically.',
+    also:['UM12','UM1']}
+};
+
+// ── FINDER TREE ─────────────────────────────────────────────────────────────
+var TREE = {
+  root:{step:1,q:'What kind of capital decision are you facing?',choices:[
+    {icon:'🛒',title:'Buying or acquiring an asset',desc:'Evaluating a purchase, comparing options, or working out the maximum you should pay',next:'buying'},
+    {icon:'🔄',title:'Replacing an asset we own',desc:'Deciding whether to replace, comparing replacements, or finding the optimal timing',next:'replacing'},
+    {icon:'📋',title:'Leasing — as lessee or lessor',desc:'Comparing lease vs buy, setting a lease rate, or finding out what a lease is costing us',next:'leasing'},
+    {icon:'💰',title:'Pricing our equipment or services',desc:'Setting a minimum hourly rate, tender price, or lease payment to recover our costs',next:'pricing'},
+    {icon:'🏷️',title:'Valuing an asset we own',desc:'Finding the minimum we should accept if selling, or the ceiling for what to pay',next:'valuing'}
+  ]},
+  buying:{step:2,q:'What best describes your situation?',choices:[
+    {icon:'✅',title:'Evaluating a single asset purchase',desc:'I want to know whether buying this specific asset makes financial sense',next:'R_UM1'},
+    {icon:'⚖️',title:'Comparing two or more options',desc:'I have several candidates and want to pick the one with the best financial return',next:'R_UM2'},
+    {icon:'💲',title:'Working out the maximum I should pay',desc:'I know what the asset will return — I want to find my price ceiling',next:'R_UM13'}
+  ]},
+  replacing:{step:2,q:'What best describes your situation?',choices:[
+    {icon:'🔁',title:'Should I replace now?',desc:'I want to know whether replacing my current asset is financially justified',next:'R_UM3'},
+    {icon:'🏆',title:'Which replacement is best?',desc:'I have multiple replacement options and want to pick the highest NPV',next:'R_UM4'},
+    {icon:'📅',title:'When is the right time to replace?',desc:'I want to find the year that minimises my total annual cost of ownership',next:'R_UM5'}
+  ]},
+  leasing:{step:2,q:'What best describes your situation?',choices:[
+    {icon:'⚖️',title:'Lease vs buy — which is cheaper?',desc:'I am deciding whether to lease or purchase and want to compare total cost',next:'R_UM9'},
+    {icon:'🏦',title:'Should I sell and lease back?',desc:'I am considering releasing capital by selling and leasing back an asset I own',next:'R_UM10'},
+    {icon:'📊',title:'What is my lease costing me?',desc:'I want to find the effective financing rate embedded in my current lease',next:'R_UM11'}
+  ]},
+  pricing:{step:2,q:'What best describes your situation?',choices:[
+    {icon:'📝',title:'Minimum lease payment',desc:'I own an asset and want to lease it out — what is the minimum I need to charge?',next:'R_UM6'},
+    {icon:'🕐',title:'Minimum hourly rate',desc:'I rent out equipment by the hour — what is the minimum rate to recover costs?',next:'R_UM7'},
+    {icon:'📄',title:'Minimum tender price',desc:'I am quoting on a contract — what is my cost floor?',next:'R_UM8'}
+  ]},
+  valuing:{step:2,q:'What best describes your situation?',choices:[
+    {icon:'🔻',title:'Minimum selling price',desc:'I want to sell an asset I own — what is the lowest price I should accept?',next:'R_UM12'},
+    {icon:'🔺',title:'Maximum purchase price',desc:'I am buying — what is the highest price I should pay to earn my target return?',next:'R_UM13'}
+  ]}
+};
+
+// ── FINDER STATE ─────────────────────────────────────────────────────────────
+var PATH = [];   // e.g. ['buying']
+var CURRENT = 'root';
+
+function renderFinder() {
+  var isResult = typeof CURRENT === 'string' && CURRENT.startsWith('R_');
+  if (isResult) {
+    renderResult(CURRENT.slice(2));
+    return;
+  }
+  var node = TREE[CURRENT];
+  var step = node ? node.step : 1;
+
+  // step indicators
+  ['stp1','stp2','stp3'].forEach(function(id,i){
+    var el = document.getElementById(id);
+    el.classList.remove('active','done');
+    if (i+1 === step) el.classList.add('active');
+    else if (i+1 < step) el.classList.add('done');
+  });
+
+  var html = '';
+  if (PATH.length > 0) {
+    html += '<button class="q-back" onclick="goBack()">← Back</button>';
+  }
+  html += '<div class="q-wrap">';
+  html += '<div class="q-top">';
+  html += '<div class="q-step-label">Step ' + step + ' of 2 — ' + (step===1?'Decision type':'Narrow down') + '</div>';
+  html += '<div class="q-text">' + esc(node.q) + '</div>';
+  html += '</div>';
+  html += '<div class="q-choices">';
+  node.choices.forEach(function(c){
+    html += '<button class="choice" onclick="choose(' + JSON.stringify(c.next) + ')">';
+    html += '<span class="ch-ico">' + c.icon + '</span>';
+    html += '<span><span class="ch-ttl">' + esc(c.title) + '</span>';
+    html += '<span class="ch-dsc">' + esc(c.desc) + '</span></span>';
+    html += '</button>';
+  });
+  html += '</div></div>';
+  document.getElementById('finder-content').innerHTML = html;
+}
+
+function renderResult(mid) {
+  var m = MODELS[mid];
+  if (!m) return;
+  // step 3 active
+  ['stp1','stp2','stp3'].forEach(function(id,i){
+    var el = document.getElementById(id);
+    el.classList.remove('active','done');
+    if (i < 2) el.classList.add('done'); else el.classList.add('active');
+  });
+  var freeTag = m.free ? ' <span class="free-tag">Free</span>' : '';
+  var alsoHtml = '';
+  if (m.also && m.also.length) {
+    alsoHtml += '<div class="result-also"><div class="result-also-label">Also consider</div><div class="also-items">';
+    m.also.forEach(function(aid){
+      var am = MODELS[aid];
+      if (!am) return;
+      alsoHtml += '<div class="also-item" onclick="openModel(' + JSON.stringify(am.file) + ')">';
+      alsoHtml += '<span class="also-name">' + esc(am.title) + '</span>';
+      alsoHtml += '<span class="also-arr">→</span></div>';
+    });
+    alsoHtml += '</div></div>';
+  }
+  var html = '<button class="q-back" onclick="goBack()">← Back</button>';
+  html += '<div class="result-card">';
+  html += '<div class="result-hd"><div class="result-label">Your model</div>';
+  html += '<div class="result-title">' + esc(m.title) + freeTag + '</div></div>';
+  html += '<div class="result-body">';
+  html += '<div class="result-tag">' + esc(m.tagline) + '</div>';
+  html += '<div class="result-desc">' + esc(m.desc) + '</div>';
+  html += '<a class="result-btn" href="' + m.file + '">Open model →</a>';
+  html += alsoHtml;
+  html += '</div></div>';
+  document.getElementById('finder-content').innerHTML = html;
+}
+
+function choose(next) {
+  PATH.push(CURRENT);
+  CURRENT = next;
+  renderFinder();
+}
+
+function goBack() {
+  if (PATH.length === 0) return;
+  CURRENT = PATH.pop();
+  renderFinder();
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── BROWSER ─────────────────────────────────────────────────────────────────
+function updatePreview() {
+  var key = document.getElementById('modelSel').value;
+  var area = document.getElementById('preview-area');
+  if (!key) {
+    area.innerHTML = '<div class="prev-placeholder">Select a model above to see details.</div>';
+    return;
+  }
+  var m = MODELS[key];
+  var freeTag = m.free ? ' <span class="free-tag">Free</span>' : '';
+  area.innerHTML =
+    '<div class="preview">' +
+      '<div class="prev-hd">' +
+        '<div class="prev-title">' + esc(m.title) + freeTag + '</div>' +
+        '<div class="prev-tag">' + esc(m.tagline) + '</div>' +
+      '</div>' +
+      '<div class="prev-body">' +
+        '<div class="prev-desc">' + esc(m.desc) + '</div>' +
+        '<a class="prev-open" href="' + m.file + '">Open model →</a>' +
+      '</div>' +
+    '</div>';
+}
+
+function openModel(file) {
+  window.location.href = file;
+}
+
+// ── TABS ────────────────────────────────────────────────────────────────────
+function switchTab(btn, id) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+}
+
+// ── AUTH ────────────────────────────────────────────────────────────────────
+async function signIn() {
+  if (typeof CapPlanAuth !== 'undefined') await CapPlanAuth.login();
+}
+async function signOut() {
+  if (typeof CapPlanAuth !== 'undefined') await CapPlanAuth.logout();
+}
+async function manageSubscription() {
+  if (typeof CapPlanAuth !== 'undefined') await CapPlanAuth.openPortal();
+}
+
+(async function init() {
+  renderFinder();
+  if (typeof CapPlanAuth === 'undefined') return;
+  try {
+    var suites = await CapPlanAuth.getActiveSuites();
+    if (suites && suites.includes('business_us')) {
+      // authenticated subscriber
+      document.getElementById('hdr-auth').style.display = 'flex';
+      document.getElementById('hdr-guest').style.display = 'none';
+      document.getElementById('welcome-auth').style.display = 'flex';
+      document.getElementById('welcome-guest').style.display = 'none';
+      var name = await CapPlanAuth.getDisplayName();
+      if (name) document.getElementById('hdr-name').textContent = 'Welcome, ' + name;
+    } else {
+      // not authenticated or not subscribed — show guest state
+      document.getElementById('hdr-auth').style.display = 'none';
+      document.getElementById('hdr-guest').style.display = 'flex';
+      document.getElementById('welcome-auth').style.display = 'none';
+      document.getElementById('welcome-guest').style.display = 'flex';
+    }
+  } catch(e) {
+    // fall through to guest state
+  }
+})();
+</script>
+</body>
+</html>
